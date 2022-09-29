@@ -12,17 +12,22 @@ jobs:
     strategy:
           matrix:
             node-version: [14.x, 16.x, 18.x]
-            
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checking out Code
+        uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-      - run: npm run install --if-present
-      - run: npm run lint
-      - run: npm run test --if-present
-      - run: npm run build
+      - name: Install Dependencies
+        run: npm run install --if-present
+      - name: Linting Code
+        run: npm run lint
+      - name: Testing Code
+        run: npm run test --if-present
+      - name: Building Code
+        run: npm run build
       
           
