@@ -8,8 +8,10 @@ on:
       - main
 jobs:
   Build:
-    
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./app
 
     strategy:
           matrix:
@@ -22,14 +24,23 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          cache: "npm"
+          cache-dependency-path: ./app/package-lock.json
       - name: Install Dependencies
-        run: npm run install --if-present
+        run: npm ci
       - name: Linting Code
         run: npm run lint
       - name: Testing Code
         run: npm run test --if-present
       - name: Building Code
         run: npm run build
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET}}
+          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
+          COGNITO_CLIENT_ID: ${{ secrets.COGNITO_CLIENT_ID }}
+          COGNITO_CLIENT_SECRET: ${{ secrets.COGNITO_CLIENT_SECRET }}
+          COGNITO_ISSUER: ${{ secrets.COGNITO_ISSUER }}
+
       
           
