@@ -42,7 +42,7 @@ You should now be able run the project
 
 `npm run dev` => Runs the development server  
 `npm run test` => Runs the test suite  
-`npm run lint` => Runs the linter
+`npm run lint` => Runs the linter  
 `npm run build` => Runs the build command
 
 ## Troubleshooting
