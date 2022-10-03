@@ -15,6 +15,26 @@
 6. Type `Remote Containers: Open Folder in Container`
 7. Select the option
 8. Open the repository you cloned with the file selection window
+9. Create a file in the app folder called `.env` with the following values:
+
+```
+# Note that not all variables here might be in use for your selected configuration
+# When adding additional env variables, the schema in /env/schema.mjs should be updated accordingly
+
+# Prisma
+DATABASE_URL=postgresql://postgres:posgres@localhost
+
+# Next Auth
+NEXTAUTH_SECRET=<enter a secure key here>
+NEXTAUTH_URL=http://localhost:3000
+
+# Next Auth Cognito
+COGNITO_CLIENT_ID=<replace with actual cognito id>
+COGNITO_CLIENT_SECRET=<replace with actual cognito secret>
+COGNITO_ISSUER=<replace with cognito issuer>
+```
+
+10. While in the app folder run `npm ci`
 
 You should now be able run the project
 

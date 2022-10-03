@@ -10,6 +10,7 @@ const Home: NextPage = () => {
         <meta name="description" content="Homepage of the roommate budget helper application" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <div className="body"></div>
     </>
   );
 };
