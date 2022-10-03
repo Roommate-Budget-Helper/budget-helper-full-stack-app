@@ -6,7 +6,7 @@
     - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
     - [VSCode](https://code.visualstudio.com/)
 2. Clone the repository using the following command  
-   `git clone git@github.com:Roommate-Budget-Helper/budget-helper-backend.git` - Note if you do not have SSH key setup for GitHub, follow this guide before running the above command: [Adding SSH key to GitHub](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)
+   `git clone git@github.com:Roommate-Budget-Helper/budget-helper-webui.git` - Note if you do not have SSH key setup for GitHub, follow this guide before running the above command: [Adding SSH key to GitHub](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)
 3. Open VSCode
 4. Make sure you have the following extensions installed:
     - Docker
