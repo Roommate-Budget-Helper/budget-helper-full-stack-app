@@ -1,6 +1,7 @@
 import Button from "@components/button";
 import FieldInput from "@components/fieldinput";
 import type { NextPage } from "next";
+import Link from "next/link";
 import Head from "next/head";
 import React, { useState } from "react";
 
@@ -46,9 +47,18 @@ const LoginPage: NextPage = () => {
                     type="button" />
             </div>
             <div className="actions">
-                <p>Don't have an account?</p>
-                <p>Forgot your password?</p>
-
+                <p>Don't have an account? &nbsp;
+                    <Link href="#"> 
+                        <a className="text-evergreen-80">Sign Up</a>
+                    </Link>
+                </p>
+                <p>Forgot your password? &nbsp;
+                    <Link href="#">
+                        <a className="text-evergreen-80">
+                            Reset
+                        </a>
+                     </Link>
+                </p>
             </div>
         </div>
     </>);
