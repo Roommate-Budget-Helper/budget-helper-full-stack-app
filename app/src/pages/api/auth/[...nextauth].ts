@@ -35,7 +35,6 @@ export const authOptions: NextAuthOptions = {
                 token.id = user.id;
                 token.user = user;
             }
-            console.log("token", token);
             return token;
         },
     },
