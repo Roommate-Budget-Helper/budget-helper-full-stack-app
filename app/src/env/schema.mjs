@@ -12,7 +12,10 @@ export const serverSchema = z.object({
     NEXTAUTH_URL: z.string().url(),
     COGNITO_CLIENT_ID: z.string(),
     COGNITO_CLIENT_SECRET: z.string(),
+    COGNITO_USER_POOL: z.string(),
     COGNITO_ISSUER: z.string(),
+    GOOGLE_CLIENT_ID: z.string(),
+    GOOGLE_CLIENT_SECRET: z.string(),
 });
 
 /**
