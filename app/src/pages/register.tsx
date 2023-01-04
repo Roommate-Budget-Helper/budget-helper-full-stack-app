@@ -3,14 +3,21 @@ import FieldInput from "@components/fieldinput";
 import type { NextPage } from "next";
 import Head from "next/head";
 import React, { useState } from "react";
-import { signIn, useSession, signOut } from "next-auth/react";
 import { trpc } from "utils/trpc";
 
-const LoginPage: NextPage = () => {
-    const session = useSession();
+const RegisterPage: NextPage = () => {
     const [errorState, setError] = useState(false);
-    const { data: list, refetch } = trpc.useQuery(["findAll"]);
-    console.log(list);
+    const { data: usernameResult, refetch } = trpc.useQuery([
+        "auth.validateUsername",
+        { username: "test" },
+    ]);
+    // const { data: userResult, refetch } = trpc.useQuery(["auth.findUsername"]);
+    console.log(usernameResult);
+    if (usernameResult?.name) {
+    } else {
+        console.log("No user with this result");
+    }
+    // console.log(userResult);
 
     // const onSignup = async (event: React.FormEvent<HTMLFormElement>) => {
     //     event.preventDefault();
@@ -83,4 +90,4 @@ const LoginPage: NextPage = () => {
     );
 };
 
-export default LoginPage;
+export default RegisterPage;
