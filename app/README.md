@@ -46,7 +46,10 @@ You should now be able run the project
 `npm run dev` => Runs the development server  
 `npm run test` => Runs the test suite  
 `npm run lint` => Runs the linter  
-`npm run build` => Runs the build command
+`npm run build` => Runs the build command  
+`npx prisma generate` => Rebuilds the prisma client for accessing the database from typescript  
+`npx prisma db push` => Synchronize the database with the prisma schema  
+`npx prisma studio` => Opens prisma studio for debugging
 
 ## Troubleshooting
 
