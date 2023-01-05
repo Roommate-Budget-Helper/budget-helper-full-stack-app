@@ -2,36 +2,42 @@ import Button from "@components/button";
 import FieldInput from "@components/fieldinput";
 import type { NextPage } from "next";
 import Head from "next/head";
-import React, { useState } from "react";
 import { trpc } from "utils/trpc";
+import { signIn } from "next-auth/react";
 
 const RegisterPage: NextPage = () => {
-    const [errorState, setError] = useState(false);
-    const { data: usernameResult, refetch } = trpc.useQuery([
-        "auth.validateUsername",
-        { username: "test" },
-    ]);
-    // const { data: userResult, refetch } = trpc.useQuery(["auth.findUsername"]);
-    console.log(usernameResult);
-    if (usernameResult?.name) {
-    } else {
-        console.log("No user with this result");
-    }
-    // console.log(userResult);
+    const createUser = trpc.useMutation(["auth.createUser"], {
+        onError: (error) => {
+            console.log(error);
+        },
+        onSuccess: () => {
+            console.log("User created successfully");
+            // Login the user
+            // signIn("credentials", {});
+        },
+    });
 
-    // const onSignup = async (event: React.FormEvent<HTMLFormElement>) => {
-    //     event.preventDefault();
-    //     const form = event.target as HTMLFormElement;
+    const onRegister = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const form = event.target as HTMLFormElement;
+        const username = form.elements["username"].value;
+        const email = form.elements["email"].value;
+        const password = form.elements["password"].value;
+        const confirmPassword = form.elements["confirmPassword"].value;
 
-    //     await register("credentials", {
-    //         email: form.elements["email"].value,
-    //         username: form.elements["username"].value,
-    //         password: form.elements["password"].value,
-    //         redirect: false,
-    //     }).then((res) => {
-    //         setError(!res?.ok);
-    //     });
-    // };
+        if (password !== confirmPassword) {
+            alert("Password fields do not match");
+            return;
+        }
+
+        // TODO: Handle errors that come from the server when creating a user account with trpc
+        // ex. username already exists, email already exists, password not long enough, etc.
+        createUser.mutate({
+            email: email,
+            username: username,
+            password: password,
+        });
+    };
 
     return (
         <>
@@ -56,7 +62,12 @@ const RegisterPage: NextPage = () => {
                         account!
                     </p>
                 </div>
-                <form method="post">
+                {createUser.error && (
+                    <p className="text-xl font-light text-red-600">
+                        Something went wrong! {createUser.error?.message}
+                    </p>
+                )}
+                <form method="post" onSubmit={onRegister}>
                     <div className="form-area flex flex-col justify-between items-center ">
                         <FieldInput
                             type="text"
@@ -75,7 +86,7 @@ const RegisterPage: NextPage = () => {
                         />
                         <FieldInput
                             type="password"
-                            name="confirm password"
+                            name="confirmPassword"
                             placeholder="Confirm Password"
                         />
                         <Button

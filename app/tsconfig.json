@@ -15,6 +15,7 @@
         "jsx": "preserve",
         "incremental": true,
         "noUncheckedIndexedAccess": true,
+        "suppressImplicitAnyIndexErrors": true,
         "baseUrl": "./src",
         "paths": {
             "@components/*": ["components/*"]
