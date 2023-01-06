@@ -1,10 +1,16 @@
 import { createRouter } from "./context";
 import { z } from "zod";
 import {
+    CognitoUser,
     CognitoUserAttribute,
     CognitoUserPool,
 } from "amazon-cognito-identity-js";
 import { env } from "../../env/server.mjs";
+
+const userPool = new CognitoUserPool({
+    ClientId: env.COGNITO_CLIENT_ID,
+    UserPoolId: env.COGNITO_USER_POOL,
+});
 
 export const registerRouter = createRouter()
     .mutation("createUser", {
@@ -14,11 +20,6 @@ export const registerRouter = createRouter()
             password: z.string(),
         }),
         async resolve({ ctx, input }) {
-            const userPool = new CognitoUserPool({
-                ClientId: env.COGNITO_CLIENT_ID,
-                UserPoolId: env.COGNITO_USER_POOL,
-            });
-
             // return the user object and send errors back to the client if there are any for adding a new user to the user pool
             return userPool.signUp(
                 input.username,
@@ -48,6 +49,26 @@ export const registerRouter = createRouter()
                 }
             );
         },
+    })
+    .mutation("verifyEmailCode", {
+        input: z.object({
+            username: z.string(),
+            code: z.string(),
+        }),
+        async resolve({ input }){
+            const userData = {
+                Username: input.username,
+                Pool: userPool
+            }
+            const cognitoUser = new CognitoUser(userData);
+            cognitoUser.confirmRegistration(input.code, true, function(err, result){
+                if(err){
+                    //handle error 
+                    console.error(err);
+                }
+                console.log(result);
+            })
+        }
     })
     .query("validateEmail", {
         // check if email already exists
