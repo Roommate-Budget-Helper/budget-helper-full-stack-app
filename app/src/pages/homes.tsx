@@ -1,3 +1,5 @@
+import Button from "@components/button";
+import FieldInput from "@components/fieldinput";
 import type { NextPage } from "next";
 import Head from "next/head";
 import React from "react";
@@ -7,10 +9,30 @@ const HomesPage: NextPage = () => {
 
     const viewHome = async () => {
         
+        const createHome = async (event: React.FormEvent<HTMLFormElement>) => {
+            event.preventDefault();
+            const form = (event.target as HTMLFormElement);
+    
+            // await createHome("credentials", {
+            //     image: form.elements["image"].value,
+            //     name: form.elements["name"].value,
+            //     location: form.elements["location"].value,
+            //     User[]: form.elements["users"].value,
+            //     redirect: false
+            // }).then(res => {
+            //     setError(!res?.ok);
+            // })
+        }
+
         const body = document.getElementById("core");
         if(body != null) {
-            body.innerHTML = 
-            "<div id='homeName'>Home 1</div> <div id='address'>Insert Address Here!</div>";
+            body.innerHTML = "<div>Create Home</div><br></br><form method='post' onSubmit={createHome}>" +
+                "<div><Image src='/images/apartment.png' alt='Home' width='50px' height='50px' /> Upload Home Avatar</div>" +
+                "<FieldInput type='text' name='name' placeholder='Home Name' /> <br></br>" + 
+                "<FieldInput type='text' name='address' placeholder='Location' /> <br></br>" +
+                "<FieldInput type='text' name='address' placeholder='' /> <br></br>" +
+                "<Button classNames='bg-evergreen-80 text-dorian' value='' type='submit' /> <br></br> </form>";
+            // "<div id='homeName'>Home 1</div> <div id='address'>Insert Address Here!</div>";
         }
         
     }
@@ -32,7 +54,7 @@ const HomesPage: NextPage = () => {
             </div>
             <div id ="core">
                 <div className="form-area flex flex-col justify-between items-center ">
-                    <div>Welcome to Roomate Budget Helper 👋</div>
+                    <div id="top">Welcome to Roomate Budget Helper <a>👋</a></div>
                     <div className="center"><Image src="/images/logo.png" alt="Home" width="100px" height="100px" /></div>
                     <div>You do not currently belong to any homes...</div>
                     <br></br>

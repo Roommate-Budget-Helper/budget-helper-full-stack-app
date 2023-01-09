@@ -41,5 +41,27 @@
   }
 
   #core{
-    font-size: large;
+    font-size: larger;
+    padding: 20px;
+  }
+
+  #top {
+    padding: 20px;
+  }
+
+  #top a{
+    font-size: 50px;
+  }
+
+  /* This allows the phone sized css to be defined */
+  @media (max-width: 480px) {
+    .topnav {
+      overflow: hidden;
+      border-bottom-left-radius: 15%;
+      border-bottom-right-radius: 15%;
+      padding: 15px;
+      bottom: 0%;
+      position: fixed;
+      width: 100%;
+    }
   }
