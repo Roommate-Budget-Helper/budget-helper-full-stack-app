@@ -43,6 +43,12 @@ model User {
   sessions      Session[]
 }
 
+model Home {
+  id    String  @id @default(cuid())
+  name  String
+  image String?
+}
+
 model VerificationToken {
   identifier String
   token      String   @unique
