@@ -72,12 +72,12 @@ const LoginPage: NextPage = () => {
             </div>
             <div className="actions">
                 <p>Don&apos;t have an account? &nbsp;
-                    <Link href="#"> 
+                    <Link href="register"> 
                         <a className="text-evergreen-80">Sign Up</a>
                     </Link>
                 </p>
                 <p>Forgot your password? &nbsp;
-                    <Link href="#">
+                    <Link href="forgot_password">
                         <a className="text-evergreen-80">
                             Reset
                         </a>
