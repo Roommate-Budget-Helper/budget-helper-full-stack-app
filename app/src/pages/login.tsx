@@ -1,5 +1,5 @@
 import Button from "@components/button";
-import FieldInput from "@components/fieldinput";
+import { ClearableFieldInput, VisibilityFieldInput } from "@components/fieldinput";
 import type { NextPage } from "next";
 import Link from "next/link";
 import Head from "next/head";
@@ -13,7 +13,6 @@ const LoginPage: NextPage = () => {
     const onLogin = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const form = (event.target as HTMLFormElement);
-
         await signIn("credentials", {
             username: form.elements["username"].value,
             password: form.elements["password"].value,
@@ -43,12 +42,11 @@ const LoginPage: NextPage = () => {
             </div>
             <form method="post" onSubmit={onLogin}>
                 <div className="form-area flex flex-col justify-between items-center ">
-                    <FieldInput
+                    <ClearableFieldInput
                         type="text"
                         name="username"
                         placeholder="Username or Email" />
-                     <FieldInput
-                        type="password"
+                     <VisibilityFieldInput
                         name="password"
                         placeholder="Password" />
                     <Button
