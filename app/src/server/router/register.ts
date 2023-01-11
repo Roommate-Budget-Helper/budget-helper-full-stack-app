@@ -41,6 +41,7 @@ export const registerRouter = createRouter()
                     if (result) {
                         return ctx.prisma.user.create({
                             data: {
+                                id: result.userSub,
                                 email: input.email,
                                 name: input.username,
                             },
