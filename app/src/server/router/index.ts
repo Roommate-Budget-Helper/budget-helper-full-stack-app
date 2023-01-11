@@ -5,7 +5,7 @@ import { homesRouter } from "./homes";
 
 export const appRouter = createRouter()
     .transformer(superjson)
-    .merge(".home", homesRouter);
+    .merge("home.", homesRouter);
 
 // export type definition of API
 export type AppRouter = typeof appRouter;
