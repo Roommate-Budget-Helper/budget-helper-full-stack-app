@@ -12,6 +12,7 @@ export const homesRouter = createRouter()
                     id: true,
                     name: true,
                     image: true,
+                    address: true,
                 },
                 where: {
                     id: {
@@ -25,12 +26,14 @@ export const homesRouter = createRouter()
         input: z.object({
             name: z.string(),
             image: z.string(),
+            address: z.string(),
         }),
         async resolve({ ctx, input }) {
             return await ctx.prisma.home.create({
                 data: {
                     name: input.name,
                     image: input.image,
+                    address: input.address,
                 },
             });
         },
@@ -40,6 +43,7 @@ export const homesRouter = createRouter()
             id: z.string(),
             name: z.string(),
             image: z.string(),
+            address: z.string(),
         }),
         async resolve({ ctx, input }) {
             return await ctx.prisma.home.update({
@@ -49,6 +53,7 @@ export const homesRouter = createRouter()
                 data: {
                     name: input.name,
                     image: input.image,
+                    address: input.address,
                 },
             });
         },
@@ -65,15 +70,3 @@ export const homesRouter = createRouter()
             });
         },
     });
-
-// .mutation("addHomeToUser", {
-//     input: z.object({
-//         userId: z.string(),
-//         homeid: z.string(),
-//     }),
-//     async resolve({ ctx, input }) {
-//         return await ctx.prisma.occupies.create({
-//             data: {},
-//         });
-//     },
-// })
