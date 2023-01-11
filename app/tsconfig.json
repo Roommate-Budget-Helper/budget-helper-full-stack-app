@@ -17,6 +17,7 @@
         "noUncheckedIndexedAccess": true,
         "suppressImplicitAnyIndexErrors": true,
         "baseUrl": "./src",
+        "suppressImplicitAnyIndexErrors": true,
         "paths": {
             "@components/*": ["components/*"]
         }
