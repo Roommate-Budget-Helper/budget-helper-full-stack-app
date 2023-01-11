@@ -7,7 +7,6 @@ import Image from "next/image";
 import { trpc } from "utils/trpc";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { authOptions } from "./api/auth/[...nextauth]";
 
 const CreationPage: NextPage = () => {
     const { data: session, status } = useSession();
@@ -23,10 +22,12 @@ const CreationPage: NextPage = () => {
         onSuccess: (home) => {
             console.log("Home %s created successfully", home.name);
             // Add userid and homeid to the occupies table
-            authOptions.callbacks?.session
+            if(!session?.user){
+                return;
+            }
             addUserToHome.mutate({
                 homeId: home.id,
-                userId: session?.user?.id as string,
+                userId: session.user.id
             });
         },
     });
