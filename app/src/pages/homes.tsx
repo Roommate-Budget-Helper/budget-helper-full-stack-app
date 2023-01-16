@@ -74,7 +74,7 @@ const HomesPage: NextPage = () => {
                     />
                 </Head>
                 <div className="body flex flex-col text-center">
-                    <div id="core">
+                    <div className="text-2xl p-5">
                         <div className="form-area flex flex-col justify-between items-center ">
                             <div>Create Home</div>
                             <br></br>
@@ -128,8 +128,8 @@ const HomesPage: NextPage = () => {
                 />
             </Head>
             <div className="body flex flex-col text-center">
-                <div className="topnav">
-                    <a className="center" href="/bill">
+                <div className="overflow-hidden rounded-b-lg p-4 sm:bottom-0 sm:w-full sm:fixed ">
+                    <a className="w-1/5 m-auto h-full float-left bg-gray-700 text-white text-center p-3 no-underline text-lg hover:bg-gray-100 hover:text-black" href="/bill">
                         <Image
                             src="/images/bills.png"
                             alt="Home"
@@ -137,7 +137,7 @@ const HomesPage: NextPage = () => {
                             height="35px"
                         />
                     </a>
-                    <a className="center" href="#">
+                    <a className="w-1/5 m-auto h-full float-left bg-gray-700 text-white text-center p-3 no-underline text-lg hover:bg-gray-100 hover:text-black" href="#">
                         <Image
                             src="/images/thing.png"
                             alt="Home"
@@ -145,7 +145,7 @@ const HomesPage: NextPage = () => {
                             height="35px"
                         />
                     </a>
-                    <a className="active center" onClick={createAHomePressed}>
+                    <a className="text-white bg-green-400 w-1/5 m-auto h-full float-left text-center p-3 no-underline text-lg hover:bg-gray-100 hover:text-black" onClick={createAHomePressed}>
                         <Image
                             src="/images/add_home.png"
                             alt="Home"
@@ -153,7 +153,7 @@ const HomesPage: NextPage = () => {
                             height="60px"
                         />
                     </a>
-                    <a className="center" href="/notification">
+                    <a className="w-1/5 m-auto h-full float-left bg-gray-700 text-white text-center p-3 no-underline text-lg hover:bg-gray-100 hover:text-black" href="/notification">
                         <Image
                             src="/images/notifications.png"
                             alt="Home"
@@ -161,7 +161,7 @@ const HomesPage: NextPage = () => {
                             height="35px"
                         />
                     </a>
-                    <a className="center" href="/homes">
+                    <a className="w-1/5 m-auto h-full float-left bg-gray-700 text-white text-center p-3 no-underline text-lg hover:bg-gray-100 hover:text-black" href="/homes">
                         <Image
                             src="/images/user.png"
                             alt="Home"
@@ -170,12 +170,12 @@ const HomesPage: NextPage = () => {
                         />
                     </a>
                 </div>
-                <div id="core">
-                    <div className="form-area flex flex-col justify-between items-center ">
-                        <div id="top">
-                            Welcome to Roomate Budget Helper <a>👋</a>
+                <div className="text-xl p-5">
+                    <div className="form-area flex flex-col justify-between items-center">
+                        <div className="p-5">
+                            Welcome to Roomate Budget Helper <a className="text-5xl">👋</a>
                         </div>
-                        <div className="center">
+                        <div className="w-1/5 m-auto h-full p-3">
                             <Image
                                 src="/images/logo.png"
                                 alt="Home"
