@@ -36,7 +36,7 @@ export const registerRouter = createRouter()
                       // TODO: send error to client
                         // console.log(err.message);
                         throw err;
-                        // return JSON.stringify(err);
+                        // return err;
                     }
                     if (result) {
                         return ctx.prisma.user.create({

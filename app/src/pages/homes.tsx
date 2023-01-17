@@ -6,64 +6,66 @@ import React from "react";
 import Image from "next/image";
 import { trpc } from "utils/trpc";
 import Navbar from "@components/navbar";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
+import { useState } from 'react';
 
 const HomesPage: NextPage = () => {
-
-    const { data: session, status } = useSession();
-    const router = useRouter();
-    if (status == "unauthenticated") {
-        router.push("/login");
-        return <div></div>;
-    }
+    const [homeCreated, setHomeCreated] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
     const createHome = trpc.useMutation(["home.createHome"], {
         onError: (error) => {
             console.error(error);
+            setError(error.message);
         },
         onSuccess: (home) => {
             console.log("Home %s created successfully", home.name);
             // Add userid and homeid to the occupies table
-            if(!session?.user){
-                return;
-            }
             addUserToHome.mutate({
                 homeId: home.id,
-                userId: session.user.id
             });
         },
     });
     const addUserToHome = trpc.useMutation(["occupies.addUserToHome"], {
         onError: (error) => {
             console.error(error);
+            setError(error.message);
         },
-        onSuccess: (_, { userId, homeId }) => {
+        onSuccess: (_, { homeId }) => {
             console.log(
-                "User %s add to Home %s created successfully",
-                userId,
+                "Home %s created successfully",
                 homeId
             );
         },
     });
+    const homeIds = trpc.useQuery(["occupies.getUserHomeIds"], {
+        onError: (error) => {
+            console.error(error);
+            setError(error.message);
+        },
+    });
+    // const homeObjs = trpc.useQuery(["home.getHomes", [{homeIds: homeIds.data}]], {
+    //     onError: (error) => {
+    //         console.error(error);
+    //     },
+    // });
 
     const onCreateHome = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const form = event.target as HTMLFormElement;
 
-        createHome.mutate({
+        await createHome.mutateAsync({
             image: form.elements["image"].value,
             name: form.elements["name"].value,
             address: form.elements["address"].value,
         });
+        setHomeCreated(false);
+        homeIds.refetch();
     };
 
-    let createAHome = false;
-
     function createAHomePressed() {
-        createAHome = true;
+        setHomeCreated(true);
     }
-    
-    if(createAHome) {
+
+    if(homeCreated) {
         return (
             <>
                 <Head>
@@ -113,10 +115,92 @@ const HomesPage: NextPage = () => {
                             </form>
                         </div>
                     </div>
+                    {error&&<p className="text-xl font-light text-red-600">{error}</p>}
                 </div>
             </>
         );
     }
+
+    if(homeIds.data && homeIds.data.length >= 1) {
+        return (
+            <>
+                <Head>
+                    <title>RBH Homes Page</title>
+                    <meta
+                        name="description"
+                        content="Homes page of Roommate budget helper"
+                    />
+                </Head>
+                <div className="body flex flex-col text-center">
+                    <div className="overflow-hidden rounded-b-lg p-4 sm:bottom-0 sm:w-full sm:fixed ">
+                        <a className="w-1/5 m-auto h-full float-left bg-gray-700 text-white text-center p-3 no-underline text-lg hover:bg-gray-100 hover:text-black" href="/bill">
+                            <Image
+                                src="/images/bills.png"
+                                alt="Home"
+                                width="35px"
+                                height="35px"
+                            />
+                        </a>
+                        <a className="w-1/5 m-auto h-full float-left bg-gray-700 text-white text-center p-3 no-underline text-lg hover:bg-gray-100 hover:text-black" href="#">
+                            <Image
+                                src="/images/thing.png"
+                                alt="Home"
+                                width="35px"
+                                height="35px"
+                            />
+                        </a>
+                        <a className="text-white bg-green-400 w-1/5 m-auto h-full float-left text-center p-3 no-underline text-lg hover:bg-gray-100 hover:text-black" onClick={createAHomePressed}>
+                            <Image
+                                src="/images/add_home.png"
+                                alt="Home"
+                                width="60px"
+                                height="60px"
+                            />
+                        </a>
+                        <a className="w-1/5 m-auto h-full float-left bg-gray-700 text-white text-center p-3 no-underline text-lg hover:bg-gray-100 hover:text-black" href="/notification">
+                            <Image
+                                src="/images/notifications.png"
+                                alt="Home"
+                                width="35px"
+                                height="35px"
+                            />
+                        </a>
+                        <a className="w-1/5 m-auto h-full float-left bg-gray-700 text-white text-center p-3 no-underline text-lg hover:bg-gray-100 hover:text-black" href="/homes">
+                            <Image
+                                src="/images/user.png"
+                                alt="Home"
+                                width="35px"
+                                height="35px"
+                            />
+                        </a>
+                    </div>
+                    <div className="text-xl p-5">
+                        <div className="form-area flex flex-col justify-between items-center">
+                            <div className="p-5">
+                                Welcome to Roomate Budget Helper <a className="text-5xl">👋</a>
+                            </div>
+                            <div className="w-1/5 m-auto h-full p-3">
+                                <Image
+                                    src="/images/logo.png"
+                                    alt="Home"
+                                    width="100px"
+                                    height="100px"
+                                />
+                            </div>
+                            <div>You belong to {homeIds.data.length} homes</div>
+                            <br></br>
+                            {/* <div>Home names are: {homeIds.data}.</div> */}
+                            <div>
+                                Feel free to create more homes using the plus button, or
+                                contact your home creator to invite you!
+                            </div>
+                            {error&&<p className="text-xl font-light text-red-600">{error}</p>}
+                        </div>
+                    </div>
+                </div>
+            </>
+        );
+    };
 
     return (
         <>
@@ -189,6 +273,7 @@ const HomesPage: NextPage = () => {
                             Feel free to create one using the plus button, or
                             contact your home creator to invite you!
                         </div>
+                        {error&&<p className="text-xl font-light text-red-600">{error}</p>}
                     </div>
                 </div>
             </div>

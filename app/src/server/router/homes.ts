@@ -1,7 +1,7 @@
-import { createRouter } from "./context";
+import { createProtectedRouter, createRouter } from "./context";
 import { z } from "zod";
 
-export const homesRouter = createRouter()
+export const homesRouter = createProtectedRouter()
     .query("getHomes", {
         input: z.object({
             ids: z.array(z.string()),

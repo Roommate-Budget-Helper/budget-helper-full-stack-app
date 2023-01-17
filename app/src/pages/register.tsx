@@ -8,11 +8,13 @@ import { trpc } from "utils/trpc";
 const RegisterPage: NextPage = () => {
     const [registered, setRegistered] = useState<boolean>(false);
     const [registeredUsername, setRegisteredUsername] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
     const createUser = trpc.useMutation(["auth.createUser"], {
         onError: (error) => {
             console.error(error);
+            setError(error.message);
         },
-        onSuccess: (_, { username }) => {
+        onSuccess: (_ , { username }) => {
             console.log("User created successfully");
             setRegistered(true);
             setRegisteredUsername(username);
@@ -23,6 +25,7 @@ const RegisterPage: NextPage = () => {
     const verifyEmail = trpc.useMutation(["auth.verifyEmailCode"], {
         onError: (error) => {
             console.error(error);
+            setError(error.message);
         },
         onSuccess: () => {
             console.log("User verified")
@@ -79,6 +82,11 @@ const RegisterPage: NextPage = () => {
                     type="text"
                     name="verification-code"
                     placeholder='verification code' />
+                {error && (
+                    <p className="text-xl font-light text-red-600">
+                        Something went wrong! {error}
+                    </p>
+                )}
             </form>
             </>);
     }
@@ -106,9 +114,9 @@ const RegisterPage: NextPage = () => {
                         account!
                     </p>
                 </div>
-                {createUser.error && (
+                {error && (
                     <p className="text-xl font-light text-red-600">
-                        Something went wrong! {createUser.error?.message}
+                        Something went wrong! {error}
                     </p>
                 )}
                 <form method="post" onSubmit={onRegister}>
