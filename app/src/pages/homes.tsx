@@ -11,6 +11,7 @@ import { useState } from 'react';
 const HomesPage: NextPage = () => {
     const [homeCreated, setHomeCreated] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+
     const createHome = trpc.useMutation(["home.createHome"], {
         onError: (error) => {
             console.error(error);
@@ -24,6 +25,7 @@ const HomesPage: NextPage = () => {
             });
         },
     });
+
     const addUserToHome = trpc.useMutation(["occupies.addUserToHome"], {
         onError: (error) => {
             console.error(error);
@@ -36,17 +38,26 @@ const HomesPage: NextPage = () => {
             );
         },
     });
+
     const homeIds = trpc.useQuery(["occupies.getUserHomeIds"], {
         onError: (error) => {
             console.error(error);
             setError(error.message);
         },
     });
-    // const homeObjs = trpc.useQuery(["home.getHomes", [{homeIds: homeIds.data}]], {
-    //     onError: (error) => {
-    //         console.error(error);
-    //     },
-    // });
+
+    if(homeIds?.data){
+        console.log(homeIds.data);
+        const listHome = homeIds.data;
+        // trpc.useQuery(["home.getHomes", {ids: {listHome: string[]}}], {
+        //     onError: (error) => {
+        //         console.error(error);
+        //     },
+        //     onSuccess(data) {
+        //         console.log(data);
+        //     },
+        // });
+    }
 
     const onCreateHome = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -189,7 +200,8 @@ const HomesPage: NextPage = () => {
                             </div>
                             <div>You belong to {homeIds.data.length} homes</div>
                             <br></br>
-                            {/* <div>Home names are: {homeIds.data}.</div> */}
+                            
+                            <div id="homeDisplay"></div>
                             <div>
                                 Feel free to create more homes using the plus button, or
                                 contact your home creator to invite you!
