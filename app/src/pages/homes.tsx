@@ -46,18 +46,15 @@ const HomesPage: NextPage = () => {
         },
     });
 
-    if(homeIds?.data){
-        console.log(homeIds.data);
-        const listHome = homeIds.data;
-        // trpc.useQuery(["home.getHomes", {ids: {listHome: string[]}}], {
-        //     onError: (error) => {
-        //         console.error(error);
-        //     },
-        //     onSuccess(data) {
-        //         console.log(data);
-        //     },
-        // });
-    }
+    
+    const homes = trpc.useQuery(["home.getHomes", {ids: homeIds.data?.map(i => i.homeId) ?? []}], {
+        onError: (error) => {
+            console.error(error);
+        },
+        onSuccess(data) {
+            console.log(data);
+        },
+    });
 
     const onCreateHome = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -201,7 +198,12 @@ const HomesPage: NextPage = () => {
                             <div>You belong to {homeIds.data.length} homes</div>
                             <br></br>
                             
-                            <div id="homeDisplay"></div>
+                            <div id="homeDisplay">
+                                {homes.data?.map(home => (<div key={home.id}>
+                                    <h1>{home.name}</h1>
+                                    <p>{home.address}</p>
+                                </div>))}
+                            </div>
                             <div>
                                 Feel free to create more homes using the plus button, or
                                 contact your home creator to invite you!
