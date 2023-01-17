@@ -10,17 +10,16 @@ export interface FieldInputProps {
 }
 export type FieldInputType = React.FC<Partial<FieldInputProps>>
 
-const FieldInput= React.forwardRef((props: Partial<FieldInputProps>, ref: React.Ref<HTMLInputElement> | undefined) => {
+const FieldInput= (props: Partial<FieldInputProps>) => {
     return (
     <input
-        ref={ref}
         name={props.name}
         className="bg-evergreen-60 w-96 my-4 text-xl py-2 px-4 rounded-lg" 
         type={props.type} 
         value={props.value} 
         onChange={props.onChange}
         placeholder={props.placeholder}/>);
-});
+};
 
 export interface FieldInputGadgetProperties {
     location: "right" | "left";

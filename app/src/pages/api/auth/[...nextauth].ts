@@ -54,7 +54,7 @@ export const authOptions: NextAuthOptions = {
                     type: "password"
                 },
             },
-            async authorize(credentials, _){
+            async authorize(credentials){
                 if(!credentials){
                     return null;
                 }
@@ -70,7 +70,7 @@ export const authOptions: NextAuthOptions = {
 
                const authenticatedUser = await new Promise<User | null>(resolve => {
                 user.authenticateUser(authDetails, {
-                    onSuccess(session, _) {
+                    onSuccess(session) {
                         const { sub: id, email_verified: emailVerified, email, ...restPayload  } = session.getIdToken().payload;
                         const user = {
                             id,
@@ -84,7 +84,7 @@ export const authOptions: NextAuthOptions = {
                         }
                         resolve(user);
                     },
-                    onFailure(err) {
+                    onFailure() {
                         resolve(null);
                     },
                     }) 
