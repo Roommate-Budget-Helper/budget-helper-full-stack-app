@@ -30,7 +30,7 @@ export const VisibilityFieldInput = (props: Partial<FieldInputProps>) => {
         const [visible, setVisibility] = useState<boolean>(false);
         const currentVisibility = visible ? "text" : "password";
         const toggleVisibility = () => {
-            setVisibility(visible => !visible);
+            setVisibility(visibility => !visibility);
         }
         return (
         <div className="relative flex items-center">

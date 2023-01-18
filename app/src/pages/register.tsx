@@ -9,11 +9,10 @@ const RegisterPage: NextPage = () => {
     const [registered, setRegistered] = useState<boolean>(false);
     const [registeredUsername, setRegisteredUsername] = useState<string | null>(null);
     const createUser = trpc.useMutation(["auth.createUser"], {
-        onError: (error) => {
-            console.error(error);
-        },
+        // onError: (error) => {
+        //     console.error(error);
+        // },
         onSuccess: (_, { username }) => {
-            console.log("User created successfully");
             setRegistered(true);
             setRegisteredUsername(username);
             // Login the user
@@ -21,12 +20,12 @@ const RegisterPage: NextPage = () => {
         },
     });
     const verifyEmail = trpc.useMutation(["auth.verifyEmailCode"], {
-        onError: (error) => {
-            console.error(error);
-        },
-        onSuccess: () => {
-            console.log("User verified")
-        }
+        // onError: (error) => {
+        //     console.error(error);
+        // },
+        // onSuccess: () => {
+        //     console.log("User verified")
+        // }
     })
 
     const onRegister = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -38,7 +37,6 @@ const RegisterPage: NextPage = () => {
         const confirmPassword = form.elements["confirmPassword"].value;
 
         if (password !== confirmPassword) {
-            alert("Password fields do not match");
             return;
         }
 
