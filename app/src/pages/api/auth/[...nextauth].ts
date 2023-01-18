@@ -24,9 +24,9 @@ const userPool = new CognitoUserPool({
 
 export const authOptions: NextAuthOptions = {
     callbacks: {
-        session({ session, user }) {
-            if (session.user && user) {
-                session.user.id = user.id;
+        session({ session, token }) {
+            if (session.user && token) {
+                session.user.id = token.id as string;
             }
             return session;
         },
