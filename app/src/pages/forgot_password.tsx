@@ -13,10 +13,10 @@ const ForgotPasswordPage: NextPage = () => {
     const sendForgotPasswordCode = trpc.useMutation(
         ["auth.sendForgotPasswordVerificationCode"],
         {
-            onError: (error) => {
-                // TODO: Add error handling for when the code wasn't sent
-                console.error(error);
-            },
+            // onError: (error) => {
+            //     // TODO: Add error handling for when the code wasn't sent
+            //     console.error(error);
+            // },
             onSuccess: (_, { username }) => {
                 setValidatedUsername(username);
                 setEmailSent(true);
@@ -25,12 +25,12 @@ const ForgotPasswordPage: NextPage = () => {
     );
 
     const verifyEmail = trpc.useMutation(["auth.verifyForgotPassword"], {
-        onError: (error) => {
-            console.error(error);
-        },
-        onSuccess: () => {
-            console.log("Success: User verified and password reset!");
-        },
+        // onError: (error) => {
+        //     console.error(error);
+        // },
+        // onSuccess: () => {
+        //     console.log("Success: User verified and password reset!");
+        // },
     });
 
     const onFormFill = () => {
