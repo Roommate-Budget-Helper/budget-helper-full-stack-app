@@ -1,6 +1,6 @@
 import Head from "next/head";
 import React from "react";
-import type { NextPage } from "next";
+import type { GetServerSideProps, NextPage } from "next";
 import Navbar from "@components/navbar";
 import { trpc } from "../../utils/trpc";
 import { useState } from 'react';
@@ -46,11 +46,10 @@ const HomeIdPage: NextPage<HomePageProps> = (props: HomePageProps) => {
 };
 
 
-export async function getServerSideProps({ params }){
-    const { id } = params;
+export const getServerSideProps: GetServerSideProps = async ({ params }) =>{
     return {
         props: {
-            id,
+            id: params?.id,
         }
     }
 }
