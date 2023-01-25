@@ -1,12 +1,14 @@
-import { createProtectedRouter, createRouter } from "./context";
+import { createProtectedRouter } from "./context";
 import { z } from "zod";
+import { getHomesByUserId, canUserViewHome } from "../db/HomeService";
 
 export const homesRouter = createProtectedRouter()
     .query("getHomes", {
-        input: z.object({
-            ids: z.array(z.string()),
-        }),
-        async resolve({ ctx, input }) {
+        async resolve({ ctx }) {
+            if(!ctx.session.user){
+                return;
+            }
+            const homeIds = await getHomesByUserId(ctx.session.user.id, ctx.prisma);
             return await ctx.prisma.home.findMany({
                 select: {
                     id: true,
@@ -16,7 +18,30 @@ export const homesRouter = createProtectedRouter()
                 },
                 where: {
                     id: {
-                        in: input.ids,
+                        in: homeIds,
+                    },
+                },
+            });
+        },
+    })
+    .query("getHomeById", {
+        input: z.object({
+            homeId: z.string(),
+        }),
+        async resolve({ctx, input}) {
+            if(!ctx.session.user || !(await canUserViewHome(ctx.session.user.id, input.homeId, ctx.prisma))){
+                return;
+            }            
+            return await ctx.prisma.home.findFirst({
+                select: {
+                    id:true,
+                    name: true,
+                    image: true,
+                    address: true,
+                },
+                where: {
+                    id: {
+                        in: input.homeId,
                     },
                 },
             });

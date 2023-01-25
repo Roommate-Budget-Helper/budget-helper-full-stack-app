@@ -5,42 +5,28 @@ import Head from "next/head";
 import React from "react";
 import Image from "next/image";
 import { trpc } from "utils/trpc";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
+import { useState } from 'react';
+import { useRouter } from 'next/router';
 
 const CreationPage: NextPage = () => {
-    const { data: session, status } = useSession();
+    const [error, setError] = useState<string | null>(null);
     const router = useRouter();
-    if (status == "unauthenticated") {
-        router.push("/login");
-        return <div></div>;
-    }
+
     const createHome = trpc.useMutation(["home.createHome"], {
         onError: (error) => {
-            console.error(error);
+            setError(error.message);
         },
         onSuccess: (home) => {
-            console.log("Home %s created successfully", home.name);
             // Add userid and homeid to the occupies table
-            if(!session?.user){
-                return;
-            }
             addUserToHome.mutate({
                 homeId: home.id,
-                userId: session.user.id
             });
         },
     });
+
     const addUserToHome = trpc.useMutation(["occupies.addUserToHome"], {
         onError: (error) => {
-            console.error(error);
-        },
-        onSuccess: (_, { userId, homeId }) => {
-            console.log(
-                "User %s add to Home %s created successfully",
-                userId,
-                homeId
-            );
+            setError(error.message);
         },
     });
 
@@ -48,11 +34,12 @@ const CreationPage: NextPage = () => {
         event.preventDefault();
         const form = event.target as HTMLFormElement;
 
-        createHome.mutate({
+        await createHome.mutateAsync({
             image: form.elements["image"].value,
             name: form.elements["name"].value,
             address: form.elements["address"].value,
         });
+        router.push("/homes");
     };
 
     return (
@@ -65,7 +52,7 @@ const CreationPage: NextPage = () => {
                 />
             </Head>
             <div className="body flex flex-col text-center">
-                <div id="core">
+                <div className="text-2xl p-5">
                     <div className="form-area flex flex-col justify-between items-center ">
                         <div>Create Home</div>
                         <br></br>
@@ -89,12 +76,6 @@ const CreationPage: NextPage = () => {
                                 placeholder="Address"
                             />
                             <br></br>
-                            {/* <FieldInput
-                                type="text"
-                                name=""
-                                placeholder=""
-                            /> */}
-                            <br></br>
                             <Button
                                 classNames="bg-evergreen-80 text-dorian"
                                 value="Create"
@@ -104,6 +85,7 @@ const CreationPage: NextPage = () => {
                         </form>
                     </div>
                 </div>
+                {error&&<p className="text-xl font-light text-red-600">{error}</p>}
             </div>
         </>
     );

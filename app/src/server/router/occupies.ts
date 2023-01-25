@@ -17,19 +17,4 @@ export const occupiesRouter = createRouter()
                 },
             });
         },
-    })
-    .query("getUserHomeIds", {
-        async resolve({ ctx }) {
-            if(!ctx.session?.user){
-                return;
-            }
-            return await ctx.prisma.occupies.findMany({
-                select: {
-                    homeId: true,
-                },
-                where: {
-                    userId: ctx.session.user.id,
-                },
-            });
-        },
     });
