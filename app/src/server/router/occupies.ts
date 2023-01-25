@@ -1,7 +1,7 @@
-import { createRouter } from "./context";
+import { createProtectedRouter } from "./context";
 import { z } from "zod";
 
-export const occupiesRouter = createRouter()
+export const occupiesRouter = createProtectedRouter()
     .mutation("addUserToHome", {
         input: z.object({
             homeId: z.string(),
