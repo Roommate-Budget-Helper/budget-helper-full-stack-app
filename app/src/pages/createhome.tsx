@@ -11,6 +11,12 @@ const CreationPage: NextPage = () => {
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
 
+    const addUserToHome = trpc.useMutation(["occupies.addUserToHome"], {
+        onError: (error) => {
+            setError(error.message);
+        },
+    });
+
     const createHome = trpc.useMutation(["home.createHome"], {
         onError: (error) => {
             setError(error.message);
@@ -22,13 +28,7 @@ const CreationPage: NextPage = () => {
             });
             router.push("/homes");
         },
-    });
-
-    const addUserToHome = trpc.useMutation(["occupies.addUserToHome"], {
-        onError: (error) => {
-            setError(error.message);
-        },
-    });
+    });   
 
     const onCreateHome = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
