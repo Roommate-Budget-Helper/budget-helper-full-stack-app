@@ -15,7 +15,6 @@
         "jsx": "preserve",
         "incremental": true,
         "noUncheckedIndexedAccess": true,
-        "suppressImplicitAnyIndexErrors": true,
         "baseUrl": "./src",
         "suppressImplicitAnyIndexErrors": true,
         "paths": {

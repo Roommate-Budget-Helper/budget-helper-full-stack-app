@@ -8,14 +8,11 @@ import { trpc } from "utils/trpc";
 const RegisterPage: NextPage = () => {
     const [registered, setRegistered] = useState<boolean>(false);
     const [registeredUsername, setRegisteredUsername] = useState<string | null>(null);
-    const [error, setError] = useState<string | null>(null);
     const createUser = trpc.useMutation(["auth.createUser"], {
-        onError: (error) => {
-            console.error(error);
-            setError(error.message);
-        },
-        onSuccess: (_ , { username }) => {
-            console.log("User created successfully");
+        // onError: (error) => {
+        //     console.error(error);
+        // },
+        onSuccess: (_, { username }) => {
             setRegistered(true);
             setRegisteredUsername(username);
             // Login the user
@@ -23,13 +20,12 @@ const RegisterPage: NextPage = () => {
         },
     });
     const verifyEmail = trpc.useMutation(["auth.verifyEmailCode"], {
-        onError: (error) => {
-            console.error(error);
-            setError(error.message);
-        },
-        onSuccess: () => {
-            console.log("User verified")
-        }
+        // onError: (error) => {
+        //     console.error(error);
+        // },
+        // onSuccess: () => {
+        //     console.log("User verified")
+        // }
     })
 
     const onRegister = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -41,7 +37,6 @@ const RegisterPage: NextPage = () => {
         const confirmPassword = form.elements["confirmPassword"].value;
 
         if (password !== confirmPassword) {
-            alert("Password fields do not match");
             return;
         }
 
@@ -82,11 +77,6 @@ const RegisterPage: NextPage = () => {
                     type="text"
                     name="verification-code"
                     placeholder='verification code' />
-                {error && (
-                    <p className="text-xl font-light text-red-600">
-                        Something went wrong! {error}
-                    </p>
-                )}
             </form>
             </>);
     }
@@ -114,9 +104,9 @@ const RegisterPage: NextPage = () => {
                         account!
                     </p>
                 </div>
-                {error && (
+                {createUser.error && (
                     <p className="text-xl font-light text-red-600">
-                        Something went wrong! {error}
+                        Something went wrong! {createUser.error?.message}
                     </p>
                 )}
                 <form method="post" onSubmit={onRegister}>

@@ -1,5 +1,5 @@
 name: CI/CD Pipeline
-on: 
+on:
   push:
     branches:
       - main
@@ -7,12 +7,13 @@ on:
     branches:
       - main
 env:
-    DATABASE_URL: ${{ secrets.DATABASE_URL }}
-    NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET}}
-    NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
-    COGNITO_CLIENT_ID: ${{ secrets.COGNITO_CLIENT_ID }}
-    COGNITO_CLIENT_SECRET: ${{ secrets.COGNITO_CLIENT_SECRET }}
-    COGNITO_ISSUER: ${{ secrets.COGNITO_ISSUER }}
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET}}
+  NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
+  COGNITO_CLIENT_ID: ${{ secrets.COGNITO_CLIENT_ID }}
+  COGNITO_USER_POOL: ${{ secrets.COGNITO_USER_POOL }}
+  GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+  GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET}}
 
 jobs:
   Build:
@@ -22,8 +23,8 @@ jobs:
         working-directory: ./app
 
     strategy:
-          matrix:
-            node-version: [16.x]
+      matrix:
+        node-version: [16.x]
 
     steps:
       - name: Checking out Code
@@ -42,7 +43,3 @@ jobs:
         run: npm run test --if-present
       - name: Building Code
         run: npm run build
-        
-
-      
-          

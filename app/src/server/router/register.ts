@@ -33,10 +33,10 @@ export const registerRouter = createRouter()
                 [],
                 function (err, result) {
                     if (err) {
-                      // TODO: send error to client
+                        // TODO: send error to client
                         // console.log(err.message);
                         throw err;
-                        // return err;
+                        // return JSON.stringify(err);
                     }
                     if (result) {
                         return ctx.prisma.user.create({
@@ -56,49 +56,65 @@ export const registerRouter = createRouter()
             username: z.string(),
             code: z.string(),
         }),
-        async resolve({ input }){
+        async resolve({ input }) {
             const userData = {
                 Username: input.username,
-                Pool: userPool
-            }
+                Pool: userPool,
+            };
             const cognitoUser = new CognitoUser(userData);
-            cognitoUser.confirmRegistration(input.code, true, function(err, result){
-                if(err){
-                    //handle error 
-                    console.error(err);
+            cognitoUser.confirmRegistration(
+                input.code,
+                true,
+                function (err, result) {
+                    if (err) {
+                        //handle error
+                        console.error(err);
+                    }
+                    console.log(result);
                 }
-                console.log(result);
-            })
-        }
+            );
+        },
     })
-    .query("validateEmail", {
-        // check if email already exists
+    // Send Forgot Password Code to email in Cognito
+    .mutation("sendForgotPasswordVerificationCode", {
         input: z.object({
-            email: z.string(),
+            username: z.string(),
         }),
-        async resolve({ ctx, input }) {
-            return await ctx.prisma.user.findUnique({
-                select: {
-                    email: true,
+        async resolve({ input }) {
+            const userData = {
+                Username: input.username,
+                Pool: userPool,
+            };
+            const cognitoUser = new CognitoUser(userData);
+            cognitoUser.forgotPassword({
+                onSuccess: function (result) {
+                    console.log("call result: " + result);
                 },
-                where: {
-                    email: input.email,
+                onFailure: function (err) {
+                    console.log(err);
                 },
             });
         },
     })
-    .query("validateUsername", {
-        // check if username already exists
+    // Enter in new password and verification code provided by email
+    .mutation("verifyForgotPassword", {
         input: z.object({
             username: z.string(),
+            code: z.string(),
+            password: z.string(),
         }),
-        async resolve({ ctx, input }) {
-            return await ctx.prisma.user.findFirst({
-                select: {
-                    name: true,
+        async resolve({ input }) {
+            const userData = {
+                Username: input.username,
+                Pool: userPool,
+            };
+            const cognitoUser = new CognitoUser(userData);
+            cognitoUser.confirmPassword(input.code, input.password, {
+                onSuccess() {
+                    console.log("Password confirmed!");
                 },
-                where: {
-                    name: input.username,
+                onFailure(err) {
+                    console.log("Error: ", err);
                 },
             });
         },
