@@ -3,7 +3,6 @@ import FieldInput from "@components/fieldinput";
 import type { NextPage } from "next";
 import Head from "next/head";
 import React from "react";
-import Image from "next/image";
 import { trpc } from "utils/trpc";
 import { useState } from 'react';
 import { useRouter } from 'next/router';
@@ -16,11 +15,12 @@ const CreationPage: NextPage = () => {
         onError: (error) => {
             setError(error.message);
         },
-        onSuccess: (home) => {
+        onSuccess: async (home) => {
             // Add userid and homeid to the occupies table
-            addUserToHome.mutate({
+            await addUserToHome.mutateAsync({
                 homeId: home.id,
             });
+            router.push("/homes");
         },
     });
 
@@ -39,7 +39,6 @@ const CreationPage: NextPage = () => {
             name: form.elements["name"].value,
             address: form.elements["address"].value,
         });
-        router.push("/homes");
     };
 
     return (
