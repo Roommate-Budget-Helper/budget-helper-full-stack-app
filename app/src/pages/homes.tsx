@@ -11,9 +11,7 @@ const HomesPage: NextPage = () => {
     const [error, setError] = useState<string | null>(null);
 
     
-    const homes = trpc.useQuery(["home.getHomes"], {
-
-    });
+    const homes = trpc.useQuery(["home.getHomes"]);
 
 
     return (
