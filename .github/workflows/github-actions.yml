@@ -45,18 +45,33 @@ jobs:
         run: npm run build
   cypress-run:
     runs-on: ubuntu-latest
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
-      - name: Start containers
-        run: docker-compose -f "docker-compose.yml" up -d
       - name: Cypress run
         uses: cypress-io/github-action@v5.0.7 # use the explicit version number
         with:
-          build: npm run build
+          build: npm run build && npx prisma db push
           start: npm start
           working-directory: ./app
         env:
-          DATABASE_URL: postgresql://postgres:postgres@host.docker.internal
+          DATABASE_URL: postgresql://postgres:postgres@localhost
