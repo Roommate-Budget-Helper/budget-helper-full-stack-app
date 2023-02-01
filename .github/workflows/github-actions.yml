@@ -14,7 +14,6 @@ env:
   COGNITO_USER_POOL: ${{ secrets.COGNITO_USER_POOL }}
   GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
   GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET}}
-  CYPRESS_API_KEY: ${{ secrets.CYPRESS_API_KEY }}
 jobs:
   Build:
     runs-on: ubuntu-latest
@@ -76,6 +75,11 @@ jobs:
         run: npx prisma generate
       - name: Sync Database
         run: npx prisma db push
+      - name: Create Cypress env
+        uses: jsdaniell/create-json@v1.2.2
+        with:
+          name: "cypress.env.json"
+          json: ${{ secrets.CYPRESS_API_KEY }}
       - name: Cypress run
         uses: cypress-io/github-action@v5.0.7 # use the explicit version number
         with:
