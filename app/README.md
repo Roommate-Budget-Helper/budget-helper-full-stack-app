@@ -47,8 +47,10 @@ GOOGLE_CLIENT_SECRET=<google-client-secret-here>
 3. Go to [MailSlurp](https://www.mailslurp.com/) and create an account
 4. After logging in confirm you see a dashboard similar to this:
    ![MailSlurp Dashboard](../docs/mailslurp.png)
+5. Copy the API Access key and place it in the `cypress.env.json`  
+   You should now be able run the project
 
-You should now be able run the project
+### Note: Cypress must be run outside of the docker dev environment on your host machine. If you have a M1 Mac refer to the following guide: []()
 
 ## Commands
 

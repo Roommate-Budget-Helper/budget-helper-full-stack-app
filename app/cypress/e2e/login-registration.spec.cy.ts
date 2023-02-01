@@ -33,6 +33,7 @@ describe('Login and Registration Test', () => {
       cy.get('button[type=submit]').click();
       cy.waitForEmail(inboxId).then(email => {
         assert.isDefined(email);
+        console.log(email.body)
         assert.strictEqual(/Your verification code is/.test(email.body), true);
         const code = email.body.match(/\d+/)[0];
         cy.get('input[name=verification-code]').type(`${code}{enter}`)
