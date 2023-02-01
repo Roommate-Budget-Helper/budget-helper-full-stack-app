@@ -67,10 +67,15 @@ jobs:
         uses: actions/checkout@v3
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
+      - name: Sync Database
+        uses: npx prisma db push
+        with:
+          working-directory: ./app
       - name: Cypress run
         uses: cypress-io/github-action@v5.0.7 # use the explicit version number
         with:
-          build: npm run build && npx prisma db push
+          build: npm run build
+
           start: npm start
           working-directory: ./app
         env:
