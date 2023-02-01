@@ -45,17 +45,18 @@ jobs:
         run: npm run build
   cypress-run:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./app
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
+      - name: Start containers
+        run: docker-compose -f "docker-compose.yml" up -d
       - name: Cypress run
         uses: cypress-io/github-action@v5.0.7 # use the explicit version number
         with:
           build: npm run build
           start: npm start
           working-directory: ./app
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@host.docker.internal
