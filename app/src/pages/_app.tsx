@@ -7,6 +7,7 @@ import superjson from "superjson";
 import type { AppType } from "next/app";
 import type { AppRouter } from "../server/router";
 import type { Session } from "next-auth";
+import { RouteGuard } from "@components/routeguard";
 import "../styles/globals.css";
 
 const MyApp: AppType<{ session: Session | null }> = ({
@@ -15,7 +16,9 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
     return (
         <SessionProvider session={session}>
-            <Component {...pageProps} />
+            <RouteGuard>
+                <Component {...pageProps} />
+            </RouteGuard>
         </SessionProvider>
     );
 };

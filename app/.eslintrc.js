@@ -15,4 +15,8 @@ module.exports = {
         "plugin:@typescript-eslint/recommended",
         "prettier",
     ],
+
+    "rules": {
+        "@next/next/no-html-link-for-pages": ["error", "app/src/pages"]
+    }
 };
