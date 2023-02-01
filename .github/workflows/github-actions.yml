@@ -87,3 +87,9 @@ jobs:
           build: npm run build
           start: npm start
           working-directory: ./app
+      - name: "Upload screenshots and videos to Slack"
+        uses: trymbill/cypress-slack-video-upload-action@v1.3.0
+        with:
+          token: ${{ secrets.SLACK_TOKEN }}
+          channels: "cypress-ci-tests"
+          workdir: app/cypress
