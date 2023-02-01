@@ -55,7 +55,7 @@ GOOGLE_CLIENT_SECRET=<google-client-secret-here>
 ## Commands
 
 `npm run dev` => Runs the development server  
-`npm run test` => Runs the jest test suite
+`npm run test` => Runs the jest test suite  
 `npm run e2e` => Runs the cypress test suite  
 `npm run lint` => Runs the linter  
 `npm run build` => Runs the build command  
