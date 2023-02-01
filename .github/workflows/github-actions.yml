@@ -14,7 +14,7 @@ env:
   COGNITO_USER_POOL: ${{ secrets.COGNITO_USER_POOL }}
   GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
   GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET}}
-
+  CYPRESS_API_KEY: ${{ secrets.CYPRESS_API_KEY }}
 jobs:
   Build:
     runs-on: ubuntu-latest
@@ -43,3 +43,15 @@ jobs:
         run: npm run test --if-present
       - name: Building Code
         run: npm run build
+  cypress-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      # Install NPM dependencies, cache them correctly
+      # and run all Cypress tests
+      - name: Cypress run
+        uses: cypress-io/github-action@v5.x.x # use the explicit version number
+        with:
+          build: npm run build
+          start: npm start

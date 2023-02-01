@@ -37,14 +37,24 @@ GOOGLE_CLIENT_ID=<google-client-id-here>
 GOOGLE_CLIENT_SECRET=<google-client-secret-here>
 ```
 
-10. While in the app folder run `npm ci`
+10. While in the app folder run `npm i`
+
+## Setting up testing
+
+1. Create a file called `cypress.env.json` in the app folder
+2. Enter the following values:
+   `{ "API_KEY": "<replace-this-with-your-actual-api-key>" }`
+3. Go to [MailSlurp](https://www.mailslurp.com/) and create an account
+4. After logging in confirm you see a dashboard similar to this:
+   ![MailSlurp Dashboard](../docs/mailslurp.png)
 
 You should now be able run the project
 
 ## Commands
 
 `npm run dev` => Runs the development server  
-`npm run test` => Runs the test suite  
+`npm run test` => Runs the jest test suite
+`npm run e2e` => Runs the cypress test suite  
 `npm run lint` => Runs the linter  
 `npm run build` => Runs the build command  
 `npx prisma generate` => Rebuilds the prisma client for accessing the database from typescript  
