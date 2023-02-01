@@ -80,6 +80,7 @@ jobs:
         with:
           name: "cypress.env.json"
           json: ${{ secrets.CYPRESS_API_KEY }}
+          dir: "app/"
       - name: Cypress run
         uses: cypress-io/github-action@v5.0.7 # use the explicit version number
         with:
