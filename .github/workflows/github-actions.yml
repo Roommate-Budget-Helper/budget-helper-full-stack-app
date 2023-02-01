@@ -45,6 +45,9 @@ jobs:
         run: npm run build
   cypress-run:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./app
     services:
       # Label used to access the service container
       postgres:
@@ -69,8 +72,6 @@ jobs:
       # and run all Cypress tests
       - name: Sync Database
         run: npx prisma db push
-        with:
-          working-directory: ./app
       - name: Cypress run
         uses: cypress-io/github-action@v5.0.7 # use the explicit version number
         with:
