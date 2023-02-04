@@ -49,6 +49,13 @@ GOOGLE_CLIENT_SECRET=<google-client-secret-here>
    ![MailSlurp Dashboard](../docs/mailslurp.png)
 5. Copy the API Access key and place it in the `cypress.env.json`  
    You should now be able run the project
+6. Run `npx cypress install` in the /app folder to prepare cypress for the first time
+7. Setup an X-Server on your host machine and allow connections to localhost:
+
+-   Mac: `brew install --cask Xquartz`
+-   Windows: [Xming](https://sourceforge.net/projects/xming/)
+-   Linux: Install `xorg-xhost` package if not already on your system  
+    ALL: Run `xhost + localhost`
 
 ### Note: Cypress must be run outside of the docker dev environment on your host machine. If you have a M1 Mac refer to the following guide: []()
 
