@@ -55,9 +55,15 @@ GOOGLE_CLIENT_SECRET=<google-client-secret-here>
 -   Mac: `brew install --cask Xquartz`
 -   Windows: [Xming](https://sourceforge.net/projects/xming/)
 -   Linux: Install `xorg-xhost` package if not already on your system  
-    ALL: Run `xhost + localhost`
+    Mac + Linux: Run `xhost + localhost`
 
-### Note: Cypress must be run outside of the docker dev environment on your host machine. If you have a M1 Mac refer to the following guide: []()
+### Notes for Windows: 
+   # Change your DISPLAY location for xming
+      export DISPLAY=<your ip address>:0
+   # Run the xming application in your local computer
+      <xming executable location in explorer> :0 -ac
+   # Run the e2e test in dev container
+      npm run e2e
 
 ## Commands
 
@@ -66,9 +72,9 @@ GOOGLE_CLIENT_SECRET=<google-client-secret-here>
 `npm run e2e` => Runs the cypress test suite  
 `npm run lint` => Runs the linter  
 `npm run build` => Runs the build command  
-`npx prisma generate` => Rebuilds the prisma client for accessing the database from typescript  
+`npx prisma generate` => Rebuilds the prisma client for accessing the database from typescript 
 `npx prisma db push` => Synchronize the database with the prisma schema  
-`npx prisma studio` => Opens prisma studio for debugging
+`npx prisma studio` => Opens prisma studio for debugging 
 
 ## Troubleshooting
 
