@@ -1,58 +1,39 @@
 import Image from "next/image";
 import Link from "next/link";
+import Icon from '@mdi/react';
+import { mdiCashMultiple, mdiFileDocumentOutline, mdiBellOutline, mdiAccountCircleOutline, mdiPlus } from '@mdi/js';
 
+
+const navItemStyle = "w-1/5 m-auto h-full float-left flex items-start justify-center text-white text-center p-3 no-underline text-lg hover:text-evergreen-80";
 // TODO: WIP fix styles
 const Navbar: React.FC = () => {
     return (
-        <div className="overflow-hidden rounded-b-lg p-4 sm:bottom-0 sm:w-full sm:fixed ">
+        <div className="overflow-show rounded-b-lg p-4 sm:bottom-0 sm:w-full sm:fixed">
         <Link href="/bills">
-            <a className="w-1/5 m-auto h-full float-left bg-gray-700 text-white text-center p-3 no-underline text-lg hover:bg-gray-100 hover:text-black">
-                <Image
-                    src="/images/bills.png"
-                    alt="Home"
-                    width="35px"
-                    height="35px"
-                />
+            <a className={navItemStyle+ " bg-gray-700"}>
+                <Icon path={mdiCashMultiple} size="35px" />
             </a>
         </Link>
         <Link href="#">
-            <a className="w-1/5 m-auto h-full float-left bg-gray-700 text-white text-center p-3 no-underline text-lg hover:bg-gray-100 hover:text-black">
-                <Image
-                    src="/images/thing.png"
-                    alt="Home"
-                    width="35px"
-                    height="35px"
-                />
+            <a className={navItemStyle+ " bg-gray-700"}>
+              <Icon path={mdiFileDocumentOutline} size="35px" />
             </a>
         </Link>
         <Link href="/createhome">
-            <a className="text-white bg-green-400 w-1/5 m-auto h-full float-left text-center p-3 no-underline text-lg hover:bg-gray-100 hover:text-black">
-                <Image
-                    src="/images/add_home.png"
-                    alt="Home"
-                    width="60px"
-                    height="60px"
-                />
+            <a className={"bg-white " +navItemStyle}>
+             <div className="bg-dorian text-slate-600 border-solid border-slate-600 border-2 w-24 h-24 sm:w-16 sm:h-16 flex justify-center items-center rounded-full">
+                <Icon path={mdiPlus} size={1} />
+             </div>
             </a>
         </Link>
         <Link href="/notification">
-            <a className="w-1/5 m-auto h-full float-left bg-gray-700 text-white text-center p-3 no-underline text-lg hover:bg-gray-100 hover:text-black">
-                <Image
-                    src="/images/notifications.png"
-                    alt="Home"
-                    width="35px"
-                    height="35px"
-                />
+            <a className={navItemStyle+ " bg-gray-700"}>
+                <Icon path={mdiBellOutline} size="35px" />
             </a>
         </Link>
         <Link href="/homes">
-            <a className="w-1/5 m-auto h-full float-left bg-gray-700 text-white text-center p-3 no-underline text-lg hover:bg-gray-100 hover:text-black">
-                <Image
-                    src="/images/user.png"
-                    alt="Home"
-                    width="35px"
-                    height="35px"
-                />
+            <a className={navItemStyle+ " bg-gray-700"}>
+                <Icon path={mdiAccountCircleOutline} size="35px" />
             </a>
         </Link>
     </div>
