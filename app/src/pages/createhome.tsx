@@ -46,24 +46,28 @@ const CreationPage: NextPage = () => {
         if(fileList != null){
             imageFile = fileList[0]
         }
-        if(!imageFile) return;
-        const { url, fields } = await getPresignedURL.mutateAsync(imageFile.name);
-        console.log({ url, fields});
-        const data = {
-            ...fields,
-            'Content-Type': imageFile.type,
-            file: imageFile
+        let key = null;
+        if(imageFile){
+            const { url, fields } = await getPresignedURL.mutateAsync(imageFile.name);
+            console.log({ url, fields});
+            const data = {
+                ...fields,
+                'Content-Type': imageFile.type,
+                file: imageFile
+            }
+            key = fields.key;
+            const formData = new FormData();
+            for(const name in data){
+                formData.append(name, data[name]);
+            }
+            await fetch(url, {
+                method: "POST",
+                body: formData
+            })
         }
-        const formData = new FormData();
-        for(const name in data){
-            formData.append(name, data[name]);
-        }
-        await fetch(url, {
-            method: "POST",
-            body: formData
-        })
+        
         await createHome.mutateAsync({
-            image: fields.key,
+            image: key,
             name: form.elements["name"].value,
             address: form.elements["address"].value,
         });

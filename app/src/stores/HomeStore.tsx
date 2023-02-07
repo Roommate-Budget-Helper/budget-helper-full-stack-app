@@ -1,7 +1,6 @@
-import { create, createStore } from "zustand";
+import { createStore } from "zustand";
 import { createContext, useEffect, useRef } from "react";
 import { Home } from "@prisma/client";
-import { Reducible } from "utils/types";
 import { useSession } from "next-auth/react";
 import { inferQueryOutput, trpc } from "utils/trpc";
 import { createUseZustandContext } from "utils/useZustandContext";
@@ -62,6 +61,8 @@ export const HomeProvider = ({ children, ...props}: HomeProviderProps) => {
         getHomes().then(homes => {
             if(!homes.data) return;
             storeRef.current?.getState().setHomes(homes.data);
+            if(homes.data.length > 0 && homes.data[0])
+                storeRef.current?.getState().setSelectedHome(homes.data[0].id);
         })
     }, [session.data, getHomes]);
 
