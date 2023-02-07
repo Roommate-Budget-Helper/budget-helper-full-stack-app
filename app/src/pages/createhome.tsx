@@ -6,10 +6,12 @@ import React from "react";
 import { trpc } from "utils/trpc";
 import { useState } from 'react';
 import { useRouter } from 'next/router';
+import { useHomeContext } from "@stores/HomeStore";
 
 const CreationPage: NextPage = () => {
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
+    const refetchHomes = useHomeContext(s => s.refetchHomes);
 
     const addUserToHome = trpc.useMutation(["occupies.addUserToHome"], {
         onError: (error) => {
@@ -26,6 +28,7 @@ const CreationPage: NextPage = () => {
             await addUserToHome.mutateAsync({
                 homeId: home.id,
             });
+            await refetchHomes();
             router.push("/homes");
         },
     });   

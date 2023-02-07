@@ -18,7 +18,8 @@
         "baseUrl": "./src",
         "suppressImplicitAnyIndexErrors": true,
         "paths": {
-            "@components/*": ["components/*"]
+            "@components/*": ["components/*"],
+            "@stores/*": ["stores/*"]
         }
     },
     "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.cjs", "**/*.mjs"],

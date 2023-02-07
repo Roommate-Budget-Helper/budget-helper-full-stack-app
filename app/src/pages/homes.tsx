@@ -2,16 +2,15 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import React from "react";
 import Image from "next/image";
-import { trpc } from "utils/trpc";
 import Navbar from "@components/navbar";
 import { useState } from 'react';
+import { useHomeContext } from "@stores/HomeStore";
+
 
 
 const HomesPage: NextPage = () => {
     const [error, setError] = useState<string | null>(null);
-
-    
-    const homes = trpc.useQuery(["home.getHomes"]);
+    const homes = useHomeContext((s) => s.homes);
 
 
     return (
@@ -38,12 +37,12 @@ const HomesPage: NextPage = () => {
                                 height="100px"
                             />
                         </div>
-                        {homes.data && homes.data.length > 0 ? <>
-                        <div>You belong to {homes.data.length} homes</div>
+                        {homes && homes.length > 0 ? <>
+                        <div>You belong to {homes.length} homes</div>
                         <br></br>
                         
                         <div id="homeDisplay">
-                            {homes.data?.map(home => (<div key={home.id}>
+                            {homes.map(home => (<div key={home.id}>
                                 <h1>{home.name}</h1>
                                 <p>{home.address}</p>
                                 <a className="text-evergreen-80" href={`/home/${home.id}`}>View</a>
