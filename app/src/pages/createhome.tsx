@@ -2,16 +2,19 @@ import Button from "@components/button";
 import FieldInput from "@components/fieldinput";
 import type { NextPage } from "next";
 import Head from "next/head";
-import React from "react";
+import React, { useRef } from "react";
 import { trpc } from "utils/trpc";
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useHomeContext } from "@stores/HomeStore";
 
+
 const CreationPage: NextPage = () => {
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
     const refetchHomes = useHomeContext(s => s.refetchHomes);
+    const fileRef = useRef<HTMLInputElement>(null);
+    const getPresignedURL = trpc.useMutation(["upload.getPresignedURL"])
 
     const addUserToHome = trpc.useMutation(["occupies.addUserToHome"], {
         onError: (error) => {
@@ -24,6 +27,7 @@ const CreationPage: NextPage = () => {
             setError(error.message);
         },
         onSuccess: async (home) => {
+
             // Add userid and homeid to the occupies table
             await addUserToHome.mutateAsync({
                 homeId: home.id,
@@ -37,8 +41,29 @@ const CreationPage: NextPage = () => {
         event.preventDefault();
         const form = event.target as HTMLFormElement;
 
+        const fileList = fileRef.current?.files
+        let imageFile = null
+        if(fileList != null){
+            imageFile = fileList[0]
+        }
+        if(!imageFile) return;
+        const { url, fields } = await getPresignedURL.mutateAsync(imageFile.name);
+        console.log({ url, fields});
+        const data = {
+            ...fields,
+            'Content-Type': imageFile.type,
+            file: imageFile
+        }
+        const formData = new FormData();
+        for(const name in data){
+            formData.append(name, data[name]);
+        }
+        await fetch(url, {
+            method: "POST",
+            body: formData
+        })
         await createHome.mutateAsync({
-            image: form.elements["image"].value,
+            image: fields.key,
             name: form.elements["name"].value,
             address: form.elements["address"].value,
         });
@@ -60,11 +85,7 @@ const CreationPage: NextPage = () => {
                         <br></br>
                         <form method="post" onSubmit={onCreateHome}>
                             {/* TODO: Give it a cute image uploader */}
-                            <FieldInput
-                                type="text"
-                                name="image"
-                                placeholder="Image"
-                            ></FieldInput>
+                            <input ref={fileRef} type="file" name="image" accept=".png, .jpg" ></input>
                             <br></br>
                             <FieldInput
                                 type="text"

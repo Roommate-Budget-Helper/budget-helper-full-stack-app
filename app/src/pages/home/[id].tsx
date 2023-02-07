@@ -1,5 +1,6 @@
 import Head from "next/head";
 import React from "react";
+import Image from "next/image";
 import type { GetServerSideProps, NextPage } from "next";
 import Navbar from "@components/navbar";
 import { trpc } from "../../utils/trpc";
@@ -30,6 +31,7 @@ const HomeIdPage: NextPage<HomePageProps> = (props: HomePageProps) => {
                <Navbar />
                 {homeData.data ? <div className="text-xl p-5">
                     <div className="form-area flex flex-col justify-between items-center">
+                        <Image alt="Home Image" src={homeData.data.image} width="128px" height="128px"/>
                         <div className="p-5">{homeData.data.name}</div>
                         <div className="p-1 text-sm">📍Address: {homeData.data.address}</div>
                         <div className="p-5" >This is the roommates cost chart</div>

@@ -1,6 +1,7 @@
 import { createProtectedRouter } from "./context";
 import { z } from "zod";
 import { getHomesByUserId, canUserViewHome } from "../db/HomeService";
+import { getSignedImage } from "./image-upload";
 
 export const homesRouter = createProtectedRouter()
     .query("getHomes", {
@@ -9,7 +10,7 @@ export const homesRouter = createProtectedRouter()
                 return;
             }
             const homeIds = await getHomesByUserId(ctx.session.user.id, ctx.prisma);
-            return await ctx.prisma.home.findMany({
+            const homes = await ctx.prisma.home.findMany({
                 select: {
                     id: true,
                     name: true,
@@ -22,6 +23,11 @@ export const homesRouter = createProtectedRouter()
                     },
                 },
             });
+            for(const home of homes){
+                if(!home.image) continue;
+                home.image = await getSignedImage(home.image);
+            }
+            return homes;
         },
     })
     .query("getHomeById", {
@@ -32,7 +38,7 @@ export const homesRouter = createProtectedRouter()
             if(!ctx.session.user || !(await canUserViewHome(ctx.session.user.id, input.homeId, ctx.prisma))){
                 return;
             }            
-            return await ctx.prisma.home.findFirst({
+            const home = await ctx.prisma.home.findFirst({
                 select: {
                     id:true,
                     name: true,
@@ -45,15 +51,22 @@ export const homesRouter = createProtectedRouter()
                     },
                 },
             });
+            if(!home) return;
+            if(home.image) home.image = await getSignedImage(home.image);
+            return home;
         },
     })
     .mutation("createHome", {
         input: z.object({
             name: z.string(),
-            image: z.string(),
+            image: z.any(),
             address: z.string(),
         }),
         async resolve({ ctx, input }) {
+
+            //Creates image key here so the image can bey placed in the S3 Bucket and referenced in the Prisma Database
+
+            //Puts home info in prisma database
             return await ctx.prisma.home.create({
                 data: {
                     name: input.name,

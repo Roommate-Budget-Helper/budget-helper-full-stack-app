@@ -14,6 +14,7 @@ export const serverSchema = z.object({
     COGNITO_USER_POOL: z.string(),
     GOOGLE_CLIENT_ID: z.string(),
     GOOGLE_CLIENT_SECRET: z.string(),
+    S3_BUCKET_NAME: z.string(),
 });
 
 /**
