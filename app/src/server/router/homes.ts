@@ -1,6 +1,8 @@
 import { createProtectedRouter } from "./context";
 import { z } from "zod";
 import { getHomesByUserId, canUserViewHome } from "../db/HomeService";
+import { putImage } from "./image-upload";
+import { randomUUID } from "crypto";
 
 export const homesRouter = createProtectedRouter()
     .query("getHomes", {
@@ -50,14 +52,22 @@ export const homesRouter = createProtectedRouter()
     .mutation("createHome", {
         input: z.object({
             name: z.string(),
-            image: z.string(),
+            image: z.any(),
             address: z.string(),
         }),
         async resolve({ ctx, input }) {
+
+            //Creates image key here so the image can bey placed in the S3 Bucket and referenced in the Prisma Database
+            const imageKey = `${input.name}-${randomUUID()}`
+            
+            //Puts object in S3 Bucket
+            await putImage(imageKey, input.image);
+
+            //Puts home info in prisma database
             return await ctx.prisma.home.create({
                 data: {
                     name: input.name,
-                    image: input.image,
+                    image: imageKey,
                     address: input.address,
                 },
             });
