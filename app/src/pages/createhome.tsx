@@ -43,6 +43,7 @@ const CreationPage: NextPage = () => {
         if(fileList != null){
             imageFile = fileList[0]
         }
+        if(!imageFile) return;
         const { url, fields } = await getPresignedURL.mutateAsync(imageFile.name);
         console.log({ url, fields});
         const data = {
