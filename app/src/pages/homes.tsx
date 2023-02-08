@@ -5,11 +5,14 @@ import Image from "next/image";
 import Navbar from "@components/navbar";
 import { useState } from 'react';
 import { useHomeContext } from "@stores/HomeStore";
+import Icon from "@mdi/react";
+import { mdiDotsVertical } from "@mdi/js";
 
 
 
 const HomesPage: NextPage = () => {
     const [error, setError] = useState<string | null>(null);
+    const [isMenuOpen, setMenuOpen] = useState<boolean>(false);
     const homes = useHomeContext((s) => s.homes);
     const selectedHome = useHomeContext((s) => s.selectedHome);
 
@@ -32,6 +35,18 @@ const HomesPage: NextPage = () => {
                 <div className="text-xl p-5">
                     {selectedHome && homeData ? 
                     <div className="body flex flex-col text-center">
+                        <div 
+                        className="self-end mr-6 rounded-full hover:bg-slate-200 w-12 h-12 flex items-center relative"
+                        onClick={() => setMenuOpen(open => !open)}>
+                            <Icon path={mdiDotsVertical} size={1} className="mx-auto"/>
+                            {isMenuOpen && <div className="absolute top-10 right-10 w-96 bg-slate-50">
+                                <div className="hover:bg-slate-200 border-b-2 border-black py-2">Invite Roommate</div>
+                                <div className="hover:bg-slate-200 border-b-2 border-black py-2">Remove Roommate</div>
+                                <div className="hover:bg-slate-200 border-b-2 border-black py-2">Edit Home</div>
+                                <div className="hover:bg-slate-200 border-b-2 border-black py-2">Leave Home</div>
+                                <div className="hover:bg-slate-200 border-b-2 border-black py-2">Delete Home</div>
+                            </div>}
+                        </div>
                         <div className="text-xl p-5">
                             <div className="form-area flex flex-col justify-between items-center">
                                 {homeData.image &&
