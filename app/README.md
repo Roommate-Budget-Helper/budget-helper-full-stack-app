@@ -52,10 +52,9 @@ GOOGLE_CLIENT_SECRET=<google-client-secret-here>
 6. Run `npx cypress install` in the /app folder to prepare cypress for the first time
 7. Setup an X-Server on your host machine and allow connections to localhost:
 
--   Mac: `brew install --cask Xquartz`
+-   Mac: `brew install --cask Xquartz`. Run `xhost + localhost`
 -   Windows: [Xming](https://sourceforge.net/projects/xming/)
--   Linux: Install `xorg-xhost` package if not already on your system  
-    Mac + Linux: Run `xhost + localhost`
+-   Linux: Install `xorg-xhost` package if not already on your system. In docker desktop, enable file sharing for `/tmp/.X11-unix` Run `xhost + local:docker`
 
 ### Notes for Windows: 
    # Change your DISPLAY location for xming
