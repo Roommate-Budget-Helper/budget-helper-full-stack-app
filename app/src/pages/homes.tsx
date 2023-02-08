@@ -7,12 +7,15 @@ import { useState } from 'react';
 import { useHomeContext } from "@stores/HomeStore";
 import Icon from "@mdi/react";
 import { mdiDotsVertical } from "@mdi/js";
+import Modal from '@components/modal';
+import Button from '@components/button';
 
 
 
 const HomesPage: NextPage = () => {
     const [error, setError] = useState<string | null>(null);
     const [isMenuOpen, setMenuOpen] = useState<boolean>(false);
+    const [isDeleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
     const homes = useHomeContext((s) => s.homes);
     const selectedHome = useHomeContext((s) => s.selectedHome);
 
@@ -20,6 +23,8 @@ const HomesPage: NextPage = () => {
         return homes.find(home => home.id === selectedHome);
     }, [selectedHome, homes]);
 
+    const handleCloseDeleteModal = () => setDeleteModalOpen(false);
+    const handleOpenDeleteModal = () => setDeleteModalOpen(true);
 
     return (
         <>
@@ -42,9 +47,10 @@ const HomesPage: NextPage = () => {
                             {isMenuOpen && <div className="absolute top-10 right-10 w-96 bg-slate-50">
                                 <div className="hover:bg-slate-200 border-b-2 border-black py-2">Invite Roommate</div>
                                 <div className="hover:bg-slate-200 border-b-2 border-black py-2">Remove Roommate</div>
+                                <div className="hover:bg-slate-200 border-b-2 border-black py-2">Edit Permissions</div>
                                 <div className="hover:bg-slate-200 border-b-2 border-black py-2">Edit Home</div>
                                 <div className="hover:bg-slate-200 border-b-2 border-black py-2">Leave Home</div>
-                                <div className="hover:bg-slate-200 border-b-2 border-black py-2">Delete Home</div>
+                                <div className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={handleOpenDeleteModal}>Delete Home</div>
                             </div>}
                         </div>
                         <div className="text-xl p-5">
@@ -84,8 +90,19 @@ const HomesPage: NextPage = () => {
                         </div>
                         {error&&<p className="text-xl font-light text-red-600">{error}</p>}
                     </div>}
-                </div>
+                </div>              
             </div>
+            <Modal show={isDeleteModalOpen} onHide={handleCloseDeleteModal}>
+                <Modal.Header>
+                    Delete Home 
+                </Modal.Header>
+                <Modal.Body>Are you sure you want to delete this home? Deleting will remove this home for all occupants, and cannot be undone.</Modal.Body>
+                <Modal.Footer>
+                    <Button classNames="bg-red-600" onClick={handleCloseDeleteModal} value="Cancel"/>
+                    <Button classNames="bg-evergreen-80" onClick={handleCloseDeleteModal} value="Delete Permanently" />
+                </Modal.Footer> 
+            </Modal>  
+
         </>
     );
 };
