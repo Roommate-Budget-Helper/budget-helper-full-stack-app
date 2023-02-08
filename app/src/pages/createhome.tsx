@@ -13,6 +13,7 @@ const CreationPage: NextPage = () => {
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
     const refetchHomes = useHomeContext(s => s.refetchHomes);
+    const setSelectedHome = useHomeContext(s => s.setSelectedHome);
     const fileRef = useRef<HTMLInputElement>(null);
     const getPresignedURL = trpc.useMutation(["upload.getPresignedURL"])
 
@@ -32,6 +33,7 @@ const CreationPage: NextPage = () => {
             await addUserToHome.mutateAsync({
                 homeId: home.id,
             });
+            setSelectedHome(home.id);
             await refetchHomes();
             router.push("/homes");
         },

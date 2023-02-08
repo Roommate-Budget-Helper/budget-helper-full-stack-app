@@ -46,7 +46,10 @@ const Navbar: React.FC = () => {
                 className="rounded-full bg-slate-300 w-24 h-24 flex items-center justify-center" 
                 onClick={onItemClicked(home.id)}    
             >
-                {home.image ?<Image src={home.image} alt="home icon" width="64px" height="64px" />:<p>T</p>}
+                {home.image ?<Image src={home.image} alt="home icon" width="64px" height="64px" />:<p>{home.name.split(" ").reduce((a,c) => {
+                    a += c[0];
+                    return a;
+                }, "")}</p>}
             </div>))}
             <Link href="/createhome" style={{
                 zIndex: 100,
