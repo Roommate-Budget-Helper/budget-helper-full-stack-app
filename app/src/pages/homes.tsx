@@ -46,7 +46,7 @@ const HomesPage: NextPage = () => {
                             {homes.data?.map(home => (<div key={home.id}>
                                 <h1>{home.name}</h1>
                                 <p>{home.address}</p>
-                                <a className="text-evergreen-80" href={`/home/${home.id}`}>View</a>
+                                <a className="text-evergreen-80" href={`/home/${home.id}`}>View {home.name}</a>
                             </div>))}
                         </div>
                         </> : <>
