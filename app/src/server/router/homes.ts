@@ -101,6 +101,11 @@ export const homesRouter = createProtectedRouter()
             id: z.string(),
         }),
         async resolve({ ctx, input }) {
+            await ctx.prisma.occupies.deleteMany({
+                where: {
+                    homeId: input.id,
+                }
+            }); 
             return await ctx.prisma.home.delete({
                 where: {
                     id: input.id,

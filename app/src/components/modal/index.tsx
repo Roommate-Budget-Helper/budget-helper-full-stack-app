@@ -20,7 +20,10 @@ const Modal: ModalType & ModalSubComponents =(props: React.PropsWithChildren<Mod
     return (<>
     <div style={{
             zIndex: 300,
-        }}id="defaultModal" tabIndex={-1} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-modal md:h-full">
+        }}
+        tabIndex={-1} 
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-modal md:h-full"
+    >
             <div className="relative w-full h-full max-w-2xl md:h-auto">
                 {/* <!-- Modal content --> */}
                 <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
@@ -30,7 +33,8 @@ const Modal: ModalType & ModalSubComponents =(props: React.PropsWithChildren<Mod
         </div>
         <div style={{
             zIndex: 200,
-        }} className='absolute inset-0 bg-black bg-opacity-60'></div>
+            }} 
+            className='absolute inset-0 bg-black bg-opacity-60'></div>
         </>)
 }
 

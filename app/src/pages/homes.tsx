@@ -9,22 +9,42 @@ import Icon from "@mdi/react";
 import { mdiDotsVertical } from "@mdi/js";
 import Modal from '@components/modal';
 import Button from '@components/button';
-
+import { trpc } from "utils/trpc";
 
 
 const HomesPage: NextPage = () => {
     const [error, setError] = useState<string | null>(null);
     const [isMenuOpen, setMenuOpen] = useState<boolean>(false);
     const [isDeleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
+    const [isLeaveModalOpen, setLeaveModalOpen] = useState<boolean>(false);
+
     const homes = useHomeContext((s) => s.homes);
     const selectedHome = useHomeContext((s) => s.selectedHome);
+    const setSelectedHome = useHomeContext((s) => s.setSelectedHome);
+    const refetchHomes = useHomeContext((s) => s.refetchHomes);
+    
+    const deleteHome = trpc.useMutation(["home.deleteHome"]);
+    const leaveHome = trpc.useMutation(["occupies.removeUserFromHome"]);
 
     const homeData = useMemo(() => {
         return homes.find(home => home.id === selectedHome);
     }, [selectedHome, homes]);
 
-    const handleCloseDeleteModal = () => setDeleteModalOpen(false);
-    const handleOpenDeleteModal = () => setDeleteModalOpen(true);
+    const handleToggleModal = (setterFunction: React.SetStateAction<boolean>) => () => setterFunction(state => !state);
+    
+    const handleDelete = async () => {
+        setDeleteModalOpen(false);
+        if(selectedHome != null) await deleteHome.mutateAsync({id: selectedHome});
+        await refetchHomes();
+        setSelectedHome(homes.length > 0 && homes[0] ? homes[0].id : null);        
+    };
+
+    const handleLeave = async () => {
+        setLeaveModalOpen(false);
+        if(selectedHome != null) await leaveHome.mutateAsync({homeId: selectedHome});
+        await refetchHomes();
+        setSelectedHome(homes.length > 0 && homes[0] ? homes[0].id : null);
+    }
 
     return (
         <>
@@ -42,15 +62,15 @@ const HomesPage: NextPage = () => {
                     <div className="body flex flex-col text-center">
                         <div 
                         className="self-end mr-6 rounded-full hover:bg-slate-200 w-12 h-12 flex items-center relative"
-                        onClick={() => setMenuOpen(open => !open)}>
+                        onClick={handleToggleModal(setMenuOpen)}>
                             <Icon path={mdiDotsVertical} size={1} className="mx-auto"/>
                             {isMenuOpen && <div className="absolute top-10 right-10 w-96 bg-slate-50">
                                 <div className="hover:bg-slate-200 border-b-2 border-black py-2">Invite Roommate</div>
                                 <div className="hover:bg-slate-200 border-b-2 border-black py-2">Remove Roommate</div>
                                 <div className="hover:bg-slate-200 border-b-2 border-black py-2">Edit Permissions</div>
                                 <div className="hover:bg-slate-200 border-b-2 border-black py-2">Edit Home</div>
-                                <div className="hover:bg-slate-200 border-b-2 border-black py-2">Leave Home</div>
-                                <div className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={handleOpenDeleteModal}>Delete Home</div>
+                                <div className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={handleToggleModal(setLeaveModalOpen)}>Leave Home</div>
+                                <div className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={handleToggleModal(setDeleteModalOpen)}>Delete Home</div>
                             </div>}
                         </div>
                         <div className="text-xl p-5">
@@ -92,16 +112,26 @@ const HomesPage: NextPage = () => {
                     </div>}
                 </div>              
             </div>
-            <Modal show={isDeleteModalOpen} onHide={handleCloseDeleteModal}>
-                <Modal.Header>
+            <Modal show={isDeleteModalOpen} onHide={handleToggleModal(setDeleteModalOpen)}>
+                <Modal.Header onHide={handleToggleModal(setDeleteModalOpen)}>
                     Delete Home 
                 </Modal.Header>
                 <Modal.Body>Are you sure you want to delete this home? Deleting will remove this home for all occupants, and cannot be undone.</Modal.Body>
                 <Modal.Footer>
-                    <Button classNames="bg-red-600" onClick={handleCloseDeleteModal} value="Cancel"/>
-                    <Button classNames="bg-evergreen-80" onClick={handleCloseDeleteModal} value="Delete Permanently" />
+                    <Button classNames="bg-red-600" onClick={handleToggleModal(setDeleteModalOpen)} value="Cancel"/>
+                    <Button classNames="bg-evergreen-80" onClick={handleDelete} value="Delete Permanently" />
                 </Modal.Footer> 
-            </Modal>  
+            </Modal> 
+            <Modal show={isLeaveModalOpen} onHide={handleToggleModal(setLeaveModalOpen)}>
+                <Modal.Header onHide={handleToggleModal(setLeaveModalOpen)}>
+                    Leave Home 
+                </Modal.Header>
+                <Modal.Body>Are you sure you want to leave this home? Leaving will remove yourself from this home, and cannot be undone without another user to invite you back.</Modal.Body>
+                <Modal.Footer>
+                    <Button classNames="bg-red-600" onClick={handleToggleModal(setLeaveModalOpen)} value="Cancel"/>
+                    <Button classNames="bg-evergreen-80" onClick={handleLeave} value="Leave" />
+                </Modal.Footer> 
+            </Modal>   
 
         </>
     );
