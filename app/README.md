@@ -37,19 +37,43 @@ GOOGLE_CLIENT_ID=<google-client-id-here>
 GOOGLE_CLIENT_SECRET=<google-client-secret-here>
 ```
 
-10. While in the app folder run `npm ci`
+10. While in the app folder run `npm i`
 
-You should now be able run the project
+## Setting up testing
+
+1. Create a file called `cypress.env.json` in the app folder
+2. Enter the following values:
+   `{ "API_KEY": "<replace-this-with-your-actual-api-key>" }`
+3. Go to [MailSlurp](https://www.mailslurp.com/) and create an account
+4. After logging in confirm you see a dashboard similar to this:
+   ![MailSlurp Dashboard](../docs/mailslurp.png)
+5. Copy the API Access key and place it in the `cypress.env.json`  
+   You should now be able run the project
+6. Run `npx cypress install` in the /app folder to prepare cypress for the first time
+7. Setup an X-Server on your host machine and allow connections to localhost:
+
+-   Mac: `brew install --cask Xquartz`. Run `xhost + localhost`
+-   Windows: [Xming](https://sourceforge.net/projects/xming/)
+-   Linux: Install `xorg-xhost` package if not already on your system. In docker desktop, enable file sharing for `/tmp/.X11-unix` Run `xhost + local:docker`
+
+### Notes for Windows: 
+   # Change your DISPLAY location for xming
+      export DISPLAY=<your ip address>:0
+   # Run the xming application in your local computer
+      <xming executable location in explorer> :0 -ac
+   # Run the e2e test in dev container
+      npm run e2e
 
 ## Commands
 
 `npm run dev` => Runs the development server  
-`npm run test` => Runs the test suite  
+`npm run test` => Runs the jest test suite  
+`npm run e2e` => Runs the cypress test suite  
 `npm run lint` => Runs the linter  
 `npm run build` => Runs the build command  
-`npx prisma generate` => Rebuilds the prisma client for accessing the database from typescript  
+`npx prisma generate` => Rebuilds the prisma client for accessing the database from typescript 
 `npx prisma db push` => Synchronize the database with the prisma schema  
-`npx prisma studio` => Opens prisma studio for debugging
+`npx prisma studio` => Opens prisma studio for debugging 
 
 ## Troubleshooting
 
