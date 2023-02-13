@@ -35,10 +35,11 @@ const Navbar: React.FC = () => {
               <Icon path={mdiFileDocumentOutline} size="35px" />
             </a>
         </Link>
-        <div className="bg-gray-700 relative h-12 w-24">
+        <div className="bg-gray-700 relative h-12 w-24" id="Home">
             {homes.map(home => (
             <div 
                 key={home.id}
+                id={home.name}
                 style={{
                     zIndex: home.id == selectedHome ? 200 : 100,
                     position: isSelecting ? "static" : "absolute"
@@ -55,7 +56,7 @@ const Navbar: React.FC = () => {
                 zIndex: 100,
                 position: isSelecting ? "static" : "absolute"
             }}>
-                <a className="w-100 h-full flex-grow flex items-start justify-center text-white text-center no-underline text-lg hover:text-evergreen-80">
+                <a id="createHome" className="w-100 h-full flex-grow flex items-start justify-center text-white text-center no-underline text-lg hover:text-evergreen-80">
                 <div className="bg-dorian text-slate-600 border-solid border-slate-600 border-2 w-24 h-24 flex justify-center items-center rounded-full">
                     <Icon path={mdiPlus} size={1} />
                 </div>

@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
 
 import { Email, InboxDto } from "mailslurp-client";
+import 'cypress-file-upload'
 
 // ***********************************************
 // This example commands.ts shows you how to
