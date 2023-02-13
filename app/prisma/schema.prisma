@@ -55,7 +55,7 @@ model Home {
 model Occupies {
   userId String
   homeId String
-  home   Home   @relation(fields: [homeId], references: [id])
+  home   Home   @relation(fields: [homeId], references: [id], onDelete: Cascade)
   user   User   @relation(fields: [userId], references: [id])
 
   @@id([userId, homeId])
