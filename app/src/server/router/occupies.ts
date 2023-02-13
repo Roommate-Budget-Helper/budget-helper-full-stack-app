@@ -17,4 +17,19 @@ export const occupiesRouter = createProtectedRouter()
                 },
             });
         },
+    })
+    .mutation("removeUserFromHome", {
+        input: z.object({
+            homeId: z.string(),
+        }),
+        async resolve({ ctx, input }){
+            return await ctx.prisma.occupies.delete({
+                where: {
+                   userId_homeId: {
+                    userId: ctx.session.user.id,
+                    homeId: input.homeId,
+                   }
+                }
+            });
+        },
     });
