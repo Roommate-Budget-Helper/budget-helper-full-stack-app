@@ -80,7 +80,7 @@ export const homesRouter = createProtectedRouter()
         input: z.object({
             id: z.string(),
             name: z.string(),
-            image: z.string(),
+            image: z.any(),
             address: z.string(),
         }),
         async resolve({ ctx, input }) {
