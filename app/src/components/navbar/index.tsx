@@ -4,7 +4,7 @@ import Icon from '@mdi/react';
 import { mdiCashMultiple, mdiFileDocumentOutline, mdiBellOutline, mdiAccountCircleOutline, mdiPlus } from '@mdi/js';
 import { useHomeContext } from "@stores/HomeStore";
 import { useState } from "react";
-
+import { signOut } from 'next-auth/react';
 
 const navItemStyle = "h-full py-4 flex-grow flex items-start justify-center text-white text-center p-3 no-underline text-lg hover:text-evergreen-80";
 // TODO: WIP fix styles
@@ -23,6 +23,11 @@ const Navbar: React.FC = () => {
         setSelectedHome(id);
         setSelecting(false);
     }
+
+    function signOutAndGoToLogin() {
+        signOut();
+    }
+
     return (
         <div className="overflow-show rounded-b-lg p-4 flex">
         <Link href="/bills">
@@ -67,8 +72,8 @@ const Navbar: React.FC = () => {
                 <Icon path={mdiBellOutline} size="35px" />
             </a>
         </Link>
-        <Link href="/homes">
-            <a className={navItemStyle+ " bg-gray-700"}>
+        <Link href="/login" >
+            <a onClick={signOutAndGoToLogin} className={navItemStyle+ " bg-gray-700"} >
                 <Icon path={mdiAccountCircleOutline} size="35px" />
             </a>
         </Link>

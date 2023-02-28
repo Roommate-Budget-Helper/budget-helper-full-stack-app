@@ -4,6 +4,7 @@ import FieldInput from "@components/fieldinput";
 import Button from "@components/button";
 import Head from "next/head";
 import { trpc } from "utils/trpc";
+import { signIn } from 'next-auth/react';
 
 const ForgotPasswordPage: NextPage = () => {
     const [username, setUsername] = useState<string>("");
@@ -57,6 +58,12 @@ const ForgotPasswordPage: NextPage = () => {
             password: password,
             code: verification,
         });
+
+        await signIn("credentials", {
+            username: username,
+            password: password,
+            redirect: false
+        })
     };
 
     if (emailSent) {
