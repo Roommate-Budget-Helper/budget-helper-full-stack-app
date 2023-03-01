@@ -5,13 +5,15 @@ import { registerRouter } from "./register";
 import { homesRouter } from "./homes";
 import { occupiesRouter } from "./occupies";
 import { fileUploadRouter } from "./image-upload";
+import { invitationRouter } from "./invitation";
 
 export const appRouter = createRouter()
     .transformer(superjson)
     .merge("home.", homesRouter)
     .merge("occupies.", occupiesRouter)
     .merge("auth.", registerRouter)
-    .merge("upload.", fileUploadRouter);
+    .merge("upload.", fileUploadRouter)
+    .merge("invite.", invitationRouter);
 
 // export type definition of API
 export type AppRouter = typeof appRouter;
