@@ -11,6 +11,7 @@ import Modal from '@components/modal';
 import Button from '@components/button';
 import { trpc } from "utils/trpc";
 import Link from "next/link";
+import FieldInput from "@components/fieldinput";
 
 
 const HomesPage: NextPage = () => {
@@ -18,6 +19,8 @@ const HomesPage: NextPage = () => {
     const [isMenuOpen, setMenuOpen] = useState<boolean>(false);
     const [isDeleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
     const [isLeaveModalOpen, setLeaveModalOpen] = useState<boolean>(false);
+    const [isInviteModalOpen, setInviteModalOpen] = useState<boolean>(false);
+
 
     const homes = useHomeContext((s) => s.homes);
     const selectedHome = useHomeContext((s) => s.selectedHome);
@@ -26,12 +29,13 @@ const HomesPage: NextPage = () => {
     
     const deleteHome = trpc.useMutation(["home.deleteHome"]);
     const leaveHome = trpc.useMutation(["occupies.removeUserFromHome"]);
+    const inviteRoommate = trpc.useMutation(["invite.sendInvitation"]);
 
     const homeData = useMemo(() => {
         return homes.find(home => home.id === selectedHome);
     }, [selectedHome, homes]);
 
-    const handleToggleModal = (setterFunction: React.SetStateAction<boolean>) => () => setterFunction(state => !state);
+    const handleToggleModal = (setterFunction: React.Dispatch<React.SetStateAction<boolean>>) => () => setterFunction(state => !state);
     
     const handleDelete = async () => {
         setDeleteModalOpen(false);
@@ -45,6 +49,17 @@ const HomesPage: NextPage = () => {
         if(selectedHome != null) await leaveHome.mutateAsync({homeId: selectedHome});
         await refetchHomes();
         setSelectedHome(homes.length > 0 && homes[0] ? homes[0].id : null);
+    }
+
+    const handleInvite = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const form = (event.target as HTMLFormElement);
+        if(!selectedHome) return;
+        await inviteRoommate.mutateAsync({
+            homeId: selectedHome,
+            email: form.elements["email"].value,
+        });
+        setInviteModalOpen(false);
     }
 
     return (
@@ -66,7 +81,7 @@ const HomesPage: NextPage = () => {
                         onClick={handleToggleModal(setMenuOpen)}>
                             <Icon path={mdiDotsVertical} size={1} className="mx-auto"/>
                             {isMenuOpen && <div className="absolute top-10 right-10 w-96 bg-slate-50">
-                                <div className="hover:bg-slate-200 border-b-2 border-black py-2">Invite Roommate</div>
+                                <div className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={handleToggleModal(setInviteModalOpen)}>Invite Roommate</div>
                                 <div className="hover:bg-slate-200 border-b-2 border-black py-2">Remove Roommate</div>
                                 <div className="hover:bg-slate-200 border-b-2 border-black py-2">Edit Permissions</div>
                                 <div className="hover:bg-slate-200 border-b-2 border-black py-2"><Link href="/updatehome">Update Home</Link> </div>
@@ -132,8 +147,23 @@ const HomesPage: NextPage = () => {
                     <Button classNames="bg-red-600" onClick={handleToggleModal(setLeaveModalOpen)} value="Cancel"/>
                     <Button classNames="bg-evergreen-80" onClick={handleLeave} value="Leave" />
                 </Modal.Footer> 
-            </Modal>   
-
+            </Modal>
+            <Modal show={isInviteModalOpen} onHide={handleToggleModal(setInviteModalOpen)}>
+                <Modal.Header onHide={handleToggleModal(setInviteModalOpen)}>
+                   Invite Roommate
+                </Modal.Header>
+                <form onSubmit={handleInvite}>
+                    <Modal.Body>
+                        <FieldInput
+                        name="email"
+                        placeholder="email"/>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button classNames="bg-red-600" onClick={handleToggleModal(setLeaveModalOpen)} value="Cancel"/>
+                        <Button classNames="bg-evergreen-80" value="Submit" type="submit" />
+                    </Modal.Footer> 
+                </form>
+            </Modal>
         </>
     );
 };
