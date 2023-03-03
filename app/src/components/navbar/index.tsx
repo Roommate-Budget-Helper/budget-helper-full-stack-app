@@ -46,9 +46,9 @@ const Navbar: React.FC = () => {
 
     return (
         <div className="overflow-show rounded-b-lg p-4 flex">
-        <Link href="/bills">
+        <Link href="/billing">
             <a className={navItemStyle+ " bg-gray-700"}>
-                <WrappedIcon activePath="/bills" currentPath={router.asPath} path={mdiCashMultiple} size="35px" />
+                <WrappedIcon activePath="/billing" currentPath={router.asPath} path={mdiCashMultiple} size="35px" />
             </a>
         </Link>
         <Link href="#">

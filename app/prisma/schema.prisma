@@ -43,6 +43,7 @@ model User {
   Occupies      Occupies[]
   sessions      Session[]
   Invitation    Invitation[]
+  Charges       Charge[]
 }
 
 model Home {
@@ -52,6 +53,7 @@ model Home {
   address    String
   Occupies   Occupies[]
   Invitation Invitation[]
+  Charges    Charge[]
 }
 
 model Occupies {
@@ -79,4 +81,21 @@ model Invitation {
   user        User   @relation(fields: [initiatorId], references: [id], onDelete: Cascade)
 
   @@unique([homeId, email])
+}
+
+model Charge {
+  chargeId String @id @default(cuid())
+  chargerId String
+  homeId String
+  email String
+  amount String
+  comment String
+  created DateTime
+  dueDate DateTime
+  paid Boolean
+  confirmed Boolean
+  home Home @relation(fields: [homeId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [chargerId], references: [id], onDelete: Cascade)
+
+  @@unique([homeId, email, chargeId])
 }
