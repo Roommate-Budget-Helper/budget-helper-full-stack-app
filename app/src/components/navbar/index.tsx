@@ -13,11 +13,11 @@ const navItemStyle = "h-full py-4 flex-grow flex items-start justify-center text
 // TODO: WIP fix styles
 
 const WrappedIcon = (props: {
-    activePath: string,
-    currentPath: string,
+    activepath: string,
+    currentpath: string,
 }&IconProps) => {
     const classes = () => {
-        if(props.activePath == props.currentPath){
+        if(props.activepath == props.currentpath){
             return "text-evergreen-80";
         }
     }
@@ -48,7 +48,7 @@ const Navbar: React.FC = () => {
         <div className="overflow-show rounded-b-lg p-4 flex">
         <Link href="/billing">
             <a className={navItemStyle+ " bg-gray-700"}>
-                <WrappedIcon activePath="/billing" currentPath={router.asPath} path={mdiCashMultiple} size="35px" />
+                <WrappedIcon activepath="/billing" currentpath={router.asPath} path={mdiCashMultiple} size="35px" />
             </a>
         </Link>
         <Link href="#">
@@ -85,7 +85,7 @@ const Navbar: React.FC = () => {
         </div>
         <Link href="/notifications">
             <a className={navItemStyle+ " bg-gray-700"}>
-                <WrappedIcon activePath="/notifications" currentPath={router.asPath} path={mdiBellOutline} size="35px" />
+                <WrappedIcon activepath="/notifications" currentpath={router.asPath} path={mdiBellOutline} size="35px" />
             </a>
         </Link>
         <Link href="/login" >

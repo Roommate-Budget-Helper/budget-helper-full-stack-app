@@ -32,4 +32,19 @@ export const occupiesRouter = createProtectedRouter()
                 }
             });
         },
+    })
+    .query("getUsersInHome", {
+      input: z.object({
+        homeId: z.string(),
+      }),
+      async resolve({ ctx, input }) {
+        const occupies = await ctx.prisma.occupies.findMany({
+          where: {
+            homeId: input.homeId,
+          }
+        });
+
+        // TODO: return the user object
+        return occupies.map(occupy => occupy.userId);
+      }
     });
