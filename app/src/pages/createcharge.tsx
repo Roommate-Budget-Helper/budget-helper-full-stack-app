@@ -5,6 +5,7 @@ import { trpc } from "utils/trpc";
 import Image from "next/image";
 import Button from "@components/button";
 import FieldInput from "@components/fieldinput";
+import { useEffect } from "react";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { useHomeContext } from "@stores/HomeStore";
@@ -29,13 +30,15 @@ const CreateChargePage: NextPage = () => {
         { homeId: selectedHome },
     ]);
 
-    console.log("Occupants", occupants);
-
     const sendCharge = trpc.useMutation(["bill.sendCharge"], {
         onError: (error) => {
             setError(error.message);
         },
     });
+
+    useEffect(() => {
+        occupants.refetch();
+    }, [selectedHome, occupants.data]);
 
     if (!selectedHome) {
         return (
@@ -79,25 +82,18 @@ const CreateChargePage: NextPage = () => {
 
                         <div>Who Paid?</div>
 
-                        {occupants && occupants.length > 0 ? (
-                            <div>
-                                {occupants.map((occupant) => (
-                                    <div
-                                        key={occupant}
-                                        className="bg-slate-600 mx-10 my-10 p-3 rounded-xl text-dorian text-base"
-                                    >
-                                        {/* {home.image && <Image src={home.image} alt="home logo" width="128px" height="128px"/>} */}
-                                        <input type="checkbox">
-                                            {" "}
-                                            {occupant}{" "}
-                                        </input>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                          // TODO: This should error, this is not possible
-                            <div>There are no occupants in this home. </div>
-                        )}
+                        {/* Loop through all of the occupants and create a checkbox for each one */}
+                        {occupants.data?.map((occupant) => {
+                          console.log("Occupant", occupant);
+                           return (<div
+                                key={occupant.id}
+                                className="bg-slate-600 mx-10 my-10 p-3 rounded-xl text-dorian text-base"
+                            >
+                                <input value={occupant.id} type="checkbox">
+                                    {occupant.name}
+                                </input>
+                              </div>);
+                        })}
 
                         <br></br>
                         <Button
