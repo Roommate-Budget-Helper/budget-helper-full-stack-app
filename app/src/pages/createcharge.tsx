@@ -3,11 +3,9 @@ import { NextPage } from "next";
 import Head from "next/head";
 import { trpc } from "utils/trpc";
 import Button from "@components/button";
-import CheckboxInput from "@components/fieldinput";
 import FieldInput from "@components/fieldinput";
 import { useEffect } from "react";
 import { useState } from "react";
-import { useRouter } from "next/router";
 import { useHomeContext } from "@stores/HomeStore";
 
 const CreateChargePage: NextPage = () => {
@@ -15,34 +13,9 @@ const CreateChargePage: NextPage = () => {
     const [splittingPage, setSplittingPage] = useState<boolean>(false);
     const [billName, setBillName] = useState<string>("");
     const [billAmount, setBillAmount] = useState<number>(0);
-    const [billIds, setBillIds] = useState<Array<string>>([]);
+    const [billIds, setBillIds] = useState<string[]>([]);
 
-    const router = useRouter();
     const selectedHome = useHomeContext((s) => s.selectedHome);
-
-    const onCreateCharge = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        const form = event.target as HTMLFormElement;
-        setBillName(form.elements["name"].value);
-        setBillAmount(form.elements["amount"].value);
-
-        let billIdsList: Array<string> = [];
-        for (const occupant in occupants.data) {
-          if(form.elements[occupant.name].value == true){
-            billIdsList.append(occupant.id);
-          }
-        }
-        setBillIds(billIdsList);
-
-        setSplittingPage(true);
-
-        console.log(billIds);
-        console.log(billAmount);
-        console.log(billName);
-        // await sendCharge.mutateAsync({
-        // homeId: selectedHome,
-        // });
-    };
 
     // Get the selected home somehow so that you can get the occupants
     const occupants = trpc.useQuery([
@@ -56,10 +29,65 @@ const CreateChargePage: NextPage = () => {
         },
     });
 
+    const users = trpc.useQuery(["occupies.getUsersById", {ids: billIds}]);
+
     useEffect(() => {
         occupants.refetch();
     }, [selectedHome]);
 
+    const onCreateCharge = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const form = event.target as HTMLFormElement;
+        const billName = form.elements["name"].value;
+        const billAmount = form.elements["amount"].value;
+
+        setBillName(billName);
+        setBillAmount(billAmount);
+
+        // check which home occupants to charge
+        occupants.data?.forEach((occupant) => {
+            if (form.elements[occupant.id]) {
+                const isOccupantSelected = form.elements[occupant.id].checked;
+                if (isOccupantSelected) {
+                    setBillIds(billIds.concat(occupant.id));
+                }
+            }
+        });
+
+        setSplittingPage(true);
+        setError(null);
+    };
+
+    const onSplitCharge = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const form = event.target as HTMLFormElement;
+
+        const currentDate = new Date();
+        const defaultDueDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, currentDate.getDate());
+        users.data?.forEach((user) => {
+            if (form.elements[user.id]) {
+                const amountDue = form.elements[user.id].value;
+                if(user.email && selectedHome){
+                  // TODO: If this fails on one of them, then it shouldn't send any of them most likely
+                  sendCharge.mutateAsync({
+                    email: user.email,
+                    homeId: selectedHome,
+                    amount: String(amountDue),
+                    comment: billName, 
+                    due: defaultDueDate,
+                  });
+                }else{
+                  // TODO: This should not be something that we even have to check. The email must be given.
+                  setError("The home is not currently selected or the user doesn't have an email.");
+                  return;
+                }
+            }
+        });
+
+        setSplittingPage(false);
+    };
+
+    // Loading page for when the home hasn't loaded in yet
     if (!selectedHome) {
         return (
             <>
@@ -75,6 +103,7 @@ const CreateChargePage: NextPage = () => {
         );
     }
 
+    // Page 2 for splitting the amount between multiple roommates
     if(splittingPage){
       return (
           <>
@@ -83,16 +112,36 @@ const CreateChargePage: NextPage = () => {
                   <meta name="description" content="Create Charges" />
               </Head>
               <div className="body flex flex-col text-center">
-                  {/* <Navbar/> */}
-                  <div className="form-area flex flex-col justify-between items-center ">
-                      <div>Create Charge</div>
-                      <br></br>
-                      <div>Split the amount</div>
+                  <Navbar/>
+                  <h1 className="text-5xl my-10 font-bold text-evergreen-100">Create Charge</h1>
 
-                      <div className="bg-slate-600 mx-10 my-10 p-3 rounded-xl text-dorian text-base">
-                          {/* TODO: If checkbox is checked add occupant to array. 
-                        Then make a field input for each one next to their name to split the budget evenly */}
-                      </div>
+                  <div className="form-area flex flex-col justify-between items-center ">
+                      <form method="post" onSubmit={onSplitCharge}>
+                        <div className="bg-evergreen-100 mx-10 my-10 p-3 rounded-xl text-base">
+                          <h2 className="text-2xl mb-2 font-bold text-dorian">Splitting ${billAmount}</h2>
+                          <hr></hr>
+                          {users && users.data && users.data.map((user) => {
+                              return (<div key={user.id}> 
+                              {/* TODO: Fix the layout on this page and the checkbox page */}
+                                <div className="text-dorian"> {user.name} </div>
+                                {/* TODO: Set a min and max value as well as decimal steps for the money input */}
+                                <FieldInput
+                                  type="number"
+                                  name={user.id}
+                                  placeholder=""
+                                />
+                              </div>);
+                          })}
+
+                        <Button
+                            classNames="bg-evergreen-80 text-dorian"
+                            value="Send Charge"
+                            type="submit"
+                        />
+                        </div>
+                      </form>
+                      
+                      {error &&<p className="text-xl font-light text-red-600">{error}</p>}
                   </div>
                   
               </div>
@@ -100,6 +149,7 @@ const CreateChargePage: NextPage = () => {
       );
     }
 
+    // Page 1 for selecting who is going to pay
     return (
         <>
             <Head>
@@ -107,53 +157,52 @@ const CreateChargePage: NextPage = () => {
                 <meta name="description" content="Create Charges" />
             </Head>
             <div className="body flex flex-col text-center">
-                {/* <Navbar/> */}
+                <Navbar/>
                 <div className="form-area flex flex-col justify-between items-center ">
-                    <div>Create Charge</div>
+
+                    <h1 className="text-5xl mt-10 font-bold text-evergreen-100">Create Charge</h1>
                     <br></br>
                     <form method="post" onSubmit={onCreateCharge}>
                         <br></br>
                         <FieldInput
                             type="text"
                             name="name"
-                            placeholder="Enter Description"
+                            placeholder="Enter Charge Description"
                         />
                         <br></br>
                         <FieldInput
-                            type="text"
+                            type="number"
                             name="amount"
-                            placeholder="Enter Amount"
+                            placeholder="Enter Charge Amount"
                         />
-
-                        <div>Who Paid?</div>
-
+                        <h2 className="text-3xl mt-5 font-bold text-evergreen-100">Who is Paying?</h2>
                         {occupants.data?.map((occupant) => {
                             if (occupant.name) {
-                                console.log("Occupant", occupant);
                                 return (
                                     <div
                                         key={occupant.id}
-                                        className="bg-slate-600 mx-10 my-10 p-3 rounded-xl text-dorian text-base"
+                                        className="bg-slate-600 w-96 my-10 p-3 rounded-xl text-dorian text-base "
                                     >
                                     <FieldInput
-                                        value={occupant.id}
                                         type="checkbox"
-                                        placeholder={occupant.name}
-                                        name={occupant.name}
+                                        placeholder=""
+                                        name={occupant.id}
                                     />
-                                    <div>{occupant.name}</div>
+                                    
+                                    {occupant.name}
                                     </div>
                                 );
                             }
                         })}
-
                         <Button
                             classNames="bg-evergreen-80 text-dorian"
                             value="Create"
                             type="submit"
                         />
-                    <br></br>
                     </form>
+                    <br></br>
+                    {/* TODO: Insert the amount of steps circles for creating a charge */}
+                    {error &&<p className="text-xl font-light text-red-600">{error}</p>}
                 </div>
             </div>
         </>

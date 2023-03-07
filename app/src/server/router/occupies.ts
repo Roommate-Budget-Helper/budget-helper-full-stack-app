@@ -60,4 +60,17 @@ export const occupiesRouter = createProtectedRouter()
                 },
             });
         },
+    }).query("getUsersById", {
+      input: z.object({
+        ids: z.string().array(),
+      }),
+      async resolve({ctx, input}){
+        return await ctx.prisma.user.findMany({
+          where: {
+            id: {
+              in: input.ids,
+            }
+          }
+        });
+      }
     });

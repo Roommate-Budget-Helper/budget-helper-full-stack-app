@@ -10,7 +10,7 @@ export const billingRouter = createProtectedRouter()
     input: z.object({
         email: z.string().email(),
         homeId: z.string(),
-        amount: z.number(),
+        amount: z.string(),
         due: z.date(),
         comment: z.string()
     }),
@@ -33,7 +33,7 @@ export const billingRouter = createProtectedRouter()
                 email: input.email,
                 amount: input.amount,
                 comment: input.comment,
-                created: Date(),
+                created: new Date(),
                 dueDate: input.due,
                 paid: false,
                 confirmed: false
