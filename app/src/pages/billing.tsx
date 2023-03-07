@@ -2,7 +2,6 @@ import Navbar from "@components/navbar";
 import { NextPage } from "next";
 import Head from "next/head";
 import { trpc } from "utils/trpc";
-import Image from "next/image";
 import Button from "@components/button";
 import { useHomeContext } from "@stores/HomeStore";
 
@@ -34,7 +33,7 @@ const BillingPage: NextPage = () => {
                             <div>
                                 {charges.map((charge) => (
                                     <div
-                                        key={charge.id}
+                                        key={charge.chargeId}
                                         className="bg-slate-600 mx-10 my-10 p-3 rounded-xl text-dorian text-base"
                                     >
                                       {/* TODO: This is going to be the charger id user image */}

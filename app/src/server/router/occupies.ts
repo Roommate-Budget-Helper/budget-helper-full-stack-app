@@ -49,7 +49,9 @@ export const occupiesRouter = createProtectedRouter()
                     homeId: input.homeId,
                 },
             });
-
+            if(!occupants){
+              return [];
+            }
             return await ctx.prisma.user.findMany({
                 where: {
                     id: {
@@ -57,8 +59,5 @@ export const occupiesRouter = createProtectedRouter()
                     },
                 },
             });
-
-            // return await getUserById(occupies.map(occupy => occupy.userId), ctx.prisma);
-            // return occupies.map(occupy => occupy.userId);
         },
     });

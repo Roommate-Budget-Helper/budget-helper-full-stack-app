@@ -81,7 +81,8 @@ export const billingRouter = createProtectedRouter()
 .query("getCharges", {
     async resolve({ ctx }){
         if(!ctx.session.user.email) return;
-        const charges = await ctx.prisma.charge.findMany({
+
+        return await ctx.prisma.charge.findMany({
             select: {
                 chargeId: true,
                 home: true,
@@ -95,6 +96,6 @@ export const billingRouter = createProtectedRouter()
                 email: ctx.session.user.email
             }
         });
-        return charges.map(charges => charges.charge);
+        
     }
 });
