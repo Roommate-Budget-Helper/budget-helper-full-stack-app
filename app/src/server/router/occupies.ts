@@ -62,9 +62,12 @@ export const occupiesRouter = createProtectedRouter()
         },
     }).query("getUsersById", {
       input: z.object({
-        ids: z.string().array(),
+        ids: z.string().array().nullish(),
       }),
       async resolve({ctx, input}){
+        if(!input.ids){
+          return [];
+        }
         return await ctx.prisma.user.findMany({
           where: {
             id: {
@@ -73,4 +76,4 @@ export const occupiesRouter = createProtectedRouter()
           }
         });
       }
-    });
+      });

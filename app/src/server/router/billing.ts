@@ -78,7 +78,7 @@ export const billingRouter = createProtectedRouter()
         });
     }
 })
-.query("getCharges", {
+.query("getCharges", { // get all UNPAID charges for current user
     async resolve({ ctx }){
         if(!ctx.session.user.email) return;
 
@@ -93,7 +93,8 @@ export const billingRouter = createProtectedRouter()
                 comment: true
             },
             where: {
-                email: ctx.session.user.email
+                email: ctx.session.user.email,
+                paid: false
             }
         });
         
