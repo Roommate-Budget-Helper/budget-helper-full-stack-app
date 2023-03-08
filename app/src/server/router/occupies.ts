@@ -41,39 +41,20 @@ export const occupiesRouter = createProtectedRouter()
             if (!input.homeId) {
                 return [];
             }
-            const occupants = await ctx.prisma.occupies.findMany({
+            return await ctx.prisma.occupies.findMany({
                 select: {
-                    userId: true,
+                    user: {
+                        select: {
+                            id: true,
+                            name: true,
+                            email: true,
+                            image: true,
+                        },
+                    }
                 },
                 where: {
                     homeId: input.homeId,
                 },
             });
-            if(!occupants){
-              return [];
-            }
-            return await ctx.prisma.user.findMany({
-                where: {
-                    id: {
-                        in: occupants.map(occupant => occupant.userId),
-                    },
-                },
-            });
         },
-    }).query("getUsersById", {
-      input: z.object({
-        ids: z.string().array().nullish(),
-      }),
-      async resolve({ctx, input}){
-        if(!input.ids){
-          return [];
-        }
-        return await ctx.prisma.user.findMany({
-          where: {
-            id: {
-              in: input.ids,
-            }
-          }
-        });
-      }
-      });
+    });

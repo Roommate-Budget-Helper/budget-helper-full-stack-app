@@ -90,6 +90,13 @@ export const billingRouter = createProtectedRouter()
                 dueDate: true,
                 created: true,
                 chargerId: true,
+                user: { // charger data
+                  select: {
+                    name: true,
+                    email: true,
+                    image: true
+                  }
+                },
                 comment: true
             },
             where: {

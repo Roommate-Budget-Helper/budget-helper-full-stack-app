@@ -29,8 +29,6 @@ const CreateChargePage: NextPage = () => {
         },
     });
 
-    const users = trpc.useQuery(["occupies.getUsersById", {ids: billIds}]);
-
     useEffect(() => {
         occupants.refetch();
     }, [selectedHome]);
@@ -46,10 +44,10 @@ const CreateChargePage: NextPage = () => {
 
         // check which home occupants to charge
         occupants.data?.forEach((occupant) => {
-            if (form.elements[occupant.id]) {
-                const isOccupantSelected = form.elements[occupant.id].checked;
+            if (form.elements[occupant.user.id]) {
+                const isOccupantSelected = form.elements[occupant.user.id].checked;
                 if (isOccupantSelected) {
-                    setBillIds(billIds.concat(occupant.id));
+                    setBillIds(billIds.concat(occupant.user.id));
                 }
             }
         });
@@ -64,13 +62,13 @@ const CreateChargePage: NextPage = () => {
 
         const currentDate = new Date();
         const defaultDueDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, currentDate.getDate());
-        users.data?.forEach((user) => {
-            if (form.elements[user.id]) {
-                const amountDue = form.elements[user.id].value;
-                if(user.email && selectedHome){
+        occupants.data?.forEach((occupant) => {
+            if (form.elements[occupant.user.id]) {
+                const amountDue = form.elements[occupant.user.id].value;
+                if(occupant.user.email && selectedHome){
                   // TODO: If this fails on one of them, then it shouldn't send any of them most likely
                   sendCharge.mutateAsync({
-                    email: user.email,
+                    email: occupant.user.email,
                     homeId: selectedHome,
                     amount: String(amountDue),
                     comment: billName, 
@@ -120,14 +118,14 @@ const CreateChargePage: NextPage = () => {
                         <div className="bg-evergreen-100 mx-10 my-10 p-3 rounded-xl text-base">
                           <h2 className="text-2xl mb-2 font-bold text-dorian">Splitting ${billAmount}</h2>
                           <hr></hr>
-                          {users && users.data && users.data.map((user) => {
-                              return (<div key={user.id}> 
+                          {occupants.data && occupants.data.map((occupant) => {
+                              return (<div key={occupant.user.id}> 
                               {/* TODO: Fix the layout on this page and the checkbox page */}
-                                <div className="text-dorian"> {user.name} </div>
+                                <div className="text-dorian"> {occupant.user.name} </div>
                                 {/* TODO: Set a min and max value as well as decimal steps for the money input */}
                                 <FieldInput
                                   type="number"
-                                  name={user.id}
+                                  name={occupant.user.id}
                                   placeholder=""
                                 />
                               </div>);
@@ -177,19 +175,19 @@ const CreateChargePage: NextPage = () => {
                         />
                         <h2 className="text-3xl mt-5 font-bold text-evergreen-100">Who is Paying?</h2>
                         {occupants.data?.map((occupant) => {
-                            if (occupant.name) {
+                            if (occupant.user.name) {
                                 return (
                                     <div
-                                        key={occupant.id}
+                                        key={occupant.user.id}
                                         className="bg-slate-600 w-96 my-10 p-3 rounded-xl text-dorian text-base "
                                     >
                                     <FieldInput
                                         type="checkbox"
                                         placeholder=""
-                                        name={occupant.id}
+                                        name={occupant.user.id}
                                     />
                                     
-                                    {occupant.name}
+                                    {occupant.user.name}
                                     </div>
                                 );
                             }
