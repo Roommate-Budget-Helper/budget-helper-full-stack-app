@@ -60,7 +60,7 @@ export const billingRouter = createProtectedRouter()
         })
     }
 })
-.mutation("confirmPay", 
+.mutation("confirmCharge", 
 {
     input: z.object({
         confirmed: z.boolean(),
@@ -78,7 +78,7 @@ export const billingRouter = createProtectedRouter()
         });
     }
 })
-.query("getCharges", { // get all UNPAID charges for current user
+.query("getUnpaidCharges", { 
     async resolve({ ctx }){
         if(!ctx.session.user.email) return;
 
@@ -106,4 +106,26 @@ export const billingRouter = createProtectedRouter()
         });
         
     }
-});
+})
+.query("getUnconfirmedCharges", { 
+    async resolve({ ctx }){
+        if(!ctx.session.user.email) return;
+
+        return await ctx.prisma.charge.findMany({
+            select: {
+                chargeId: true,
+                home: true,
+                amount: true,
+                dueDate: true,
+                created: true,
+                email: true,
+                comment: true
+            },
+            where: {
+                chargerId: ctx.session.user.id,
+                paid: true, 
+                confirmed: false,
+            }
+        });
+    }
+})
