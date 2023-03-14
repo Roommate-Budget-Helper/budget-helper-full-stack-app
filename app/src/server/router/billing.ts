@@ -8,8 +8,10 @@ export const billingRouter = createProtectedRouter()
 .mutation("sendCharge",
 {
     input: z.object({
-        email: z.string().email(),
+        receiverId: z.string(),
+        chargerId: z.string(),
         homeId: z.string(),
+        amountBeforeSplit: z.string(),
         amount: z.string(),
         due: z.date(),
         comment: z.string()
@@ -28,9 +30,10 @@ export const billingRouter = createProtectedRouter()
         // return await sendEmail(input.email, home.address); MAKE THIS AN EMAIL FOR A CHARGE
         return await ctx.prisma.charge.create({
             data: {
-                chargerId: ctx.session.user.id,
+                chargerId: input.chargerId,
                 homeId: input.homeId,
-                email: input.email,
+                receiverId: input.receiverId,
+                amountBeforeSplit: input.amountBeforeSplit,
                 amount: input.amount,
                 comment: input.comment,
                 created: new Date(),
@@ -48,14 +51,14 @@ export const billingRouter = createProtectedRouter()
         chargeId: z.string()
     }),
     async resolve({ ctx, input }) {
-        if(!ctx.session.user.email) return;
-        if(!await canUserPayCharge(ctx.session.user.email, input.chargeId, ctx.prisma)) return;
+        if(!await canUserPayCharge(ctx.session.user.id, input.chargeId, ctx.prisma)) return;
         return await ctx.prisma.charge.update({
             where: {
                 chargeId: input.chargeId
             },
             data: {
-                paid: input.paid
+                paid: input.paid,
+                paidDate: new Date(),
             }
         })
     }
@@ -86,11 +89,12 @@ export const billingRouter = createProtectedRouter()
             select: {
                 chargeId: true,
                 home: true,
+                amountBeforeSplit: true,
                 amount: true,
                 dueDate: true,
                 created: true,
                 chargerId: true,
-                user: { // charger data
+                chargeUser: { // charger data
                   select: {
                     name: true,
                     email: true,
@@ -100,7 +104,7 @@ export const billingRouter = createProtectedRouter()
                 comment: true
             },
             where: {
-                email: ctx.session.user.email,
+                receiverId: ctx.session.user.id,
                 paid: false
             }
         });
@@ -115,10 +119,19 @@ export const billingRouter = createProtectedRouter()
             select: {
                 chargeId: true,
                 home: true,
+                amountBeforeSplit: true,
                 amount: true,
                 dueDate: true,
                 created: true,
-                email: true,
+                receiverId: true,
+                receiveUser: { // receiver data
+                  select: {
+                    name: true,
+                    email: true,
+                    image: true
+                  }
+                },
+                paidDate: true,
                 comment: true
             },
             where: {

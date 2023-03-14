@@ -63,26 +63,31 @@ const BillingPage: NextPage = () => {
                               router.push("/createcharge");
                             }}
                         />
-                        <h2 className="text-3xl mt-5 font-bold text-evergreen-100">Pay Charges</h2>
+                        <h2 className="text-3xl mt-5 font-bold text-evergreen-100">Charges to Pay</h2>
                         {unpaidCharges && unpaidCharges.length > 0 ? (
                             <div>
                                 {unpaidCharges.map((charge) => (
                                     <div
                                         key={charge.chargeId}
-                                        className="bg-slate-600 mx-106 my-10 p-3 rounded-xl text-dorian text-base"
+                                        className="bg-slate-600 justify-items-center mx-106 my-10 p-3 rounded-xl text-dorian text-base"
                                     >
-                                        {charge.user.image && charge.user.name && (
-                                            <Image
-                                                className="rounded-full"
-                                                src={charge.user.image}
-                                                alt={charge.user.name}
-                                                width="128px"
-                                                height="128px"
-                                            />
+                                        {charge.chargeUser.name && (
+                                          <div className="rounded-full bg-evergreen-80 w-24 h-24 flex items-center justify-center">
+                                            {charge.chargeUser.image ?
+                                              <Image src={charge.chargeUser.image} alt={charge.chargeUser.name} width="64px" height="64px" />
+                                              :<p>{charge.chargeUser.name.split(" ").reduce((a,c) => {
+                                                a += c[0];
+                                                return a;
+                                            }, "")}</p>}
+                                            </div>
                                         )}
-                                        <p>Charger: {charge.user.name} </p>
+                                        <br></br>
+                                        <p>Charger: {charge.chargeUser.name} </p>
                                         <p>Description: {charge.comment} </p>
-                                        <p>Amount: {charge.amount}</p>
+                                        <p>Amount Before Splitting: ${charge.amountBeforeSplit}</p>
+                                        <p>Amount Owed: ${charge.amount}</p>
+                                        <p>Due Date: {charge.dueDate.toDateString()}</p>
+                                        <br></br>
                                         <div className="flex space-x-5">
                                             <Button
                                                 classNames="bg-evergreen-80"
@@ -102,7 +107,7 @@ const BillingPage: NextPage = () => {
 
                         <hr className="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700"></hr>
 
-                        <h2 className="text-3xl mt-5 font-bold text-evergreen-100">Unconfirmed Charges</h2>
+                        <h2 className="text-3xl mt-5 font-bold text-evergreen-100">Charges to Confirm</h2>
                         {unconfirmedCharges && unconfirmedCharges.length > 0 ? (
                             <div>
                                 {unconfirmedCharges.map((charge) => (
@@ -110,9 +115,11 @@ const BillingPage: NextPage = () => {
                                         key={charge.chargeId}
                                         className="bg-slate-600 mx-106 my-10 p-3 rounded-xl text-dorian text-base"
                                     >
-                                        <p>From: {charge.email} </p>
+                                        <p>From: {charge.receiveUser.name} </p>
                                         <p>Description: {charge.comment} </p>
-                                        <p>Amount: {charge.amount}</p>
+                                        <p>Amount Before Splitting: ${charge.amountBeforeSplit}</p>
+                                        <p>Amount Paid: ${charge.amount}</p>
+                                        <p>Date Paid: {charge.paidDate?.toDateString()}</p>
                                         
                                         <div className="flex space-x-5">
                                             <Button

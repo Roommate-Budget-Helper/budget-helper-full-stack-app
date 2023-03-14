@@ -13,7 +13,8 @@ const CreateChargePage: NextPage = () => {
     const [splittingPage, setSplittingPage] = useState<boolean>(false);
     const [billName, setBillName] = useState<string>("");
     const [billAmount, setBillAmount] = useState<number>(0);
-    const [billIds, setBillIds] = useState<string[]>([]);
+    const [billId, setBillId] = useState<string>("");
+    const [dueDate, setDueDate] = useState<string>("");
 
     const selectedHome = useHomeContext((s) => s.selectedHome);
 
@@ -38,45 +39,58 @@ const CreateChargePage: NextPage = () => {
         const form = event.target as HTMLFormElement;
         const billName = form.elements["name"].value;
         const billAmount = form.elements["amount"].value;
+        const dueDate = form.elements["dueDate"].value;
 
         setBillName(billName);
         setBillAmount(billAmount);
+        setDueDate(dueDate);
 
         // check which home occupants to charge
+        let checkedId = 0;
         occupants.data?.forEach((occupant) => {
             if (form.elements[occupant.user.id]) {
                 const isOccupantSelected = form.elements[occupant.user.id].checked;
-                if (isOccupantSelected) {
-                    setBillIds(billIds.concat(occupant.user.id));
+                if (isOccupantSelected && checkedId === 0) {
+                    setBillId(occupant.user.id);
+                    checkedId++;
+                }else if(isOccupantSelected){
+                  setError("You can only select one occupant to have paid the bill");
+                  checkedId++;
                 }
             }
         });
 
-        setSplittingPage(true);
-        setError(null);
+        if(checkedId === 1){
+          setSplittingPage(true);
+          setError(null);
+        }
     };
 
     const onSplitCharge = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const form = event.target as HTMLFormElement;
 
-        const currentDate = new Date();
-        const defaultDueDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, currentDate.getDate());
+        const formattedDueDate = new Date(dueDate);
         occupants.data?.forEach((occupant) => {
             if (form.elements[occupant.user.id]) {
                 const amountDue = form.elements[occupant.user.id].value;
-                if(occupant.user.email && selectedHome){
+                // Don't send a charge to the person who paid the bill
+                if(selectedHome){
                   // TODO: If this fails on one of them, then it shouldn't send any of them most likely
-                  sendCharge.mutateAsync({
-                    email: occupant.user.email,
-                    homeId: selectedHome,
-                    amount: String(amountDue),
-                    comment: billName, 
-                    due: defaultDueDate,
-                  });
+                  if(occupant.user.id !== billId){
+                    sendCharge.mutateAsync({
+                      amountBeforeSplit: String(billAmount),
+                      chargerId: billId,
+                      receiverId: occupant.user.id,
+                      homeId: selectedHome,
+                      amount: String(amountDue),
+                      comment: billName, 
+                      due: formattedDueDate,
+                    });
+                  }
                 }else{
                   // TODO: This should not be something that we even have to check. The email must be given.
-                  setError("The home is not currently selected or the user doesn't have an email.");
+                  setError("The home is not currently selected");
                   return;
                 }
             }
@@ -120,14 +134,8 @@ const CreateChargePage: NextPage = () => {
                           <hr></hr>
                           {occupants.data && occupants.data.map((occupant) => {
                               return (<div key={occupant.user.id}> 
-                              {/* TODO: Fix the layout on this page and the checkbox page */}
                                 <div className="text-dorian"> {occupant.user.name} </div>
-                                {/* TODO: Set a min and max value as well as decimal steps for the money input */}
-                                <FieldInput
-                                  type="number"
-                                  name={occupant.user.id}
-                                  placeholder=""
-                                />
+                                <input type="number" name={occupant.user.id} placeholder="0.00" step="0.01" min="0.01" max={billAmount}/>
                               </div>);
                           })}
 
@@ -168,23 +176,22 @@ const CreateChargePage: NextPage = () => {
                             placeholder="Enter Charge Description"
                         />
                         <br></br>
-                        <FieldInput
-                            type="number"
-                            name="amount"
-                            placeholder="Enter Charge Amount"
-                        />
+                        <input type="number" className="bg-evergreen-60 w-96 my-4 text-xl py-2 px-4 rounded-lg" 
+                          name="amount" placeholder="Amount" step="0.01" min="0.01" max="1000000" />
+                        <br></br>
+                        <input type="date" className="bg-evergreen-60 w-96 my-4 text-xl py-2 px-4 rounded-lg" name="dueDate" min={new Date().toISOString().split('T')[0]}/>
                         <h2 className="text-3xl mt-5 font-bold text-evergreen-100">Who is Paying?</h2>
                         {occupants.data?.map((occupant) => {
                             if (occupant.user.name) {
                                 return (
                                     <div
                                         key={occupant.user.id}
-                                        className="bg-slate-600 w-96 my-10 p-3 rounded-xl text-dorian text-base "
+                                        className="bg-slate-600 w-96 my-10 p-3 rounded-xl text-dorian text-base"
                                     >
-                                    <FieldInput
+                                    <input
                                         type="checkbox"
-                                        placeholder=""
                                         name={occupant.user.id}
+                                        className="mr-4"
                                     />
                                     
                                     {occupant.user.name}
@@ -199,7 +206,11 @@ const CreateChargePage: NextPage = () => {
                         />
                     </form>
                     <br></br>
-                    {/* TODO: Insert the amount of steps circles for creating a charge */}
+                    <div className="text-2xl text-evergreen-100 font-bold mt-5">Step 1 of 2</div>
+                    <div className="flex items-center justify-between"> 
+                      <span className="text-dorian bg-slate-800 rounded-full h-10 w-10 my-7 mr-3">1</span>
+                      <span className="text-dorian bg-slate-600 rounded-full h-10 w-10">2</span>
+                    </div>
                     {error &&<p className="text-xl font-light text-red-600">{error}</p>}
                 </div>
             </div>

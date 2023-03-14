@@ -34,16 +34,17 @@ model Session {
 }
 
 model User {
-  id            String       @id
-  name          String?
-  email         String?      @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  Occupies      Occupies[]
-  sessions      Session[]
-  Invitation    Invitation[]
-  Charges       Charge[]
+  id             String       @id
+  name           String
+  email          String       @unique
+  emailVerified  DateTime?
+  image          String?
+  accounts       Account[]
+  Occupies       Occupies[]
+  sessions       Session[]
+  Invitation     Invitation[]
+  ReceiveCharges Charge[]     @relation("chargeUser")
+  SentCharges    Charge[]     @relation("receiveUser")
 }
 
 model Home {
@@ -84,18 +85,21 @@ model Invitation {
 }
 
 model Charge {
-  chargeId String @id @default(cuid())
-  chargerId String
-  homeId String
-  email String
-  amount String
-  comment String
-  created DateTime
-  dueDate DateTime
-  paid Boolean
-  confirmed Boolean
-  home Home @relation(fields: [homeId], references: [id], onDelete: Cascade)
-  user User @relation(fields: [chargerId], references: [id], onDelete: Cascade)
+  chargeId          String    @id @default(cuid())
+  chargerId         String
+  receiverId        String
+  homeId            String
+  amountBeforeSplit String
+  amount            String
+  comment           String
+  created           DateTime
+  dueDate           DateTime
+  paid              Boolean
+  paidDate          DateTime?
+  confirmed         Boolean
+  home              Home      @relation(fields: [homeId], references: [id], onDelete: Cascade)
+  chargeUser        User      @relation("chargeUser", fields: [chargerId], references: [id], onDelete: Cascade)
+  receiveUser       User      @relation("receiveUser", fields: [receiverId], references: [id], onDelete: Cascade)
 
-  @@unique([homeId, email, chargeId])
+  @@unique([homeId, receiverId, chargeId])
 }

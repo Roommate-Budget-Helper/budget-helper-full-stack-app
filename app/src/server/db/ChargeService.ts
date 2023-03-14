@@ -1,13 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 
-export const canUserPayCharge = async (email: string, chargeId: string, db: PrismaClient) => {
+export const canUserPayCharge = async (receiveId: string, chargeId: string, db: PrismaClient) => {
     return !!(await db.charge.findFirst({
         select: {
            chargeId: true,
         },
         where: {
             chargeId: chargeId,
-            email: email
+            receiverId: receiveId,
         }
     }));
 }
