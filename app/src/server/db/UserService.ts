@@ -14,17 +14,22 @@ export const getUserPermissions = async (user: string, homeId: string, db: Prism
 }
 
 export const hasPermission = async (user: string, homeId: string, permission: Permission, db: PrismaClient) => {
+    const conditions = [
+        {
+            name: permission,
+        }
+    ];
+    if(permission !== Permission.Owner){
+        conditions.push({
+            name: Permission.Owner,
+        }, {
+            name: Permission.Admin,
+        });
+    }
+    
     return !!(await db.permission.findFirst({
         where: {
-            OR: [
-                {
-                    name: permission,
-                }, {
-                    name: Permission.Owner,
-                }, {
-                    name: Permission.Admin,
-                }
-            ], 
+            OR: conditions, 
             occupiesUserId: user,
             occupiesHomeId: homeId,
         }
