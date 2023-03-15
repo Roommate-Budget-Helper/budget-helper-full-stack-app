@@ -194,7 +194,7 @@ const HomesPage: NextPage = () => {
                 </Modal.Footer> 
             </Modal>
             <Modal show={isEditPermissionsModalOpen} onHide={handleToggleModal(setEditPermissionsModalOpen)}>
-                <Modal.Header onHide={handleToggleModal(setLeaveModalOpen)}>
+                <Modal.Header onHide={handleToggleModal(setEditPermissionsModalOpen)}>
                     Set User Permissions 
                 </Modal.Header>
                 <form onSubmit={handleUpdatePermission}>
