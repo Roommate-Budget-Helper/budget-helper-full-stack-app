@@ -1,4 +1,6 @@
+import { Permission } from "types/permissions";
 import { canUserViewHome } from "server/db/HomeService";
+import { hasPermission } from "server/db/UserService";
 import { sendEmail } from "server/services/email/invitation";
 import { z } from "zod";
 import { createProtectedRouter } from "./context";
@@ -12,7 +14,9 @@ export const invitationRouter = createProtectedRouter()
         homeId: z.string()
     }),
     async resolve({ ctx, input }){
-        if(!await canUserViewHome(ctx.session.user.id, input.homeId, ctx.prisma)) return;
+        if(!(await hasPermission(ctx.session.user.id, input.homeId, Permission.Edit, ctx.prisma)) ||
+           !(await canUserViewHome(ctx.session.user.id,input.homeId, ctx.prisma)))
+                return;
         const home = await ctx.prisma.home.findFirst({
             select: {
                 address: true

@@ -15,24 +15,13 @@ const CreationPage: NextPage = () => {
     const refetchHomes = useHomeContext(s => s.refetchHomes);
     const setSelectedHome = useHomeContext(s => s.setSelectedHome);
     const fileRef = useRef<HTMLInputElement>(null);
-    const getPresignedURL = trpc.useMutation(["upload.getPresignedURL"])
-
-    const addUserToHome = trpc.useMutation(["occupies.addUserToHome"], {
-        onError: (error) => {
-            setError(error.message);
-        },
-    });
+    const getPresignedURL = trpc.useMutation(["upload.getPresignedURL"]);
 
     const createHome = trpc.useMutation(["home.createHome"], {
         onError: (error) => {
             setError(error.message);
         },
         onSuccess: async (home) => {
-
-            // Add userid and homeid to the occupies table
-            await addUserToHome.mutateAsync({
-                homeId: home.id,
-            });
             setSelectedHome(home.id);
             await refetchHomes();
             router.push("/homes");
