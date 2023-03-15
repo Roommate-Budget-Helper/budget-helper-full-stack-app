@@ -19,6 +19,7 @@ export const hasPermission = async (user: string, homeId: string, permission: Pe
             name: permission,
         }
     ];
+    
     if(permission !== Permission.Owner){
         conditions.push({
             name: Permission.Owner,
