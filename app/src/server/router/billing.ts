@@ -1,6 +1,5 @@
 import { canUserViewHome } from "server/db/HomeService";
-import { canUserPayCharge, canUserConfirmCharge } from "server/db/ChargeService";
-import { sendEmail } from "server/services/email/invitation";
+import { canUserPayCharge, canUserConfirmCharge, handleSendChargeEmail } from "server/db/ChargeService";
 import { z } from "zod";
 import { createProtectedRouter } from "./context";
 
@@ -18,17 +17,7 @@ export const billingRouter = createProtectedRouter()
     }),
     async resolve({ ctx, input }){
         if(!await canUserViewHome(ctx.session.user.id, input.homeId, ctx.prisma)) return;
-        const home = await ctx.prisma.home.findFirst({
-            select:{
-                address: true
-            },
-            where: {
-                id: input.homeId
-            }
-        });
-        if(!home) return;
-        // return await sendEmail(input.email, home.address); MAKE THIS AN EMAIL FOR A CHARGE
-        return await ctx.prisma.charge.create({
+        const result = await ctx.prisma.charge.create({
             data: {
                 chargerId: input.chargerId,
                 homeId: input.homeId,
@@ -42,6 +31,13 @@ export const billingRouter = createProtectedRouter()
                 confirmed: false
             }
         });
+
+        // send the email only on success of the charge creation
+        if(result){
+          // await handleSendChargeEmail(result, ctx.prisma);
+        }
+        
+        return result;
     }
 })
 .mutation("payCharge", 
