@@ -14,7 +14,6 @@ env:
   COGNITO_USER_POOL: ${{ secrets.COGNITO_USER_POOL }}
   GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
   GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET}}
-
 jobs:
   Build:
     runs-on: ubuntu-latest
@@ -43,3 +42,54 @@ jobs:
         run: npm run test --if-present
       - name: Building Code
         run: npm run build
+  cypress-run:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost
+    defaults:
+      run:
+        working-directory: ./app
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      # Install NPM dependencies, cache them correctly
+      # and run all Cypress tests
+      - name: Generate prisma
+        run: npx prisma generate
+      - name: Sync Database
+        run: npx prisma db push
+      - name: Create Cypress env
+        uses: jsdaniell/create-json@v1.2.2
+        with:
+          name: "cypress.env.json"
+          json: ${{ secrets.CYPRESS_API_KEY }}
+          dir: "app/"
+      - name: Cypress run
+        uses: cypress-io/github-action@v5.0.7 # use the explicit version number
+        with:
+          build: npm run build
+          start: npm start
+          working-directory: ./app
+      - name: "Upload screenshots and videos to Slack"
+        uses: trymbill/cypress-slack-video-upload-action@v1.3.0
+        with:
+          token: ${{ secrets.SLACK_TOKEN }}
+          channels: "cypress-ci-tests"
+          workdir: app/cypress

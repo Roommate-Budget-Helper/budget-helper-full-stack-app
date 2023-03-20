@@ -39,3 +39,7 @@ cypress.env.json
 
 # typescript
 *.tsbuildinfo
+
+# Cypress
+cypress.env.json
+cypress/videos

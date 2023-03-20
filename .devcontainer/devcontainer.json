@@ -8,9 +8,17 @@
 		// Append -bullseye or -buster to pin to an OS version.
 		// Use -bullseye variants on local on arm64/Apple Silicon.
 		"args": {
-			"VARIANT": "16-bullseye"
+			"VARIANT": "16-bullseye",
 		}
 	},
+	"runArgs": [
+		"--net",
+		"host",
+		"-e",
+		"DISPLAY=localhost:0",
+		"-v",
+		"/tmp/.X11-unix:/tmp/.X11-unix"
+	], // Force container to run in x86
 	// Configure tool-specific properties.
 	"customizations": {
 		// Configure properties specific to VS Code.

@@ -22,6 +22,6 @@
             "@stores/*": ["stores/*"]
         }
     },
-    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.cjs", "**/*.mjs"],
+    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.cjs", "**/*.mjs", "cypress/support/e2e.ts"],
     "exclude": ["node_modules"]
 }
