@@ -9,6 +9,7 @@ import type { AppRouter } from "../server/router";
 import type { Session } from "next-auth";
 import { RouteGuard } from "@components/routeguard";
 import "../styles/globals.css";
+import { HomeProvider } from "@stores/HomeStore";
 
 const MyApp: AppType<{ session: Session | null }> = ({
     Component,
@@ -16,9 +17,11 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
     return (
         <SessionProvider session={session}>
-            <RouteGuard>
-                <Component {...pageProps} />
-            </RouteGuard>
+            <HomeProvider>
+                <RouteGuard>
+                    <Component {...pageProps} />
+                </RouteGuard>
+            </HomeProvider>
         </SessionProvider>
     );
 };

@@ -1,6 +1,9 @@
 import { createProtectedRouter } from "./context";
 import { z } from "zod";
 import { getHomesByUserId, canUserViewHome } from "../db/HomeService";
+import { getSignedImage } from "./image-upload";
+import { hasPermission } from "server/db/UserService";
+import { Permission } from "types/permissions";
 
 export const homesRouter = createProtectedRouter()
     .query("getHomes", {
@@ -9,7 +12,7 @@ export const homesRouter = createProtectedRouter()
                 return;
             }
             const homeIds = await getHomesByUserId(ctx.session.user.id, ctx.prisma);
-            return await ctx.prisma.home.findMany({
+            const homes = await ctx.prisma.home.findMany({
                 select: {
                     id: true,
                     name: true,
@@ -22,6 +25,11 @@ export const homesRouter = createProtectedRouter()
                     },
                 },
             });
+            for(const home of homes){
+                if(!home.image) continue;
+                home.image = await getSignedImage(home.image);
+            }
+            return homes;
         },
     })
     .query("getHomeById", {
@@ -32,7 +40,7 @@ export const homesRouter = createProtectedRouter()
             if(!ctx.session.user || !(await canUserViewHome(ctx.session.user.id, input.homeId, ctx.prisma))){
                 return;
             }            
-            return await ctx.prisma.home.findFirst({
+            const home = await ctx.prisma.home.findFirst({
                 select: {
                     id:true,
                     name: true,
@@ -45,32 +53,58 @@ export const homesRouter = createProtectedRouter()
                     },
                 },
             });
+            if(!home) return;
+            if(home.image) home.image = await getSignedImage(home.image);
+            return home;
         },
     })
     .mutation("createHome", {
         input: z.object({
             name: z.string(),
-            image: z.string(),
+            image: z.any(),
             address: z.string(),
         }),
         async resolve({ ctx, input }) {
-            return await ctx.prisma.home.create({
+
+            //Creates image key here so the image can bey placed in the S3 Bucket and referenced in the Prisma Database
+
+            //Puts home info in prisma database
+            const home =  await ctx.prisma.home.create({
                 data: {
                     name: input.name,
                     image: input.image,
                     address: input.address,
                 },
             });
+            await ctx.prisma.occupies.create({
+                data: {
+                    userId: ctx.session.user.id,
+                    homeId: home.id,
+                }
+            });
+
+            await ctx.prisma.permission.create({
+                data: {
+                    occupiesUserId: ctx.session.user.id,
+                    occupiesHomeId: home.id,
+                    name: Permission.Owner,
+                }
+            })
+
+            return home;
         },
     })
     .mutation("updateHome", {
         input: z.object({
             id: z.string(),
             name: z.string(),
-            image: z.string(),
+            image: z.any(),
             address: z.string(),
         }),
         async resolve({ ctx, input }) {
+            if(!(await hasPermission(ctx.session.user.id, input.id, Permission.Edit, ctx.prisma)) ||
+               !(await canUserViewHome(ctx.session.user.id,input.id, ctx.prisma)))
+                return;
             return await ctx.prisma.home.update({
                 where: {
                     id: input.id,
@@ -88,6 +122,14 @@ export const homesRouter = createProtectedRouter()
             id: z.string(),
         }),
         async resolve({ ctx, input }) {
+            if(!(await hasPermission(ctx.session.user.id, input.id, Permission.Delete, ctx.prisma)) ||
+               !(await canUserViewHome(ctx.session.user.id,input.id, ctx.prisma)))
+                return;
+            await ctx.prisma.occupies.deleteMany({
+                where: {
+                    homeId: input.id,
+                }
+            }); 
             return await ctx.prisma.home.delete({
                 where: {
                     id: input.id,

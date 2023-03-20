@@ -1,23 +1,34 @@
-import Button from "@components/button";
-import FieldInput from "@components/fieldinput";
 import type { NextPage } from "next";
-import Head from "next/head";
-import React, { useRef } from "react";
-import { trpc } from "utils/trpc";
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useHomeContext } from "@stores/HomeStore";
+import React, { useRef, useMemo } from "react";
+import { trpc } from "utils/trpc";
+import Head from "next/head";
+import FieldInput from "@components/fieldinput";
+import Button from "@components/button";
+import Image from "next/image";
 
-
-const CreationPage: NextPage = () => {
+const UpdatePage: NextPage = () => {
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
+    const fileRef = useRef<HTMLInputElement>(null);
+    const getPresignedURL = trpc.useMutation(["upload.getPresignedURL"])
+    
     const refetchHomes = useHomeContext(s => s.refetchHomes);
     const setSelectedHome = useHomeContext(s => s.setSelectedHome);
-    const fileRef = useRef<HTMLInputElement>(null);
-    const getPresignedURL = trpc.useMutation(["upload.getPresignedURL"]);
+    const selectedHome = useHomeContext((s) => s.selectedHome);
+    const homes = useHomeContext((s) => s.homes);
+    
+    const homeData = useMemo(() => {
+        return homes.find(home => home.id === selectedHome);
+    }, [selectedHome, homes]);
+    
+    if(homeData == undefined){
+        console.log("Error! Home data not found");
+    }
 
-    const createHome = trpc.useMutation(["home.createHome"], {
+    const updateHome = trpc.useMutation(["home.updateHome"], {
         onError: (error) => {
             setError(error.message);
         },
@@ -26,9 +37,9 @@ const CreationPage: NextPage = () => {
             await refetchHomes();
             router.push("/homes");
         },
-    });   
+    }); 
 
-    const onCreateHome = async (event: React.FormEvent<HTMLFormElement>) => {
+    const onUpdateHome = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const form = event.target as HTMLFormElement;
 
@@ -36,8 +47,16 @@ const CreationPage: NextPage = () => {
         let imageFile = null
         if(fileList != null){
             imageFile = fileList[0]
+        }   
+        let key;
+        if(homeData == undefined){
+            return;
         }
-        let key = null;
+        if(homeData.image == null){
+            key = undefined
+        }
+        key = homeData.image;
+        
         if(imageFile){
             const { url, fields } = await getPresignedURL.mutateAsync(imageFile.name);
             console.log({ url, fields});
@@ -55,12 +74,28 @@ const CreationPage: NextPage = () => {
                 method: "POST",
                 body: formData
             })
-        }
+        }   
         
-        await createHome.mutateAsync({
+        console.log(form.elements["name"].value.type)
+        console.log(form.elements["address"].value.type)
+        
+        let name;
+        if(form.elements["name"].value.type == undefined){
+            name = homeData.name
+        }
+        name = form.elements["name"].value
+
+        let address;
+        if(form.elements["address"].value.type == undefined){
+            address = homeData.address
+        }
+        address = form.elements["address"].value
+
+        await updateHome.mutateAsync({
+            id: homeData.id,
             image: key,
-            name: form.elements["name"].value,
-            address: form.elements["address"].value,
+            name: name,
+            address: address,
         });
     };
 
@@ -73,30 +108,35 @@ const CreationPage: NextPage = () => {
                     content="Homes page of Roommate budget helper"
                 />
             </Head>
+            {homeData &&
             <div className="body flex flex-col text-center">
                 <div className="text-2xl p-5">
                     <div className="form-area flex flex-col justify-between items-center ">
-                        <div>Create Home</div>
+                        <div>Update Home</div>
                         <br></br>
-                        <form method="post" onSubmit={onCreateHome}>
+                        <form method="post" onSubmit={onUpdateHome}>
                             {/* TODO: Give it a cute image uploader */}
+                            {homeData.image &&
+                            <div className="relative -z-10">
+                                <Image alt="Home Image" src={homeData.image} width="128px" height="128px"/>
+                            </div>}                            
                             <input ref={fileRef} type="file" name="image" accept=".png, .jpg" ></input>
                             <br></br>
                             <FieldInput
                                 type="text"
                                 name="name"
-                                placeholder="Home Name"
+                                placeholder = {homeData.name}
                             />
                             <br></br>
                             <FieldInput
                                 type="text"
                                 name="address"
-                                placeholder="Address"
+                                placeholder= {homeData.address}
                             />
                             <br></br>
                             <Button
                                 classNames="bg-evergreen-80 text-dorian"
-                                value="Create"
+                                value="Update"
                                 type="submit"
                             />
                             <br></br>
@@ -104,9 +144,9 @@ const CreationPage: NextPage = () => {
                     </div>
                 </div>
                 {error&&<p className="text-xl font-light text-red-600">{error}</p>}
-            </div>
+            </div>}
         </>
     );
 };
 
-export default CreationPage;
+export default UpdatePage;

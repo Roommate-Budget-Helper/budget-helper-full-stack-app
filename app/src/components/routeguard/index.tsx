@@ -18,7 +18,10 @@ function RouteGuard({ children } : RouteGuardProps) {
         if(session.status === "unauthenticated" && path && !publicPaths.includes(path)){
             setAllowed(false);
             router.push("/login");
-        }else{
+        } if(session.status === "authenticated" && path && publicPaths.includes(path)){
+            setAllowed(true);
+            router.push("/homes");
+        } else{
             setAllowed(true);
         }
     }, [session.status, router.asPath])

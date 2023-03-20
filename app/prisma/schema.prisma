@@ -34,29 +34,35 @@ model Session {
 }
 
 model User {
-  id            String     @id
-  name          String?
-  email         String?    @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  Occupies      Occupies[]
-  sessions      Session[]
+  id             String       @id
+  name           String
+  email          String       @unique
+  emailVerified  DateTime?
+  image          String?
+  accounts       Account[]
+  Occupies       Occupies[]
+  sessions       Session[]
+  Invitation     Invitation[]
+  ReceiveCharges Charge[]     @relation("chargeUser")
+  SentCharges    Charge[]     @relation("receiveUser")
 }
 
 model Home {
-  id       String     @id @default(cuid())
-  name     String
-  image    String?
-  address  String
-  Occupies Occupies[]
+  id         String       @id @default(cuid())
+  name       String
+  image      String?
+  address    String
+  Occupies   Occupies[]
+  Invitation Invitation[]
+  Charges    Charge[]
 }
 
 model Occupies {
-  userId String
-  homeId String
-  home   Home   @relation(fields: [homeId], references: [id])
-  user   User   @relation(fields: [userId], references: [id])
+  userId      String
+  homeId      String
+  home        Home         @relation(fields: [homeId], references: [id], onDelete: Cascade)
+  user        User         @relation(fields: [userId], references: [id])
+  permissions Permission[]
 
   @@id([userId, homeId])
 }
@@ -67,4 +73,42 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Invitation {
+  initiatorId String
+  homeId      String
+  email       String
+  home        Home   @relation(fields: [homeId], references: [id], onDelete: Cascade)
+  user        User   @relation(fields: [initiatorId], references: [id], onDelete: Cascade)
+
+  @@unique([homeId, email])
+}
+
+model Charge {
+  chargeId          String    @id @default(cuid())
+  chargerId         String
+  receiverId        String
+  homeId            String
+  amountBeforeSplit String
+  amount            String
+  comment           String
+  created           DateTime
+  dueDate           DateTime
+  paid              Boolean
+  paidDate          DateTime?
+  confirmed         Boolean
+  home              Home      @relation(fields: [homeId], references: [id], onDelete: Cascade)
+  chargeUser        User      @relation("chargeUser", fields: [chargerId], references: [id], onDelete: Cascade)
+  receiveUser       User      @relation("receiveUser", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@unique([homeId, receiverId, chargeId])
+}
+
+model Permission {
+  id             String    @id @default(cuid())
+  name           String
+  Occupies       Occupies? @relation(fields: [occupiesUserId, occupiesHomeId], references: [userId, homeId])
+  occupiesUserId String?
+  occupiesHomeId String?
 }

@@ -20,4 +20,12 @@ export default defineNextConfig({
         locales: ["en"],
         defaultLocale: "en",
     },
+    images: {
+        remotePatterns: [
+            {
+                protocol: "https",
+                hostname: "roommate-budget-helper.s3.amazonaws.com",
+            },
+        ],
+    },
 });
