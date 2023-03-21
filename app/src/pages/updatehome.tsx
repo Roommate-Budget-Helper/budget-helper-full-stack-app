@@ -42,7 +42,7 @@ const UpdatePage: NextPage = () => {
 
         const fileList = fileRef.current?.files
         let imageFile = null
-        if(fileList !== null){
+        if(fileList){
             imageFile = fileList[0]
         }   
         let key;
