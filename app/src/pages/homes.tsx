@@ -84,7 +84,7 @@ const HomesPage: NextPage = () => {
                                 <div className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={handleToggleModal(setInviteModalOpen)}>Invite Roommate</div>
                                 <div className="hover:bg-slate-200 border-b-2 border-black py-2">Remove Roommate</div>
                                 <div className="hover:bg-slate-200 border-b-2 border-black py-2">Edit Permissions</div>
-                                <div className="hover:bg-slate-200 border-b-2 border-black py-2"><Link href="/updatehome">Update Home</Link> </div>
+                                <Link href="/updatehome"><div className="hover:bg-slate-200 border-b-2 border-black py-2">Update Home</div></Link>
                                 <div className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={handleToggleModal(setLeaveModalOpen)}>Leave Home</div>
                                 <div className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={handleToggleModal(setDeleteModalOpen)}>Delete Home</div>
                             </div>}

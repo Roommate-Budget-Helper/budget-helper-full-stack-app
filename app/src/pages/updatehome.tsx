@@ -76,20 +76,9 @@ const UpdatePage: NextPage = () => {
             })
         }   
         
-        console.log(form.elements["name"].value.type)
-        console.log(form.elements["address"].value.type)
         
-        let name;
-        if(form.elements["name"].value.type == undefined){
-            name = homeData.name
-        }
-        name = form.elements["name"].value
-
-        let address;
-        if(form.elements["address"].value.type == undefined){
-            address = homeData.address
-        }
-        address = form.elements["address"].value
+        const name = form.elements["name"].value;
+        const address = form.elements["address"].value;
 
         await updateHome.mutateAsync({
             id: homeData.id,
@@ -125,13 +114,13 @@ const UpdatePage: NextPage = () => {
                             <FieldInput
                                 type="text"
                                 name="name"
-                                placeholder = {homeData.name}
+                                defaultValue={homeData.name}
                             />
                             <br></br>
                             <FieldInput
                                 type="text"
                                 name="address"
-                                placeholder= {homeData.address}
+                                defaultValue= {homeData.address}
                             />
                             <br></br>
                             <Button
