@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 
 export interface FieldInputProps {
     value: string;
+    defaultValue: string;
     name: string;
     placeholder: string;
     type: React.HTMLInputTypeAttribute;
@@ -16,7 +17,8 @@ const FieldInput= (props: Partial<FieldInputProps>) => {
         name={props.name}
         className="bg-evergreen-60 w-96 my-4 text-xl py-2 px-4 rounded-lg" 
         type={props.type} 
-        value={props.value} 
+        value={props.value}
+        defaultValue={props.defaultValue} 
         onChange={props.onChange}
         placeholder={props.placeholder}/>);
 };
