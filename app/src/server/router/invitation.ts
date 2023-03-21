@@ -1,7 +1,7 @@
-import { Permission } from "types/permissions";
-import { canUserViewHome } from "server/db/HomeService";
-import { hasPermission } from "server/db/UserService";
-import { sendEmail } from "server/services/email/invitation";
+import { Permission } from "../../types/permissions";
+import { canUserViewHome } from "../db/HomeService";
+import { hasPermission } from "../db/UserService";
+import { sendEmail } from "../services/email/invitation";
 import { z } from "zod";
 import { createProtectedRouter } from "./context";
 import { getSignedImage } from "./image-upload";

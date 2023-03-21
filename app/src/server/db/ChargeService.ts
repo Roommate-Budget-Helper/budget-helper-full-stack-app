@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Charge } from "@prisma/client";
-import { sendEmail } from "server/services/email/charge";
+import { sendEmail } from "../services/email/charge";
 
 export const canUserPayCharge = async (receiveId: string, chargeId: string, db: PrismaClient) => {
     return !!(await db.charge.findFirst({
