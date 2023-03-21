@@ -1,8 +1,8 @@
 import { createProtectedRouter } from "./context";
 import { z } from "zod";
-import { getUserPermissions, hasPermission } from "server/db/UserService";
-import { Permission } from "types/permissions";
-import { canUserViewHome } from "server/db/HomeService";
+import { getUserPermissions, hasPermission } from "../db/UserService";
+import { Permission } from "../../types/permissions";
+import { canUserViewHome } from "../db/HomeService";
 
 export const occupiesRouter = createProtectedRouter()
     .mutation("addUserToHome", {
