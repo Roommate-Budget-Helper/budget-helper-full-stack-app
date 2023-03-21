@@ -127,7 +127,7 @@ const RegisterPage: NextPage = () => {
                         account!
                     </p>
                 </div>
-                {error != null && (
+                {error !== null && (
                     <p className="text-xl font-light text-red-600">
                         Something went wrong! {error}
                     </p>

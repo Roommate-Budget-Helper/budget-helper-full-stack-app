@@ -69,7 +69,7 @@ const HomesPage: NextPage = () => {
 
     const handleLeave = async () => {
         setLeaveModalOpen(false);
-        if(selectedHome != null) await leaveHome.mutateAsync({homeId: selectedHome});
+        if(selectedHome !== null) await leaveHome.mutateAsync({homeId: selectedHome});
         await refetchHomes();
         setSelectedHome(homes.length > 0 && homes[0] ? homes[0].id : null);
     }
