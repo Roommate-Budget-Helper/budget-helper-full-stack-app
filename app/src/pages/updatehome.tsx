@@ -23,18 +23,15 @@ const UpdatePage: NextPage = () => {
     const homeData = useMemo(() => {
         return homes.find(home => home.id === selectedHome);
     }, [selectedHome, homes]);
-    
-    if(homeData == undefined){
-        console.log("Error! Home data not found");
-    }
 
     const updateHome = trpc.useMutation(["home.updateHome"], {
         onError: (error) => {
             setError(error.message);
         },
         onSuccess: async (home) => {
-            setSelectedHome(home.id);
+            if(!home) return;
             await refetchHomes();
+            setSelectedHome(home.id);
             router.push("/homes");
         },
     }); 
@@ -49,17 +46,13 @@ const UpdatePage: NextPage = () => {
             imageFile = fileList[0]
         }   
         let key;
-        if(homeData == undefined){
+        if(!homeData){
             return;
-        }
-        if(homeData.image == null){
-            key = undefined
         }
         key = homeData.image;
         
         if(imageFile){
             const { url, fields } = await getPresignedURL.mutateAsync(imageFile.name);
-            console.log({ url, fields});
             const data = {
                 ...fields,
                 'Content-Type': imageFile.type,
@@ -76,17 +69,15 @@ const UpdatePage: NextPage = () => {
             })
         }   
         
-        console.log(form.elements["name"].value.type)
-        console.log(form.elements["address"].value.type)
         
         let name;
-        if(form.elements["name"].value.type == undefined){
+        if(form.elements["name"].value.type === undefined){
             name = homeData.name
         }
         name = form.elements["name"].value
 
         let address;
-        if(form.elements["address"].value.type == undefined){
+        if(form.elements["address"].value.type === undefined){
             address = homeData.address
         }
         address = form.elements["address"].value

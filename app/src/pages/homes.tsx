@@ -62,7 +62,7 @@ const HomesPage: NextPage = () => {
     
     const handleDelete = async () => {
         setDeleteModalOpen(false);
-        if(selectedHome != null) await deleteHome.mutateAsync({id: selectedHome});
+        if(selectedHome !== null) await deleteHome.mutateAsync({id: selectedHome});
         await refetchHomes();
         setSelectedHome(homes.length > 0 && homes[0] ? homes[0].id : null);        
     };

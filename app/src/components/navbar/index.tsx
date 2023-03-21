@@ -17,7 +17,7 @@ const WrappedIcon = (props: {
     currentpath: string,
 }&IconProps) => {
     const classes = () => {
-        if(props.activepath == props.currentpath){
+        if(props.activepath === props.currentpath){
             return "text-evergreen-80";
         }
     }
@@ -31,7 +31,7 @@ const Navbar: React.FC = () => {
     const [isSelecting, setSelecting] = useState<boolean>(false);
     const onItemClicked = (id: string) => (event: React.MouseEvent) => {
         event.preventDefault();
-        if(router.asPath != "/homes") router.push("/homes")
+        if(router.asPath !== "/homes") router.push("/homes")
         if(!isSelecting){
             setSelecting(true);
             return;
@@ -61,7 +61,7 @@ const Navbar: React.FC = () => {
             <div 
                 key={home.id}
                 style={{
-                    zIndex: home.id == selectedHome ? 200 : 100,
+                    zIndex: home.id === selectedHome ? 200 : 100,
                     position: isSelecting ? "static" : "absolute"
                 }} 
                 className="rounded-full bg-slate-300 w-24 h-24 flex items-center justify-center" 

@@ -49,7 +49,7 @@ export const registerRouter = createRouter()
                     }
                 }
             );
-            if(error == null) return signupAuth;
+            if(!error) return signupAuth;
             return error;
         },
     })

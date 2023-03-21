@@ -33,14 +33,13 @@ const CreationPage: NextPage = () => {
         const form = event.target as HTMLFormElement;
 
         const fileList = fileRef.current?.files
-        let imageFile = null
-        if(fileList != null){
-            imageFile = fileList[0]
+        if(!fileList){
+            return;
         }
+        const imageFile = fileList[0];
         let key = null;
         if(imageFile){
             const { url, fields } = await getPresignedURL.mutateAsync(imageFile.name);
-            console.log({ url, fields});
             const data = {
                 ...fields,
                 'Content-Type': imageFile.type,

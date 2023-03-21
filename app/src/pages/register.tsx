@@ -13,8 +13,6 @@ const RegisterPage: NextPage = () => {
     const [error, setError] = useState<string | null>(null);
     const createUser = trpc.useMutation(["auth.createUser"], {
         onError: (error) => {
-            console.log(error);
-            console.log(error.message);
             setError(error.message);
             return;
         },
