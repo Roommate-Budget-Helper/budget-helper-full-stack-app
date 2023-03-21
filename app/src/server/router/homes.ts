@@ -3,7 +3,7 @@ import { z } from "zod";
 import { getHomesByUserId, canUserViewHome } from "../db/HomeService";
 import { getSignedImage } from "./image-upload";
 import { hasPermission } from "../db/UserService";
-import { Permission } from "types/permissions";
+import { Permission } from "../../types/permissions";
 
 export const homesRouter = createProtectedRouter()
     .query("getHomes", {
