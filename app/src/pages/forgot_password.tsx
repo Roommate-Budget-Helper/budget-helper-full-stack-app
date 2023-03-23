@@ -7,35 +7,39 @@ import { trpc } from "utils/trpc";
 import { signIn } from 'next-auth/react';
 
 const ForgotPasswordPage: NextPage = () => {
-    const [username, setUsername] = useState<string>("");
     const [validatedUsername, setValidatedUsername] = useState<string>("");
     const [emailSent, setEmailSent] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
 
     const sendForgotPasswordCode = trpc.useMutation(
         ["auth.sendForgotPasswordVerificationCode"],
         {
-            // onError: (error) => {
-            //     // TODO: Add error handling for when the code wasn't sent
-            //     console.error(error);
-            // },
+            onError: (error) => {
+                console.error(error);
+                setError(error.message);
+            },
             onSuccess: (_, { username }) => {
                 setValidatedUsername(username);
                 setEmailSent(true);
+                setError(null);
             },
         }
     );
 
     const verifyEmail = trpc.useMutation(["auth.verifyForgotPassword"], {
-        // onError: (error) => {
-        //     console.error(error);
-        // },
-        // onSuccess: () => {
-        //     console.log("Success: User verified and password reset!");
-        // },
+        onError: (error) => {
+            console.error(error);
+            setError(error.message);
+        },
+        onSuccess: () => {
+            setError(null);
+        }
     });
 
-    const onFormFill = () => {
-        // TODO: Add error handling for when the username is not found
+    const onUsername = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const form = event.target as HTMLFormElement;
+        const username = form.elements["username"].value;
         sendForgotPasswordCode.mutate({
             username: username,
         });
@@ -52,15 +56,18 @@ const ForgotPasswordPage: NextPage = () => {
             return;
         }
 
-        // TODO: Add error handling for when the verification code is incorrect
         verifyEmail.mutate({
             username: validatedUsername,
             password: password,
             code: verification,
         });
 
+        if(error){
+            return;
+        }
+
         await signIn("credentials", {
-            username: username,
+            username: validatedUsername,
             password: password,
             redirect: false
         })
@@ -83,6 +90,11 @@ const ForgotPasswordPage: NextPage = () => {
                     <p className="text-xl py-4 font-light">
                         Enter in your verification code and new password below
                     </p>
+                    {error && (
+                        <p className="text-xl font-light text-red-600">
+                            Something went wrong! {error}
+                        </p>
+                    )}
                 </div>
                 <form method="post" onSubmit={onVerify}>
                     <div className="form-area flex flex-col justify-between items-center ">
@@ -124,23 +136,28 @@ const ForgotPasswordPage: NextPage = () => {
                     <p className="text-xl py-4 font-light">
                         Forgot your password? No worries, we can help you out!
                     </p>
+                    {error && (
+                        <p className="text-xl font-light text-red-600">
+                            Something went wrong! {error}
+                        </p>
+                    )}
                 </div>
             </div>
 
             <div className="form-area flex flex-col justify-between items-center ">
+                <form method="post" onSubmit={onUsername}>
                 <FieldInput
                     type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.currentTarget.value)}
+                    name="username"
                     placeholder="Username"
                 />
-                <div className="py-5"></div>
+                <div className="py-3"></div>
                 <Button
-                    classNames="bg-evergreen-80 text-dorian"
-                    value="Send Email Notification"
-                    type="button"
-                    onClick={onFormFill}
+                  classNames="bg-evergreen-80 text-dorian"
+                  value="Reset Password"
+                  type="submit"
                 />
+                </form>
             </div>
         </>
     );
