@@ -15,7 +15,6 @@ const ForgotPasswordPage: NextPage = () => {
         ["auth.sendForgotPasswordVerificationCode"],
         {
             onError: (error) => {
-                console.error(error);
                 setError(error.message);
             },
             onSuccess: (_, { username }) => {
@@ -28,7 +27,6 @@ const ForgotPasswordPage: NextPage = () => {
 
     const verifyEmail = trpc.useMutation(["auth.verifyForgotPassword"], {
         onError: (error) => {
-            console.error(error);
             setError(error.message);
         },
         onSuccess: () => {
