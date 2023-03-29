@@ -13,9 +13,19 @@ describe('Login and Registration Test', () => {
   });
   const password = "Abc@12345";
   const username = generateUsername();
+
+  it("can generate a new email address and sign up", () => {
+    registerUser(username, password);
+  });
+
+  it("Can log in with registered user", () => {
+    loginUser(username, password);
+  });
+});
+
+  export const registerUser = (username, password) => {
   let inboxId;
   let emailAddress;
-  it('can generate a new email address and sign up', () => {
     // see commands.js custom commands
     cy.createInbox().then(inbox => {
       // verify a new inbox was created
@@ -39,12 +49,11 @@ describe('Login and Registration Test', () => {
         cy.wait(600);
       })
     });
-  });
+  };
   
-  it('Can log in with registered user', () => {
+  export const loginUser = (username, password) => {
     cy.get('input[name=username]').type(username);
     cy.get('input[name=password]').type(password);
     cy.get('button[type=submit]').click();
     cy.url().should('contain', '/homes');
-  })
-});
+  }
