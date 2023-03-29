@@ -16,34 +16,10 @@ describe('Registration Test', () => {
     cy.contains("Welcome to Roommate Budget Helper, your friendly budgeting application");
   });
 
+
   // Success flow for registration
   it('can generate a new email address and sign up', () => {
-    let inboxId: string;
-    let emailAddress: string;
-    // see commands.js custom commands
-    cy.createInbox().then(inbox => {
-      // verify a new inbox was created
-      assert.isDefined(inbox)
-
-      // save the inboxId for later checking the emails
-      inboxId = inbox.id
-      emailAddress = inbox.emailAddress;
-
-      // sign up with inbox email address and the password
-      cy.get('input[name=email]').type(emailAddress);
-      cy.get('input[name=password]').type(successPassword);
-      cy.get('input[name=confirmPassword]').type(successPassword);
-      cy.get('input[name=username]').type(successUsername);
-      cy.get('button[type=submit]').click();
-
-      cy.waitForEmail(inboxId).then(email => {
-        assert.isDefined(email);
-        assert.strictEqual(/Your (confirmation|verification) code is/.test(email.body), true);
-        const code = email.body.match(/\d+/)[0];
-        cy.get('input[name=verification-code]').type(`${code}{enter}`)
-        cy.wait(600);
-      })
-    });
+    registerUser(successUsername, successPassword);
   });
 
   it('can throw an error when false verification code sign up', () => {
@@ -105,10 +81,7 @@ describe('Login Test', () => {
 
   // Success flow for login
   it('Can log in with registered user', () => {
-    cy.get('input[name=username]').type(successUsername);
-    cy.get('input[name=password]').type(successPassword);
-    cy.get('button[type=submit]').click();
-    cy.url().should('contain', '/homes');
+    loginUser(successUsername, successPassword)
   });
 
   it('Can throw error on not existing username', () => {
@@ -125,6 +98,45 @@ describe('Login Test', () => {
     cy.contains('Invalid Login Details Provided. Please try again!');
   });
 });
+
+export const loginUser = (username, password) => {
+  cy.visit('http://localhost:3000/login');
+  cy.get('input[name=username]').type(username);
+  cy.get('input[name=password]').type(password);
+  cy.get('button[type=submit]').click();
+  cy.url().should('contain', '/homes');
+};
+
+export const registerUser = (username, password) => {
+  cy.visit('http://localhost:3000/login');
+  cy.contains("Sign Up").click();
+  let inboxId: string;
+  let emailAddress: string;
+  // see commands.js custom commands
+  cy.createInbox().then(inbox => {
+    // verify a new inbox was created
+    assert.isDefined(inbox)
+
+    // save the inboxId for later checking the emails
+    inboxId = inbox.id
+    emailAddress = inbox.emailAddress;
+
+    // sign up with inbox email address and the password
+    cy.get('input[name=email]').type(emailAddress);
+    cy.get('input[name=password]').type(password);
+    cy.get('input[name=confirmPassword]').type(password);
+    cy.get('input[name=username]').type(username);
+    cy.get('button[type=submit]').click();
+
+    cy.waitForEmail(inboxId).then(email => {
+      assert.isDefined(email);
+      assert.strictEqual(/Your (confirmation|verification) code is/.test(email.body), true);
+      const code = email.body.match(/\d+/)[0];
+      cy.get('input[name=verification-code]').type(`${code}{enter}`)
+      cy.wait(600);
+    })
+  });
+}
 
 // describe('Forgot Password Test', () => {
 // });
