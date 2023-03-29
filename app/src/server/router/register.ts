@@ -21,7 +21,8 @@ export const registerRouter = createRouter()
         }),
         async resolve({ ctx, input }) {
             // return the user object and send errors back to the client if there are any for adding a new user to the user pool
-            return userPool.signUp(
+            let error = null;
+            const signupAuth = userPool.signUp(
                 input.username,
                 input.password,
                 [
@@ -34,11 +35,10 @@ export const registerRouter = createRouter()
                 function (err, result) {
                     if (err) {
                         // TODO: send error to client
-                        // console.log(err.message);
+                        error = err;
                         throw err;
-                        // return JSON.stringify(err);
                     }
-                    if (result) {
+                    else if (result) {
                         return ctx.prisma.user.create({
                             data: {
                                 id: result.userSub,
@@ -49,6 +49,8 @@ export const registerRouter = createRouter()
                     }
                 }
             );
+            if(!error) return signupAuth;
+            return error;
         },
     })
     .mutation("verifyEmailCode", {

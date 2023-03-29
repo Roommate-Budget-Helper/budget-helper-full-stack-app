@@ -28,12 +28,6 @@ const LoginPage: NextPage = () => {
                 name="description"
                 content="Login page of Roommate Budget Helper" />
         </Head>
-        <div>  
-            <pre>{JSON.stringify(session, null, 2)}</pre>
-            <Button value="logout" onClick={() => {
-                signOut();
-            }}/>
-        </div>
         <div className="body flex flex-col text-center">
             <div className="headertext-center pt-4">
                 <h1 className="text-5xl font-bold text-evergreen-100">Welcome Back 👋</h1>

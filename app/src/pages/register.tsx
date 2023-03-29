@@ -4,17 +4,22 @@ import FieldInput from "@components/fieldinput";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { trpc } from "utils/trpc";
+import { signIn } from 'next-auth/react';
 
 const RegisterPage: NextPage = () => {
     const [registered, setRegistered] = useState<boolean>(false);
     const [registeredUsername, setRegisteredUsername] = useState<string | null>(null);
+    const [registeredPassword, setRegisteredPassword] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
     const createUser = trpc.useMutation(["auth.createUser"], {
-        // onError: (error) => {
-        //     console.error(error);
-        // },
-        onSuccess: (_, { username }) => {
+        onError: (error) => {
+            setError(error.message);
+            return;
+        },
+        onSuccess: (_, { username, password }) => {
             setRegistered(true);
             setRegisteredUsername(username);
+            setRegisteredPassword(password);
             // Login the user
             // signIn("credentials", {});
         },
@@ -60,6 +65,12 @@ const RegisterPage: NextPage = () => {
             code: verification,
             username: registeredUsername
         })
+
+        await signIn("credentials", {
+            username: registeredUsername,
+            password: registeredPassword,
+            redirect: false
+        })
     };
 
     if(registered){
@@ -72,11 +83,23 @@ const RegisterPage: NextPage = () => {
                     content="Email verification for Roommate Budget Helper"
                 />
             </Head>
-            <form method="post" onSubmit={onVerify}>
+            <div className="body flex flex-col text-center">
+                    <h1 className="text-5xl font-bold text-evergreen-100">
+                        Account Created!
+                    </h1>
+                    <p className="text-xl py-4 font-light">
+                        Enter the verification code that we sent to your email below
+                    </p>
+                </div>
+            <form method="post" onSubmit={onVerify} className='grid grid-rows-2 gap-4 place-content-center'>
                 <FieldInput
                     type="text"
                     name="verification-code"
                     placeholder='verification code' />
+                <Button 
+                    type='submit'
+                    value='Submit Code'
+                    classNames={"bg-evergreen-80 text-dorian row-span-1"} />
             </form>
             </>);
     }
@@ -104,9 +127,9 @@ const RegisterPage: NextPage = () => {
                         account!
                     </p>
                 </div>
-                {createUser.error && (
+                {error !== null && (
                     <p className="text-xl font-light text-red-600">
-                        Something went wrong! {createUser.error?.message}
+                        Something went wrong! {error}
                     </p>
                 )}
                 <form method="post" onSubmit={onRegister}>

@@ -17,7 +17,7 @@ export interface HomeState {
 
 export interface HomeActions {
     setHomes: (homes: Home[]) => void,
-    setSelectedHome: (homeId: string) => void,
+    setSelectedHome: (homeId: string | null) => void,
     clearSelectedHome: () => void,
     refetchHomes: () => Promise<void>,
 }
@@ -33,14 +33,17 @@ type HomeStore = ReturnType<typeof createHomeStore>
 const createHomeStore = (initState?: Partial<HomeState>) => createStore<HomeState&HomeActions>()((set, get) => ({
     ...DEFAULT_HOME_STATE,
     ...initState,
-    setHomes: (homes) => set({ homes }),
+    setHomes: (homes) =>set({ homes }),
     setSelectedHome: (selectedHome) => set({ selectedHome }),
     clearSelectedHome: () => set({ selectedHome: null}),
     refetchHomes: async () => {
         const refetch = get().refetch;
         const result = await refetch();
-        if(!result) return;
-        set({ homes: result.data })
+        if(!result?.data) return;
+        if(!get().selectedHome && result.data.length > 0 && result.data[0]){
+            set({ selectedHome: result.data[0].id});
+        }
+        set({ homes: result.data });
     }
 }));
  
