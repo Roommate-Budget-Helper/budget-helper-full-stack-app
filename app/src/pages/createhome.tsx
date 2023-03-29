@@ -1,5 +1,5 @@
 import Button from "@components/button";
-import FieldInput from "@components/fieldinput";
+import FieldInput, { ImageFileFieldInput } from "@components/fieldinput";
 import type { NextPage } from "next";
 import Head from "next/head";
 import React, { useRef } from "react";
@@ -7,6 +7,7 @@ import { trpc } from "utils/trpc";
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useHomeContext } from "@stores/HomeStore";
+import Navbar from "@components/navbar";
 
 
 const CreationPage: NextPage = () => {
@@ -72,37 +73,38 @@ const CreationPage: NextPage = () => {
                     content="Homes page of Roommate budget helper"
                 />
             </Head>
-            <div className="body flex flex-col text-center">
-                <div className="text-2xl p-5">
-                    <div className="form-area flex flex-col justify-between items-center ">
-                        <div>Create Home</div>
+            <Navbar/>
+            <div className="body flex flex-col text-center text-2xl p-5">
+                <h1 className="text-5xl my-5 font-bold text-evergreen-100">
+                    Create Home
+                </h1>
+                <div className="form-area flex flex-col justify-between items-center ">
+                    <form method="post" onSubmit={onCreateHome}>
+                        <FieldInput
+                            type="text"
+                            name="name"
+                            placeholder="Home Name"
+                        />
                         <br></br>
-                        <form method="post" onSubmit={onCreateHome}>
-                            {/* TODO: Give it a cute image uploader */}
-                            <input ref={fileRef} type="file" name="image" accept=".png, .jpg" ></input>
-                            <br></br>
-                            <FieldInput
-                                type="text"
-                                name="name"
-                                placeholder="Home Name"
-                            />
-                            <br></br>
-                            <FieldInput
-                                type="text"
-                                name="address"
-                                placeholder="Address"
-                            />
-                            <br></br>
-                            <Button
-                                classNames="bg-evergreen-80 text-dorian"
-                                value="Create"
-                                type="submit"
-                            />
-                            <br></br>
-                        </form>
-                    </div>
+                        <FieldInput
+                            type="text"
+                            name="address"
+                            placeholder="Address"
+                        />
+                        <br></br>
+                        <ImageFileFieldInput title="Upload A Home Image" fileRef={fileRef}/>
+                        <br></br>
+                        <Button
+                            classNames="bg-evergreen-80 text-dorian"
+                            value="Create"
+                            type="submit"
+                        />
+                        <br></br>
+                    </form>
                 </div>
-                {error&&<p className="text-xl font-light text-red-600">{error}</p>}
+                {error && (
+                    <p className="text-xl font-light text-red-600">{error}</p>
+                )}
             </div>
         </>
     );
