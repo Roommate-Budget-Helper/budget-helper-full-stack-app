@@ -2,6 +2,7 @@ import { generateUsername } from "unique-username-generator";
 
 const successUsername = generateUsername();
 const successPassword = "Abc@12345";
+let successInboxId:string;
 
 describe('Registration Test', () => {
   beforeEach(() => {
@@ -75,7 +76,7 @@ describe('Login Test', () => {
     cy.contains("Welcome Back 👋");
   });
 
-  it('Subtitle exits', () => {
+  it('Subtitle exists', () => {
     cy.contains("We are excited to have you back but to get started please login!");
   });
 
@@ -99,6 +100,57 @@ describe('Login Test', () => {
   });
 });
 
+describe('Forgot Password test', () => {
+  const newPassword = "1234Password!";
+  beforeEach(() => {
+    cy.visit('http://localhost:3000/forgot_password');
+  });
+
+  it('Title exists', () => {
+    cy.contains('Forgot Password?');
+  });
+
+  it('Subtitle exists', () => {
+    cy.contains('Forgot your password? No worries, we can help you out!');
+  });
+
+  it('Can change password', () => {
+    cy.get('input[name=username]').type(successUsername);
+    cy.get('button[type=submit').click();
+
+    cy.waitForEmail(successInboxId).then(email => {
+      assert.isDefined(email);
+      assert.strictEqual(/Your (confirmation|verification) code is/.test(email.body), true);
+      const code = email.body.match(/\d+/)[0];
+      cy.get('input[name=verification-code]').type(code);
+      cy.get('input[name=new-password]').type(newPassword);
+      cy.get('button[type=submit]').click();
+      cy.wait(600);
+    })
+  });
+
+  it('Can login with new password', () => {
+    loginUser(successUsername, newPassword);
+  });
+
+  it('can throw an error when false verification code forgot password', () => {
+    cy.get('input[name=username]').type(successUsername);
+    cy.get('button[type=submit').click();
+
+    cy.waitForEmail(successInboxId).then(email => {
+      assert.isDefined(email);
+      assert.strictEqual(/Your (confirmation|verification) code is/.test(email.body), true);
+      const code = '123456';
+      cy.get('input[name=verification-code]').type(code);
+      cy.get('input[name=new-password]').type(newPassword);
+      cy.get('button[type=submit]').click();
+      cy.wait(600);
+    })
+      cy.contains('Something went wrong! Invalid verification code provided, please try again.');
+    });
+    
+});
+
 export const loginUser = (username, password) => {
   cy.visit('http://localhost:3000/login');
   cy.get('input[name=username]').type(username);
@@ -110,7 +162,6 @@ export const loginUser = (username, password) => {
 export const registerUser = (username, password) => {
   cy.visit('http://localhost:3000/login');
   cy.contains("Sign Up").click();
-  let inboxId: string;
   let emailAddress: string;
   // see commands.js custom commands
   cy.createInbox().then(inbox => {
@@ -118,7 +169,7 @@ export const registerUser = (username, password) => {
     assert.isDefined(inbox)
 
     // save the inboxId for later checking the emails
-    inboxId = inbox.id
+    successInboxId = inbox.id
     emailAddress = inbox.emailAddress;
 
     // sign up with inbox email address and the password
@@ -128,7 +179,7 @@ export const registerUser = (username, password) => {
     cy.get('input[name=username]').type(username);
     cy.get('button[type=submit]').click();
 
-    cy.waitForEmail(inboxId).then(email => {
+    cy.waitForEmail(successInboxId).then(email => {
       assert.isDefined(email);
       assert.strictEqual(/Your (confirmation|verification) code is/.test(email.body), true);
       const code = email.body.match(/\d+/)[0];
@@ -137,6 +188,3 @@ export const registerUser = (username, password) => {
     })
   });
 }
-
-// describe('Forgot Password Test', () => {
-// });
