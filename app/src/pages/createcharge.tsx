@@ -81,9 +81,8 @@ const CreateChargePage: NextPage = () => {
                sum += Number(form.elements[occupant.user.id].value);
             }
         });
-        console.log(sum, billAmount);
 
-        if(sum != billAmount){
+        if(sum !== Number(billAmount)){
             setError("The sum of the split amounts must be equal to the total amount");
             return;
         }
