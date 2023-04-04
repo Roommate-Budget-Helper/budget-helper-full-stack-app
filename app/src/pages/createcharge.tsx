@@ -4,9 +4,12 @@ import Head from "next/head";
 import { trpc } from "utils/trpc";
 import Button from "@components/button";
 import FieldInput, { DateFieldInput, MoneyFieldInput } from "@components/fieldinput";
+import Image from "next/image";
 import { useEffect } from "react";
 import { useState } from "react";
 import { useHomeContext } from "@stores/HomeStore";
+import { router } from "@trpc/server";
+import { useRouter } from "next/router";
 
 const CreateChargePage: NextPage = () => {
     const [error, setError] = useState<string | null>(null);
@@ -17,6 +20,7 @@ const CreateChargePage: NextPage = () => {
     const [dueDate, setDueDate] = useState<string>("");
 
     const selectedHome = useHomeContext((s) => s.selectedHome);
+    const router = useRouter();
 
     // Get the selected home somehow so that you can get the occupants
     const occupants = trpc.useQuery([
@@ -70,6 +74,20 @@ const CreateChargePage: NextPage = () => {
         event.preventDefault();
         const form = event.target as HTMLFormElement;
 
+        // check that the sum of the split amounts is equal to the total amount
+        let sum = 0;
+        occupants.data?.forEach((occupant) => {
+            if (form.elements[occupant.user.id]) {
+               sum += Number(form.elements[occupant.user.id].value);
+            }
+        });
+        console.log(sum, billAmount);
+
+        if(sum != billAmount){
+            setError("The sum of the split amounts must be equal to the total amount");
+            return;
+        }
+
         const formattedDueDate = new Date(dueDate);
         occupants.data?.forEach((occupant) => {
             if (form.elements[occupant.user.id]) {
@@ -96,7 +114,7 @@ const CreateChargePage: NextPage = () => {
             }
         });
 
-        setSplittingPage(false);
+        router.push("/billing");
     };
 
     // Loading page for when the home hasn't loaded in yet
@@ -139,6 +157,33 @@ const CreateChargePage: NextPage = () => {
                                   occupants.data.map((occupant) => {
                                       return (
                                           <div key={occupant.user.id}>
+                                              <div className="rounded-full bg-evergreen-80 w-24 h-24 flex flex-col items-center justify-center">
+                                                  {occupant.user.image ? (
+                                                      <Image
+                                                          src={
+                                                              occupant.user
+                                                                  .image
+                                                          }
+                                                          alt={
+                                                              occupant.user.name
+                                                          }
+                                                          width="64px"
+                                                          height="64px"
+                                                      />
+                                                  ) : (
+                                                      <p>
+                                                          {occupant.user.name
+                                                              .split(" ")
+                                                              .reduce(
+                                                                  (a, c) => {
+                                                                      a += c[0];
+                                                                      return a.toUpperCase();
+                                                                  },
+                                                                  ""
+                                                              )}
+                                                      </p>
+                                                  )}
+                                              </div>
                                               <div className="text-dorian">
                                                   {occupant.user.name}
                                               </div>
@@ -212,7 +257,7 @@ const CreateChargePage: NextPage = () => {
                                 return (
                                     <div
                                         key={occupant.user.id}
-                                        className="bg-slate-600 w-96 my-10 p-3 rounded-xl text-dorian text-base"
+                                        className="bg-slate-600 w-88 my-10 p-3 rounded-xl text-dorian text-base"
                                     >
                                         <input
                                             type="checkbox"

@@ -56,7 +56,7 @@ const BillingPage: NextPage = () => {
                     Billing
                 </h1>
                 <div className="form-area flex flex-col justify-between items-center">
-                    <div className="bg-slate-200 py-10 px-10 rounded-xl">
+                    <div className="py-10 px-10 rounded-xl hover:shadow-xl">
                         <Button
                             classNames="bg-evergreen-80 text-dorian"
                             value="Send Charge"
@@ -65,6 +65,7 @@ const BillingPage: NextPage = () => {
                                 router.push("/createcharge");
                             }}
                         />
+                        <hr className="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700"></hr>
                         <h2 className="text-3xl mt-5 font-bold text-evergreen-100">
                             Charges to Pay
                         </h2>
@@ -73,10 +74,10 @@ const BillingPage: NextPage = () => {
                                 {unpaidCharges.map((charge) => (
                                     <div
                                         key={charge.chargeId}
-                                        className="bg-slate-600 justify-items-center mx-106 my-10 p-3 rounded-xl text-dorian text-base"
+                                        className="sm:bg-transparent md:bg-slate-600 items-center mx-10 my-10 p-3 rounded-xl flex flex-col sm:text-black md:text-dorian text-base justify-between"
                                     >
                                         {charge.chargeUser.name && (
-                                            <div className="rounded-full bg-evergreen-80 w-24 h-24 flex items-center justify-center">
+                                            <div className="rounded-full bg-evergreen-80 w-24 h-24 flex items-center flex-col justify-center">
                                                 {charge.chargeUser.image ? (
                                                     <Image
                                                         src={
@@ -96,25 +97,26 @@ const BillingPage: NextPage = () => {
                                                             .split(" ")
                                                             .reduce((a, c) => {
                                                                 a += c[0];
-                                                                return a;
+                                                                return a.toUpperCase();
                                                             }, "")}
                                                     </p>
                                                 )}
                                             </div>
                                         )}
                                         <br></br>
-                                        <p>Charger: {charge.chargeUser.name}</p>
+                                        <p className="mt-5">
+                                            Charger: {charge.chargeUser.name}
+                                        </p>
                                         <p>Description: {charge.comment} </p>
                                         <p>
                                             Amount Before Splitting: $
                                             {charge.amountBeforeSplit}
                                         </p>
                                         <p>Amount Owed: ${charge.amount}</p>
-                                        <p>
+                                        <p className="mb-5">
                                             Due Date:{" "}
                                             {charge.dueDate.toDateString()}
                                         </p>
-                                        <br></br>
                                         <div className="flex space-x-5">
                                             <Button
                                                 classNames="bg-evergreen-80"
@@ -129,7 +131,9 @@ const BillingPage: NextPage = () => {
                                 ))}
                             </div>
                         ) : (
-                            <div>You have no unpaid charges.</div>
+                            <div className="sm:bg-transparent items-center mx-10 p-3 rounded-xl flex flex-col sm:text-black text-xl text-bold justify-between">
+                                You have no unpaid charges.
+                            </div>
                         )}
 
                         <hr className="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700"></hr>
@@ -142,7 +146,7 @@ const BillingPage: NextPage = () => {
                                 {unconfirmedCharges.map((charge) => (
                                     <div
                                         key={charge.chargeId}
-                                        className="bg-slate-600 mx-106 my-10 p-3 rounded-xl text-dorian text-base"
+                                        className="sm:bg-transparent md:bg-slate-600 items-center mx-10 my-10 p-3 rounded-xl flex flex-col sm:text-black md:text-dorian text-base justify-between"
                                     >
                                         <p>From: {charge.receiveUser.name} </p>
                                         <p>Description: {charge.comment} </p>
@@ -170,7 +174,9 @@ const BillingPage: NextPage = () => {
                                 ))}
                             </div>
                         ) : (
-                            <div>You have no charges pending approval.</div>
+                            <div className="sm:bg-transparent items-center mx-10 p-3 rounded-xl flex flex-col sm:text-black text-xl text-bold justify-between">
+                                You have no charges pending approval.
+                            </div>
                         )}
 
                         {error && (
