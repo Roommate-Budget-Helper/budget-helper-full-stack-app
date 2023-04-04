@@ -125,7 +125,7 @@ const HomesPage: NextPage = () => {
                         className="self-end mr-6 rounded-full hover:bg-slate-200 w-12 h-12 flex items-center relative"
                         onClick={handleToggleModal(setMenuOpen)}>
                             <Icon path={mdiDotsVertical} size={1} className="mx-auto"/>
-                            {isMenuOpen && <div className="absolute top-10 right-10 w-96 bg-slate-50">
+                            {isMenuOpen && <div className="absolute top-10 right-10 w-88 bg-slate-50">
                                 {hasPermission(Permission.Invite) && <div className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={handleToggleModal(setInviteModalOpen)}>Invite Roommate</div>}
                                 {hasPermission(Permission.Evict) && <div className="hover:bg-slate-200 border-b-2 border-black py-2">Remove Roommate</div>}
                                 {hasPermission(Permission.Owner) && <div className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={handleToggleModal(setEditPermissionsModalOpen)}>Edit Permissions</div>}

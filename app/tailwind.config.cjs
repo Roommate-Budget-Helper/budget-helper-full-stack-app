@@ -21,6 +21,9 @@ module.exports = {
                 },
                 dorian: "#ECF1F4",
             },
+            width: {
+                "88": "22rem",
+            },
         },
         screens: {
             "2xl": { max: "1535px" },

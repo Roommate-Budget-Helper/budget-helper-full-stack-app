@@ -17,7 +17,7 @@ const FieldInput= (props: Partial<FieldInputProps>) => {
     return (
     <input
         name={props.name}
-        className="bg-evergreen-60 w-96 my-4 text-xl py-2 px-4 rounded-lg" 
+        className="bg-evergreen-60 w-88 my-4 text-xl py-2 px-4 rounded-lg" 
         type={props.type} 
         value={props.value}
         defaultValue={props.defaultValue} 
@@ -72,7 +72,7 @@ export const VisibilityFieldInput = (props: Partial<FieldInputProps>) => {
         return (
             <input 
                 {...props}
-                className="bg-evergreen-60 w-96 my-4 text-xl py-2 px-4 rounded-lg" 
+                className="bg-evergreen-60 w-88 my-4 text-xl py-2 px-4 rounded-lg" 
                 type="number"
                 min="0"
                 step="0.01"
@@ -84,7 +84,7 @@ export const VisibilityFieldInput = (props: Partial<FieldInputProps>) => {
         return (
             <input
                 {...props}
-                className="bg-evergreen-60 text-gray-400 w-96 my-4 text-xl py-2 px-4 rounded-lg"
+                className="bg-evergreen-60 text-gray-400 w-88 my-4 text-xl py-2 px-4 rounded-lg"
                 type="date"
                 placeholder=""
                 min={new Date().toISOString().split("T")[0]}
@@ -95,13 +95,13 @@ export const VisibilityFieldInput = (props: Partial<FieldInputProps>) => {
     export const ImageFileFieldInput = ( props: { title: string, fileRef: React.RefObject<HTMLInputElement> } ) => {
         const [imageName, setImageName] = useState<string | null>(null);
         return (
-            <div className="w-96 pb-2 pt-1 rounded-lg shadow-xl bg-gray-50">
+            <div className="w-88 pb-2 pt-1 rounded-lg shadow-xl bg-gray-50">
                 <div className="m-4">
                     <label className="inline-block mb-2 text-gray-400">
                         {props.title}
                     </label>
-                    <div className="flex items-center justify-center w-full">
-                        <label className="flex flex-col w-full h-32 border-4 border-evergreen-60 border-dashed hover:bg-gray-100 hover:border-gray-400">
+                    <div className="flex items-center justify-center w-full border-dashed border-4 border-evergreen-60 hover:bg-gray-100 hover:border-gray-400">
+                        <label className="flex flex-col w-full h-32">
                             <div className="flex flex-col items-center justify-center pt-7">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
