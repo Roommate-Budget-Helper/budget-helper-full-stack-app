@@ -3,7 +3,7 @@ import { NextPage } from "next";
 import Head from "next/head";
 import { trpc } from "utils/trpc";
 import Button from "@components/button";
-import FieldInput from "@components/fieldinput";
+import FieldInput, { DateFieldInput, MoneyFieldInput } from "@components/fieldinput";
 import { useEffect } from "react";
 import { useState } from "react";
 import { useHomeContext } from "@stores/HomeStore";
@@ -107,9 +107,9 @@ const CreateChargePage: NextPage = () => {
                     <title>RBH Create Charge</title>
                     <meta name="description" content="Create Charges" />
                 </Head>
-                <div className="body flex flex-col text-center">
-                    <Navbar />
-                    <div> Please select/create a home to create a charge.</div>
+                <Navbar />
+                <div className="body flex flex-col text-center text-2xl p-5">
+                    <div>Please select/create a home to create a charge.</div>
                 </div>
             </>
         );
@@ -123,33 +123,48 @@ const CreateChargePage: NextPage = () => {
                   <title>RBH Create Charge</title>
                   <meta name="description" content="Create Charges" />
               </Head>
-              <div className="body flex flex-col text-center">
-                  <Navbar/>
-                  <h1 className="text-5xl my-10 font-bold text-evergreen-100">Create Charge</h1>
-
+              <Navbar />
+              <div className="body flex flex-col text-center text-2xl p-5">
+                  <h1 className="text-5xl my-10 font-bold text-evergreen-100">
+                      Create Charge
+                  </h1>
                   <div className="form-area flex flex-col justify-between items-center ">
                       <form method="post" onSubmit={onSplitCharge}>
-                        <div className="bg-evergreen-100 mx-10 my-10 p-3 rounded-xl text-base">
-                          <h2 className="text-2xl mb-2 font-bold text-dorian">Splitting ${billAmount}</h2>
-                          <hr></hr>
-                          {occupants.data && occupants.data.map((occupant) => {
-                              return (<div key={occupant.user.id}> 
-                                <div className="text-dorian"> {occupant.user.name} </div>
-                                <input type="number" name={occupant.user.id} placeholder="0.00" step="0.01" min="0.01" max={billAmount}/>
-                              </div>);
-                          })}
+                          <div className="bg-evergreen-100 mx-10 my-10 p-3 rounded-xl text-base">
+                              <h2 className="text-2xl mb-2 font-bold text-dorian">
+                                  Splitting ${billAmount}
+                              </h2>
+                              <hr></hr>
+                              {occupants.data &&
+                                  occupants.data.map((occupant) => {
+                                      return (
+                                          <div key={occupant.user.id}>
+                                              <div className="text-dorian">
+                                                  {occupant.user.name}
+                                              </div>
+                                              <MoneyFieldInput
+                                                  name={occupant.user.id}
+                                                  placeholder="0.00"
+                                                  max={String(billAmount)}
+                                              />
+                                          </div>
+                                      );
+                                  })}
 
-                        <Button
-                            classNames="bg-evergreen-80 text-dorian"
-                            value="Send Charge"
-                            type="submit"
-                        />
-                        </div>
+                              <Button
+                                  classNames="bg-evergreen-80 text-dorian"
+                                  value="Send Charge"
+                                  type="submit"
+                              />
+                          </div>
                       </form>
-                      
-                      {error &&<p className="text-xl font-light text-red-600">{error}</p>}
+
+                      {error && (
+                          <p className="text-xl font-light text-red-600">
+                              {error}
+                          </p>
+                      )}
                   </div>
-                  
               </div>
           </>
       );
@@ -162,12 +177,12 @@ const CreateChargePage: NextPage = () => {
                 <title>RBH Create Charge</title>
                 <meta name="description" content="Create Charges" />
             </Head>
-            <div className="body flex flex-col text-center">
-                <Navbar/>
+            <Navbar />
+            <div className="body flex flex-col text-center text-2xl p-5">
+                <h1 className="text-5xl mt-10 font-bold text-evergreen-100">
+                    Create Charge
+                </h1>
                 <div className="form-area flex flex-col justify-between items-center ">
-
-                    <h1 className="text-5xl mt-10 font-bold text-evergreen-100">Create Charge</h1>
-                    <br></br>
                     <form method="post" onSubmit={onCreateCharge}>
                         <br></br>
                         <FieldInput
@@ -176,11 +191,22 @@ const CreateChargePage: NextPage = () => {
                             placeholder="Enter Charge Description"
                         />
                         <br></br>
-                        <input type="number" className="bg-evergreen-60 w-96 my-4 text-xl py-2 px-4 rounded-lg" 
-                          name="amount" placeholder="Amount" step="0.01" min="0.01" max="1000000" />
+                        <FieldInput
+                            type="text"
+                            name="category"
+                            placeholder="Charge Category"
+                        />
                         <br></br>
-                        <input type="date" className="bg-evergreen-60 w-96 my-4 text-xl py-2 px-4 rounded-lg" name="dueDate" min={new Date().toISOString().split('T')[0]}/>
-                        <h2 className="text-3xl mt-5 font-bold text-evergreen-100">Who is Paying?</h2>
+                        <MoneyFieldInput
+                            placeholder="0.00"
+                            name="amount"
+                            max="1000000"
+                        />
+                        <br></br>
+                        <DateFieldInput name="dueDate" />
+                        <h2 className="text-3xl mt-5 font-bold text-evergreen-100">
+                            Who Paid the Charge?
+                        </h2>
                         {occupants.data?.map((occupant) => {
                             if (occupant.user.name) {
                                 return (
@@ -188,13 +214,12 @@ const CreateChargePage: NextPage = () => {
                                         key={occupant.user.id}
                                         className="bg-slate-600 w-96 my-10 p-3 rounded-xl text-dorian text-base"
                                     >
-                                    <input
-                                        type="checkbox"
-                                        name={occupant.user.id}
-                                        className="mr-4"
-                                    />
-                                    
-                                    {occupant.user.name}
+                                        <input
+                                            type="checkbox"
+                                            name={occupant.user.id}
+                                            className="mr-4"
+                                        />
+                                        {occupant.user.name}
                                     </div>
                                 );
                             }
@@ -206,12 +231,22 @@ const CreateChargePage: NextPage = () => {
                         />
                     </form>
                     <br></br>
-                    <div className="text-2xl text-evergreen-100 font-bold mt-5">Step 1 of 2</div>
-                    <div className="flex items-center justify-between"> 
-                      <span className="text-dorian bg-slate-800 rounded-full h-10 w-10 my-7 mr-3">1</span>
-                      <span className="text-dorian bg-slate-600 rounded-full h-10 w-10">2</span>
+                    <div className="text-evergreen-100 font-bold mt-5">
+                        Step 1 of 2
                     </div>
-                    {error &&<p className="text-xl font-light text-red-600">{error}</p>}
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-center w-10 h-10 bg-evergreen-100 rounded-full my-2 mx-2">
+                            <span className="text-dorian">1</span>
+                        </div>
+                        <div className="flex items-center justify-center w-10 h-10 bg-evergreen-80 rounded-full my-2 mx-2">
+                            <span className="text-dorian">2</span>
+                        </div>
+                    </div>
+                    {error && (
+                        <p className="text-xl font-light text-red-600">
+                            {error}
+                        </p>
+                    )}
                 </div>
             </div>
         </>

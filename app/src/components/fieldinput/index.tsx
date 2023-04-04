@@ -8,6 +8,8 @@ export interface FieldInputProps {
     placeholder: string;
     type: React.HTMLInputTypeAttribute;
     onChange: React.ChangeEventHandler<HTMLInputElement>;
+    max: string;
+    min: string;
 }
 export type FieldInputType = React.FC<Partial<FieldInputProps>>
 
@@ -64,6 +66,30 @@ export const VisibilityFieldInput = (props: Partial<FieldInputProps>) => {
                 </div>}
             </div>
         </div>);
+    };
+
+    export const MoneyFieldInput = (props: Partial<FieldInputProps>) => {
+        return (
+            <input 
+                {...props}
+                className="bg-evergreen-60 w-96 my-4 text-xl py-2 px-4 rounded-lg" 
+                type="number"
+                min="0"
+                step="0.01"
+                />
+        )
+    };
+
+    export const DateFieldInput = (props: Partial<FieldInputProps>) => {
+        return (
+            <input
+                {...props}
+                className="bg-evergreen-60 text-gray-400 w-96 my-4 text-xl py-2 px-4 rounded-lg"
+                type="date"
+                placeholder=""
+                min={new Date().toISOString().split("T")[0]}
+            />
+        );
     };
 
     export const ImageFileFieldInput = ( props: { title: string, fileRef: React.RefObject<HTMLInputElement> } ) => {

@@ -73,7 +73,7 @@ const CreationPage: NextPage = () => {
                     content="Homes page of Roommate budget helper"
                 />
             </Head>
-            <Navbar/>
+            <Navbar />
             <div className="body flex flex-col text-center text-2xl p-5">
                 <h1 className="text-5xl my-5 font-bold text-evergreen-100">
                     Create Home
@@ -92,7 +92,10 @@ const CreationPage: NextPage = () => {
                             placeholder="Address"
                         />
                         <br></br>
-                        <ImageFileFieldInput title="Upload A Home Image" fileRef={fileRef}/>
+                        <ImageFileFieldInput
+                            title="Upload A Home Image"
+                            fileRef={fileRef}
+                        />
                         <br></br>
                         <Button
                             classNames="bg-evergreen-80 text-dorian"
