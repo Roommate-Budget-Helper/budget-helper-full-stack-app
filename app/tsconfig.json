@@ -16,7 +16,6 @@
         "incremental": true,
         "noUncheckedIndexedAccess": true,
         "baseUrl": "./src",
-        "ignoreDeprecations": "5.0",
         "suppressImplicitAnyIndexErrors": true,
         "paths": {
             "@components/*": ["components/*"],
