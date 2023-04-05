@@ -13,16 +13,18 @@ import { trpc } from "utils/trpc";
 import Link from "next/link";
 import FieldInput from "@components/fieldinput";
 import { Permission } from "types/permissions";
+import { useSession } from "next-auth/react";
 
 
 const HomesPage: NextPage = () => {
+    const { data: session } = useSession();
     const [error, setError] = useState<string | null>(null);
     const [isMenuOpen, setMenuOpen] = useState<boolean>(false);
     const [isDeleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
     const [isLeaveModalOpen, setLeaveModalOpen] = useState<boolean>(false);
     const [isInviteModalOpen, setInviteModalOpen] = useState<boolean>(false);
+    const [isRemovalModalOpen, setRemovalModalOpen] = useState<boolean>(false);
     const [isEditPermissionsModalOpen, setEditPermissionsModalOpen] = useState<boolean>(false);
-
 
     const homes = useHomeContext((s) => s.homes);
     const selectedHome = useHomeContext((s) => s.selectedHome);
@@ -33,6 +35,7 @@ const HomesPage: NextPage = () => {
     const leaveHome = trpc.useMutation(["occupies.removeUserFromHome"]);
     const inviteRoommate = trpc.useMutation(["invite.sendInvitation"]);
     const editPermissions = trpc.useMutation(["occupies.UpdatePermissions"]);
+    const removeUser = trpc.useMutation(["occupies.removeUserFromHomeById"]);
 
     const { data: userPermissions, refetch: getPermissions } = trpc.useQuery(["occupies.getPermissions", {
         homeId: selectedHome ?? ''
@@ -72,6 +75,20 @@ const HomesPage: NextPage = () => {
         if(selectedHome !== null) await leaveHome.mutateAsync({homeId: selectedHome});
         await refetchHomes();
         setSelectedHome(homes.length > 0 && homes[0] ? homes[0].id : null);
+    }
+
+    const handleRemovingRoommate = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        if(!selectedHome) return;
+        const form = (event.target as HTMLFormElement);
+        if(!form.elements["User"]) return;
+        const formUserId = form.elements["User"].value as string;
+
+        await removeUser.mutateAsync({
+            homeId: selectedHome,
+            userId: formUserId,
+        });
+        setRemovalModalOpen(false);
     }
 
     const handleUpdatePermission = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -127,7 +144,7 @@ const HomesPage: NextPage = () => {
                             <Icon path={mdiDotsVertical} size={1} className="mx-auto"/>
                             {isMenuOpen && <div className="absolute top-10 right-10 w-88 bg-slate-50">
                                 {hasPermission(Permission.Invite) && <div className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={handleToggleModal(setInviteModalOpen)}>Invite Roommate</div>}
-                                {hasPermission(Permission.Evict) && <div className="hover:bg-slate-200 border-b-2 border-black py-2">Remove Roommate</div>}
+                                {hasPermission(Permission.Evict) && <div className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={handleToggleModal(setRemovalModalOpen)}>Remove Roommate </div>}
                                 {hasPermission(Permission.Owner) && <div className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={handleToggleModal(setEditPermissionsModalOpen)}>Edit Permissions</div>}
                                 {hasPermission(Permission.Edit) && <div className="hover:bg-slate-200 border-b-2 border-black py-2"><Link href="/updatehome">Update Home</Link> </div>}
                                 <div className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={handleToggleModal(setLeaveModalOpen)}>Leave Home</div>
@@ -193,6 +210,39 @@ const HomesPage: NextPage = () => {
                     <Button classNames="bg-evergreen-80" onClick={handleLeave} value="Leave" />
                 </Modal.Footer> 
             </Modal>
+            <Modal show={isRemovalModalOpen} onHide={handleToggleModal(setRemovalModalOpen)}>
+                <Modal.Header onHide={handleToggleModal(setRemovalModalOpen)}>
+                    Remove Roommate from Home 
+                </Modal.Header>
+                <form onSubmit={handleRemovingRoommate}>
+                <Modal.Body>
+                    <div className="flex"> 
+                    <p className="text-2xl font-bold mr-4">User: </p>
+                        {occupants && occupants?.length > 1 ?
+                        (<select name="User">
+                            {occupants?.map(occupant => {
+                                // get the current user id and compare it to the occupant id
+                                if(session && session.user && occupant.user.id !== session.user.id){
+                                    return (
+                                        <option
+                                            key={occupant.user.id}
+                                            value={occupant.user.id}
+                                        >
+                                            {occupant.user.name}
+                                        </option>
+                                    );
+                                }
+                            })}
+                        </select>) : (<p className="text-2xl font-bold">You are the only occupant in this home</p>)
+                    }
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button classNames="bg-red-600" onClick={handleToggleModal(setRemovalModalOpen)} value="Cancel"/>
+                    <Button classNames="bg-evergreen-80" type="submit" value="Remove" />
+                </Modal.Footer>
+                </form>
+            </Modal>
             <Modal show={isEditPermissionsModalOpen} onHide={handleToggleModal(setEditPermissionsModalOpen)}>
                 <Modal.Header onHide={handleToggleModal(setEditPermissionsModalOpen)}>
                     Set User Permissions 
@@ -204,7 +254,6 @@ const HomesPage: NextPage = () => {
                         <option 
                             key={occupant.user.id} 
                             value={occupant.user.id}
-
                          >{occupant.user.name}</option>))}
                     </select></p>
                     {Object.values(Permission).map(permission => (
@@ -234,8 +283,8 @@ const HomesPage: NextPage = () => {
                         placeholder="email"/>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button classNames="bg-red-600" onClick={handleToggleModal(setLeaveModalOpen)} value="Cancel"/>
-                        <Button classNames="bg-evergreen-80" value="Submit" type="submit" />
+                        <Button classNames="bg-red-600" onClick={handleToggleModal(setInviteModalOpen)} value="Cancel"/>
+                        <Button classNames="bg-evergreen-80" value="Invite" type="submit" />
                     </Modal.Footer> 
                 </form>
             </Modal>
