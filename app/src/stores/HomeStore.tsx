@@ -30,22 +30,49 @@ const DEFAULT_HOME_STATE: HomeState = {
 
 type HomeStore = ReturnType<typeof createHomeStore>
 
-const createHomeStore = (initState?: Partial<HomeState>) => createStore<HomeState&HomeActions>()((set, get) => ({
-    ...DEFAULT_HOME_STATE,
-    ...initState,
-    setHomes: (homes) =>set({ homes }),
-    setSelectedHome: (selectedHome) => set({ selectedHome }),
-    clearSelectedHome: () => set({ selectedHome: null}),
-    refetchHomes: async () => {
-        const refetch = get().refetch;
-        const result = await refetch();
-        if(!result?.data) return;
-        if(!get().selectedHome && result.data.length > 0 && result.data[0]){
-            set({ selectedHome: result.data[0].id});
-        }
-        set({ homes: result.data });
-    }
-}));
+const createHomeStore = (initState?: Partial<HomeState>) =>
+    createStore<HomeState & HomeActions>()((set, get) => ({
+        ...DEFAULT_HOME_STATE,
+        ...initState,
+        setHomes: (homes) => set({ homes }),
+        setSelectedHome: (selectedHome) => {
+            if (selectedHome) {
+                localStorage.setItem("selectedHome", selectedHome);
+            } else {
+                localStorage.removeItem("selectedHome");
+            }
+            set({ selectedHome });
+        },
+        getSelectedHome: () => {
+            if (
+                !localStorage.getItem("selectedHome") &&
+                get().homes.length > 0 &&
+                get().homes[0]
+            ) {
+                return get().homes[0];
+            }
+            return localStorage.getItem("selectedHome");
+        },
+        clearSelectedHome: () => {
+            localStorage.removeItem("selectedHome");
+            set({ selectedHome: null });
+        },
+        refetchHomes: async () => {
+            const refetch = get().refetch;
+            const result = await refetch();
+            if (!result?.data) return;
+            if (
+                !localStorage.getItem("selectedHome") &&
+                !get().selectedHome &&
+                result.data.length > 0 &&
+                result.data[0]
+            ) {
+                localStorage.setItem("selectedHome", result.data[0].id);
+                set({ selectedHome: result.data[0].id });
+            }
+            set({ homes: result.data });
+        },
+    }));
  
 
 export const HomeContext = createContext<HomeStore | null>(null);
@@ -64,7 +91,7 @@ export const HomeProvider = ({ children, ...props}: HomeProviderProps) => {
         getHomes().then(homes => {
             if(!homes.data) return;
             storeRef.current?.getState().setHomes(homes.data);
-            if(homes.data.length > 0 && homes.data[0])
+            if(!localStorage.getItem('selectedHome') && homes.data.length > 0 && homes.data[0])
                 storeRef.current?.getState().setSelectedHome(homes.data[0].id);
         })
     }, [session.data, getHomes]);
