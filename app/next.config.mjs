@@ -28,4 +28,5 @@ export default defineNextConfig({
             },
         ],
     },
+    output: "standalone",
 });
