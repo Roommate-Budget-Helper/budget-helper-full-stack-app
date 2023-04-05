@@ -25,9 +25,32 @@ export const homesRouter = createProtectedRouter()
                     },
                 },
             });
+            
+
+            // for(const home of homes){
+            //     if(!home.image) continue;
+            //     home.image = await getSignedImage(home.image);
+            // }
+            const homePromises = [];
             for(const home of homes){
                 if(!home.image) continue;
-                home.image = await getSignedImage(home.image);
+                homePromises.push(new Promise<{
+                    id: string,
+                    image: string,
+                }>((resolve, reject) => {
+                   getSignedImage(home.image!).then(
+                    image => resolve({
+                        id: home.id,
+                        image,
+                    })
+                   ).catch(reject); 
+                }));
+            }
+            const homeImages = await Promise.all(homePromises);
+            for(const homeImage of homeImages){
+                const home = homes.find(home => home.id === homeImage.id);
+                if(!home) continue;
+                home.image = homeImage.image;
             }
             return homes;
         },
