@@ -68,7 +68,11 @@ RUN apt-get update && \
   && apt-get clean
 
 RUN apt update && apt install firefox-esr
-
 # "fake" dbus address to prevent errors
 # https://github.com/SeleniumHQ/docker-selenium/issues/87
 ENV DBUS_SESSION_BUS_ADDRESS=/dev/null
+
+USER node
+RUN git clone https://github.com/tfutils/tfenv.git ~/.tfenv
+RUN echo 'export PATH="$HOME/.tfenv/bin:$PATH"' >> ~/.bash_profile
+RUN sudo ln -s ~/.tfenv/bin/* /usr/local/bin
