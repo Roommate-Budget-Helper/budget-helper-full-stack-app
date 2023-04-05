@@ -18,6 +18,7 @@ const CreateChargePage: NextPage = () => {
     const [billAmount, setBillAmount] = useState<number>(0);
     const [billId, setBillId] = useState<string>("");
     const [dueDate, setDueDate] = useState<string>("");
+    const [category, setCategory] = useState<string>("");
 
     const selectedHome = useHomeContext((s) => s.selectedHome);
     const router = useRouter();
@@ -44,7 +45,8 @@ const CreateChargePage: NextPage = () => {
         const billName = form.elements["name"].value;
         const billAmount = form.elements["amount"].value;
         const dueDate = form.elements["dueDate"].value;
-        if(billName.length < 1 || billAmount < .01) {
+        const category = form.elements["category"].value;
+        if(billName.length < 1 || billAmount < .01 || category < 1) {
             setError("The form elements cannot be empty or negative!");
             return;
         }
@@ -52,6 +54,7 @@ const CreateChargePage: NextPage = () => {
         setBillName(billName);
         setBillAmount(billAmount);
         setDueDate(dueDate);
+        setCategory(category);
 
         // check which home occupants to charge
         let checkedId = 0;
