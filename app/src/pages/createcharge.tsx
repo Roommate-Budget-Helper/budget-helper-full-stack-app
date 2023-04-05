@@ -46,15 +46,26 @@ const CreateChargePage: NextPage = () => {
         const billAmount = form.elements["amount"].value;
         const dueDate = form.elements["dueDate"].value;
         const category = form.elements["category"].value;
-        if(billName.length < 1 || billAmount < 0.01 || category < 1) {
-            setError("The form elements cannot be empty or negative!");
+
+        if(billName.trim().length < 1) {
+            setError("The charge must have a name, it cannot be empty.");
             return;
+        }
+
+        if(billAmount < 0.01) {
+            setError("The bill amount must be greater than 0.01");
+            return;
+        }
+
+        if(category.trim().length < 1) {
+            setCategory("Other");
+        }else{
+            setCategory(category);
         }
 
         setBillName(billName);
         setBillAmount(billAmount);
         setDueDate(dueDate);
-        setCategory(category);
 
         // check which home occupants to charge
         let checkedId = 0;

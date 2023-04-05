@@ -35,8 +35,12 @@ const CreationPage: NextPage = () => {
 
         const nameVal = form.elements["name"].value;
         const addressVal = form.elements["address"].value;
-        if(nameVal.length < 1 || addressVal.length < 1) {
-            setError("The input fields cannot be empty!");
+        if(nameVal.trim().length < 1) {
+            setError("The home must have a name, it cannot be empty.");
+            return;
+        }
+        if(addressVal.trim().length < 1) {
+            setError("The home must have an address, it cannot be empty.");
             return;
         }
 
