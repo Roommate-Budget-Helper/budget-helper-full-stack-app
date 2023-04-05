@@ -33,6 +33,13 @@ const CreationPage: NextPage = () => {
         event.preventDefault();
         const form = event.target as HTMLFormElement;
 
+        const nameVal = form.elements["name"].value;
+        const addressVal = form.elements["address"].value;
+        if(nameVal.length < 1 || addressVal.length < 1) {
+            setError("The input fields cannot be empty!");
+            return;
+        }
+
         const fileList = fileRef.current?.files
         if(!fileList){
             return;
@@ -59,8 +66,8 @@ const CreationPage: NextPage = () => {
         
         await createHome.mutateAsync({
             image: key,
-            name: form.elements["name"].value,
-            address: form.elements["address"].value,
+            name: nameVal,
+            address: addressVal,
         });
     };
 
