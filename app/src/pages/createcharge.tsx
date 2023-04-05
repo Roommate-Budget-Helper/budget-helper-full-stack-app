@@ -46,7 +46,7 @@ const CreateChargePage: NextPage = () => {
         const billAmount = form.elements["amount"].value;
         const dueDate = form.elements["dueDate"].value;
         const category = form.elements["category"].value;
-        if(billName.length < 1 || billAmount < .01 || category < 1) {
+        if(billName.length < 1 || billAmount < 0.01 || category < 1) {
             setError("The form elements cannot be empty or negative!");
             return;
         }
