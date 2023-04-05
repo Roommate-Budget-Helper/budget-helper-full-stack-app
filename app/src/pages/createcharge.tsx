@@ -18,6 +18,7 @@ const CreateChargePage: NextPage = () => {
     const [billAmount, setBillAmount] = useState<number>(0);
     const [billId, setBillId] = useState<string>("");
     const [dueDate, setDueDate] = useState<string>("");
+    const [category, setCategory] = useState<string>("");
 
     const selectedHome = useHomeContext((s) => s.selectedHome);
     const router = useRouter();
@@ -44,6 +45,23 @@ const CreateChargePage: NextPage = () => {
         const billName = form.elements["name"].value;
         const billAmount = form.elements["amount"].value;
         const dueDate = form.elements["dueDate"].value;
+        const category = form.elements["category"].value;
+
+        if(billName.trim().length < 1) {
+            setError("The charge must have a name, it cannot be empty.");
+            return;
+        }
+
+        if(billAmount < 0.01) {
+            setError("The bill amount must be greater than 0.01");
+            return;
+        }
+
+        if(category.trim().length < 1) {
+            setCategory("Other");
+        }else{
+            setCategory(category);
+        }
 
         setBillName(billName);
         setBillAmount(billAmount);
@@ -67,6 +85,9 @@ const CreateChargePage: NextPage = () => {
         if(checkedId === 1){
           setSplittingPage(true);
           setError(null);
+        } else {
+            setError("You must have exactly one occupant as payer for a charge.");
+            return;
         }
     };
 
@@ -155,7 +176,10 @@ const CreateChargePage: NextPage = () => {
                               {occupants.data &&
                                   occupants.data.map((occupant) => {
                                       return (
-                                          <div key={occupant.user.id}>
+                                          <div 
+                                            key={occupant.user.id}
+                                            className="sm:bg-transparent md:bg-slate-600 items-center mx-10 my-10 rounded-xl flex flex-col sm:text-black md:text-dorian text-base justify-between"
+                                            >
                                               <div className="rounded-full bg-evergreen-80 w-24 h-24 flex flex-col items-center justify-center">
                                                   {occupant.user.image ? (
                                                       <Image
@@ -183,7 +207,7 @@ const CreateChargePage: NextPage = () => {
                                                       </p>
                                                   )}
                                               </div>
-                                              <div className="text-dorian">
+                                              <div className="text-dorian mt-10">
                                                   {occupant.user.name}
                                               </div>
                                               <MoneyFieldInput
