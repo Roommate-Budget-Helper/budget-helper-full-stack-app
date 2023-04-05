@@ -11,7 +11,6 @@ export const homesRouter = createProtectedRouter()
             if(!ctx.session.user){
                 return;
             }
-            const homeIds = await getHomesByUserId(ctx.session.user.id, ctx.prisma);
             const homes = await ctx.prisma.home.findMany({
                 select: {
                     id: true,
@@ -20,17 +19,14 @@ export const homesRouter = createProtectedRouter()
                     address: true,
                 },
                 where: {
-                    id: {
-                        in: homeIds,
-                    },
+                    Occupies: {
+                       some: {
+                            userId: ctx.session.user.id,
+                       }
+                    }
                 },
             });
             
-
-            // for(const home of homes){
-            //     if(!home.image) continue;
-            //     home.image = await getSignedImage(home.image);
-            // }
             const homePromises = [];
             for(const home of homes){
                 if(!home.image) continue;
