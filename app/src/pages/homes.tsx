@@ -81,6 +81,7 @@ const HomesPage: NextPage = () => {
         event.preventDefault();
         if(!selectedHome) return;
         const form = (event.target as HTMLFormElement);
+        if(!form.elements["User"]) return;
         const formUserId = form.elements["User"].value as string;
 
         await removeUser.mutateAsync({
@@ -217,7 +218,8 @@ const HomesPage: NextPage = () => {
                 <Modal.Body>
                     <div className="flex"> 
                     <p className="text-2xl font-bold mr-4">User: </p>
-                        <select name="User">
+                        {occupants && occupants?.length > 1 ?
+                        (<select name="User">
                             {occupants?.map(occupant => {
                                 // get the current user id and compare it to the occupant id
                                 if(session && session.user && occupant.user.id !== session.user.id){
@@ -231,11 +233,13 @@ const HomesPage: NextPage = () => {
                                     );
                                 }
                             })}
-                        </select>
+                        </select>) : (<p className="text-2xl font-bold">You are the only occupant in this home</p>)
+                    }
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button classNames="bg-red-600" type="submit" value="Remove" />
+                    <Button classNames="bg-red-600" onClick={handleToggleModal(setRemovalModalOpen)} value="Cancel"/>
+                    <Button classNames="bg-evergreen-80" type="submit" value="Remove" />
                 </Modal.Footer>
                 </form>
             </Modal>
