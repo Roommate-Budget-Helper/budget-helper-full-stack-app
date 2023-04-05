@@ -36,6 +36,25 @@ export const occupiesRouter = createProtectedRouter()
             });
         },
     })
+    .mutation("removeUserFromHomeById", {
+        input: z.object({
+            homeId: z.string(),
+            userId: z.string(),
+        }),
+        async resolve({ ctx, input }) {
+            if (!(await hasPermission(ctx.session.user.id, input.homeId, Permission.Owner, ctx.prisma))) {
+                return;
+            }
+            return await ctx.prisma.occupies.delete({
+                where: {
+                    userId_homeId: {
+                        userId: input.userId,
+                        homeId: input.homeId,
+                    },
+                },
+            });
+        },
+    })
     .query("getUsersInHome", {
         input: z.object({
             homeId: z.string().nullable(),
