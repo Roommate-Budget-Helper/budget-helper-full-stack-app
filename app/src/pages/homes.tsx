@@ -283,8 +283,8 @@ const HomesPage: NextPage = () => {
                         placeholder="email"/>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button classNames="bg-red-600" onClick={handleToggleModal(setLeaveModalOpen)} value="Cancel"/>
-                        <Button classNames="bg-evergreen-80" value="Leave" type="submit" />
+                        <Button classNames="bg-red-600" onClick={handleToggleModal(setInviteModalOpen)} value="Cancel"/>
+                        <Button classNames="bg-evergreen-80" value="Invite" type="submit" />
                     </Modal.Footer> 
                 </form>
             </Modal>
