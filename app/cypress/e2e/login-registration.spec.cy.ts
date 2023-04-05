@@ -3,6 +3,7 @@ import { generateUsername } from "unique-username-generator";
 const successUsername = generateUsername();
 const successPassword = "Abc@12345";
 let successInboxId:string;
+let successVerificationCode:string;
 
 describe('Registration Test', () => {
   beforeEach(() => {
@@ -118,6 +119,7 @@ describe('Forgot Password test', () => {
     cy.get('input[name=username]').type(successUsername);
     cy.get('button[type=submit').click();
 
+    cy.wait(600);
     cy.waitForEmail(successInboxId).then(email => {
       assert.isDefined(email);
       assert.strictEqual(/Your (confirmation|verification) code is/.test(email.body), true);
@@ -126,7 +128,8 @@ describe('Forgot Password test', () => {
       cy.get('input[name=new-password]').type(newPassword);
       cy.get('button[type=submit]').click();
       cy.wait(600);
-    })
+      cy.url().should('contain', '/homes');
+    });
   });
 
   it('Can login with new password', () => {
@@ -180,9 +183,11 @@ export const registerUser = (username, password) => {
     cy.get('button[type=submit]').click();
 
     cy.waitForEmail(successInboxId).then(email => {
+      successInboxId = inbox.id
       assert.isDefined(email);
       assert.strictEqual(/Your (confirmation|verification) code is/.test(email.body), true);
       const code = email.body.match(/\d+/)[0];
+      successVerificationCode = code;
       cy.get('input[name=verification-code]').type(`${code}{enter}`)
       cy.wait(600);
     })
