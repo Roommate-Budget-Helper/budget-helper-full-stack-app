@@ -86,7 +86,7 @@ const CreateChargePage: NextPage = () => {
           setSplittingPage(true);
           setError(null);
         } else {
-            setError("You must have exactly only occupant as payer for a charge.");
+            setError("You must have exactly one occupant as payer for a charge.");
             return;
         }
     };
