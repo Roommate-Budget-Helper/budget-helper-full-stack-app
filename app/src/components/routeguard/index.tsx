@@ -13,8 +13,8 @@ function RouteGuard({ children } : RouteGuardProps) {
     const [allowed, setAllowed] = useState(false);
 
     useEffect(() => {
-        const publicPaths = ["login", "register", "forgot_password"];
-        const path = router.asPath.split('/')[1];
+        const publicPaths = ["login", "register", "forgot_password", "/"];
+        const path = router.asPath === "/" ? "/" : router.asPath.split('/')[1];
         if(session.status === "unauthenticated" && path && !publicPaths.includes(path)){
             setAllowed(false);
             router.push("/login");
