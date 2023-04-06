@@ -33,36 +33,6 @@ export const homesRouter = createProtectedRouter()
             return homes.map((home) => home.home);
         },
     })
-    .query("getHomeById", {
-        input: z.object({
-            homeId: z.string(),
-        }),
-        async resolve({ctx, input}) {
-            if(!ctx.session.user){
-                return;
-            }
-            const home = await ctx.prisma.occupies.findFirst({
-                select: {
-                    home: {
-                        select: {
-                            id: true,
-                            name: true,
-                            image: true,
-                            address: true,
-                        }
-                    }
-                },
-                where: {
-                    userId: ctx.session.user.id,
-                    homeId: input.homeId,
-                },
-            });
-            if(!home || !home.home) return;
-            if(home.home.image) 
-                home.home.image = await getSignedImage(home.home.image);
-            return home.home;
-        },
-    })
     .mutation("createHome", {
         input: z.object({
             name: z.string(),
