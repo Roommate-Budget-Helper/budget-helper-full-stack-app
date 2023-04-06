@@ -38,25 +38,29 @@ export const homesRouter = createProtectedRouter()
             homeId: z.string(),
         }),
         async resolve({ctx, input}) {
-            if(!ctx.session.user || !(await canUserViewHome(ctx.session.user.id, input.homeId, ctx.prisma))){
+            if(!ctx.session.user){
                 return;
             }
-            const home = await ctx.prisma.home.findFirst({
+            const home = await ctx.prisma.occupies.findFirst({
                 select: {
-                    id:true,
-                    name: true,
-                    image: true,
-                    address: true,
+                    home: {
+                        select: {
+                            id: true,
+                            name: true,
+                            image: true,
+                            address: true,
+                        }
+                    }
                 },
                 where: {
-                    id: {
-                        in: input.homeId,
-                    },
+                    userId: ctx.session.user.id,
+                    homeId: input.homeId,
                 },
             });
-            if(!home) return;
-            if(home.image) home.image = await getSignedImage(home.image);
-            return home;
+            if(!home || !home.home) return;
+            if(home.home.image) 
+                home.home.image = await getSignedImage(home.home.image);
+            return home.home;
         },
     })
     .mutation("createHome", {
