@@ -1,6 +1,6 @@
 import { createProtectedRouter } from "./context";
 import { z } from "zod";
-import { getHomesByUserId, canUserViewHome } from "../db/HomeService";
+import { canUserViewHome } from "../db/HomeService";
 import { getSignedImage } from "./image-upload";
 import { hasPermission } from "../db/UserService";
 import { Permission } from "../../types/permissions";
@@ -11,25 +11,26 @@ export const homesRouter = createProtectedRouter()
             if(!ctx.session.user){
                 return;
             }
-            const homeIds = await getHomesByUserId(ctx.session.user.id, ctx.prisma);
-            const homes = await ctx.prisma.home.findMany({
+            const homes = await ctx.prisma.occupies.findMany({
                 select: {
-                    id: true,
-                    name: true,
-                    image: true,
-                    address: true,
+                    home: {
+                        select: {
+                            id: true,
+                            name: true,
+                            image: true,
+                            address: true,
+                        }
+                    }
                 },
                 where: {
-                    id: {
-                        in: homeIds,
-                    },
+                    userId: ctx.session.user.id,
                 },
             });
             for(const home of homes){
-                if(!home.image) continue;
-                home.image = await getSignedImage(home.image);
+                if(home.home.image)
+                    home.home.image = await getSignedImage(home.home.image);
             }
-            return homes;
+            return homes.map((home) => home.home);
         },
     })
     .query("getHomeById", {
@@ -39,7 +40,7 @@ export const homesRouter = createProtectedRouter()
         async resolve({ctx, input}) {
             if(!ctx.session.user || !(await canUserViewHome(ctx.session.user.id, input.homeId, ctx.prisma))){
                 return;
-            }            
+            }
             const home = await ctx.prisma.home.findFirst({
                 select: {
                     id:true,
