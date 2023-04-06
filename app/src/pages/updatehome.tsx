@@ -6,8 +6,10 @@ import React, { useRef, useMemo } from "react";
 import { trpc } from "utils/trpc";
 import Head from "next/head";
 import FieldInput from "@components/fieldinput";
+import { ImageFileFieldInput } from "@components/fieldinput";
 import Button from "@components/button";
 import Image from "next/image";
+import Navbar from "@components/navbar";
 
 const UpdatePage: NextPage = () => {
     const [error, setError] = useState<string | null>(null);
@@ -92,18 +94,18 @@ const UpdatePage: NextPage = () => {
             </Head>
             {homeData &&
             <div className="body flex flex-col text-center">
+                <Navbar />
                 <div className="text-2xl p-5">
                     <div className="form-area flex flex-col justify-between items-center ">
-                        <div>Update Home</div>
                         <br></br>
+                        <h1 className="text-5xl my-10 font-bold text-evergreen-100">
+                            Update Home
+                        </h1>
                         <form method="post" onSubmit={onUpdateHome}>
-                            {/* TODO: Give it a cute image uploader */}
                             {homeData.image &&
                             <div className="relative -z-10">
                                 <Image alt="Home Image" src={homeData.image} width="128px" height="128px"/>
                             </div>}                            
-                            <input ref={fileRef} type="file" name="image" accept=".png, .jpg" ></input>
-                            <br></br>
                             <FieldInput
                                 type="text"
                                 name="name"
@@ -114,6 +116,10 @@ const UpdatePage: NextPage = () => {
                                 type="text"
                                 name="address"
                                 defaultValue= {homeData.address}
+                            />
+                            <ImageFileFieldInput
+                                title="Update Home Image"
+                                fileRef={fileRef}
                             />
                             <br></br>
                             <Button
