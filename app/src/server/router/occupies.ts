@@ -84,9 +84,13 @@ export const occupiesRouter = createProtectedRouter()
         input: z.object({
             homeId: z.string(),
         }),
-        async resolve({ ctx, input }){
-            return await getUserPermissions(ctx.session.user.id, input.homeId, ctx.prisma)
-        }
+        async resolve({ ctx, input }) {
+            return await getUserPermissions(
+                ctx.session.user.id,
+                input.homeId,
+                ctx.prisma
+            );
+        },
     })
     .mutation("UpdatePermissions", {
         input: z.object({
@@ -94,23 +98,49 @@ export const occupiesRouter = createProtectedRouter()
             homeId: z.string(),
             permissions: z.array(z.nativeEnum(Permission)),
         }),
-        async resolve({ ctx, input }){
-            if(!(await canUserViewHome(ctx.session.user.id, input.homeId, ctx.prisma)) ||
-               !(await hasPermission(ctx.session.user.id, input.homeId, Permission.Owner, ctx.prisma)))
-               return; 
+        async resolve({ ctx, input }) {
+            if (
+                !(await canUserViewHome(
+                    ctx.session.user.id,
+                    input.homeId,
+                    ctx.prisma
+                )) ||
+                !(await hasPermission(
+                    ctx.session.user.id,
+                    input.homeId,
+                    Permission.Owner,
+                    ctx.prisma
+                ))
+            )
+                return;
             await ctx.prisma.permission.deleteMany({
                 where: {
-                   occupiesHomeId: input.homeId,
-                   occupiesUserId: input.user,
+                    occupiesHomeId: input.homeId,
+                    occupiesUserId: input.user,
                 }
             });
-            
+
             return await ctx.prisma.permission.createMany({
-                data: input.permissions.map(permission => ({
+                data: input.permissions.map((permission) => ({
                     name: permission,
                     occupiesUserId: input.user,
-                    occupiesHomeId: input.homeId
-                }))
+                    occupiesHomeId: input.homeId,
+                })),
             });
-        }
+        },
+    })
+    .mutation("setProfileImage", {
+        input: z.object({
+            image: z.any(),
+        }),
+        async resolve({ ctx, input }) {
+            return await ctx.prisma.user.update({
+                where: {
+                    id: ctx.session.user.id,
+                },
+                data: {
+                    image: input.image,
+                },
+            });
+        },
     });
