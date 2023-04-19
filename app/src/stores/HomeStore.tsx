@@ -61,8 +61,9 @@ const createHomeStore = (initState?: Partial<HomeState>) =>
             const refetch = get().refetch;
             const result = await refetch();
             if (!result?.data) return;
-            if (
-                !localStorage.getItem("selectedHome") &&
+            if(localStorage.getItem("selectedHome"))
+                set({ selectedHome: localStorage.getItem("selectedHome") });
+            else if (
                 !get().selectedHome &&
                 result.data.length > 0 &&
                 result.data[0]
@@ -91,7 +92,9 @@ export const HomeProvider = ({ children, ...props}: HomeProviderProps) => {
         getHomes().then(homes => {
             if(!homes.data) return;
             storeRef.current?.getState().setHomes(homes.data);
-            if(!localStorage.getItem('selectedHome') && homes.data.length > 0 && homes.data[0])
+            if(localStorage.getItem('selectedHome'))
+                storeRef.current?.getState().setSelectedHome(localStorage.getItem('selectedHome'));
+            else if(homes.data.length > 0 && homes.data[0])
                 storeRef.current?.getState().setSelectedHome(homes.data[0].id);
         })
     }, [session.data, getHomes]);
