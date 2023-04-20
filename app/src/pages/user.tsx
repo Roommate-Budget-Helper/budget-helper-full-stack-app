@@ -4,7 +4,7 @@ import React from "react";
 import Navbar from "@components/navbar";
 import { signOut } from "next-auth/react";
 import Button from "@components/button";
-import { ImageFileFieldInput } from "@components/fieldinput";
+import FieldInput, { ImageFileFieldInput } from "@components/fieldinput";
 import { trpc } from "utils/trpc";
 import { useRef } from "react";
 
@@ -12,11 +12,28 @@ import { useRef } from "react";
 const UserPage: NextPage = () => {
     const fileRef = useRef<HTMLInputElement>(null);
     const getPresignedURL = trpc.useMutation(["upload.getPresignedURL"]);
-    const setProfileImage = trpc.useMutation(["occupies.setProfileImage"]);
+    const setProfileImage = trpc.useMutation(["user.setProfileImage"]);
+    const setPaymentMethods = trpc.useMutation(["user.setPaymentMethods"]);
+    const {data: paymentMethods, refetch: refetchPaymentMethods} = trpc.useQuery(["user.getPaymentMethods"]);
 
     const onUpdateNotificationSettings = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const form = event.target as HTMLFormElement;
+        // TODO: Set notification settings for email here 
+    };
+
+    const onUpdatePaymentMethods = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const form = event.target as HTMLFormElement;
+
+        setPaymentMethods.mutateAsync({
+            paymentMethods: [
+                form.paymentMethod1.value,
+                form.paymentMethod2.value,
+                form.paymentMethod3.value
+            ]
+        });
+        await refetchPaymentMethods();
     };
 
     const onUploadProfileImage = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -72,9 +89,40 @@ const UserPage: NextPage = () => {
                             <h3 className="text-xl font-bold text-evergreen-100">
                                 Notifications
                             </h3>
+                            {/* TODO: Insert Checkboxes for notifications here */}
                             <Button
                                 classNames="bg-evergreen-80 text-dorian"
                                 value="Update Settings"
+                                type="submit"
+                            />
+                        </form>
+                        <hr></hr>
+                        <form onSubmit={onUpdatePaymentMethods} className="flex flex-col py-5">
+                            <h3 className="text-xl font-bold text-evergreen-100">
+                                Set Payment Options
+                            </h3>
+                            {paymentMethods && [...Array(3)].map((_, i) => {
+                                return (
+                                    (paymentMethods[i] && paymentMethods[i].length > 0) ?
+                                        <FieldInput
+                                            name={`paymentMethod${i + 1}`}
+                                            type="text"
+                                            value={paymentMethods[i]}
+                                            placeholder={paymentMethods[i]}
+                                            key={i}
+                                        />
+                                    :
+                                        <FieldInput
+                                            name={`paymentMethod${i + 1}`}
+                                            type="text"
+                                            placeholder="Enter payment method here"
+                                            key={i}
+                                        />
+                                )
+                            })}
+                            <Button
+                                classNames="bg-evergreen-80 text-dorian"
+                                value="Update Payment"
                                 type="submit"
                             />
                         </form>
@@ -90,7 +138,10 @@ const UserPage: NextPage = () => {
                                 type="submit"
                             />
                         </form>
-                        <hr className="py-5"></hr>
+                        <hr></hr>
+                        <h3 className="py-5 text-xl font-bold text-evergreen-100">
+                            Sign out of your account 
+                        </h3>
                         <Button
                             onClick={() => signOut}
                             classNames="bg-evergreen-80 text-dorian"

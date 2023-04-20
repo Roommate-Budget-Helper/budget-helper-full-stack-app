@@ -128,19 +128,4 @@ export const occupiesRouter = createProtectedRouter()
                 })),
             });
         },
-    })
-    .mutation("setProfileImage", {
-        input: z.object({
-            image: z.any(),
-        }),
-        async resolve({ ctx, input }) {
-            return await ctx.prisma.user.update({
-                where: {
-                    id: ctx.session.user.id,
-                },
-                data: {
-                    image: input.image,
-                },
-            });
-        },
     });
