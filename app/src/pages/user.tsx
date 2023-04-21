@@ -14,6 +14,9 @@ const UserPage: NextPage = () => {
     const setProfileImage = trpc.useMutation(["user.setProfileImage"]);
     const setPaymentMethods = trpc.useMutation(["user.setPaymentMethods"]);
     const {data: paymentMethods, refetch: refetchPaymentMethods} = trpc.useQuery(["user.getPaymentMethods"]);
+    const logOut = () => {
+        signOut();
+    };
 
     const onUpdateNotificationSettings = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -143,7 +146,7 @@ const UserPage: NextPage = () => {
                             Sign out of your account 
                         </h3>
                         <Button
-                            onClick={() => signOut}
+                            onClick={logOut}
                             classNames="bg-evergreen-80 text-dorian"
                             value="Sign Out"
                         />
