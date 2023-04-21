@@ -2,11 +2,11 @@
 resource "aws_security_group" "ECS-web" {
   name        = "ECS-rbh-web-production"
   description = "ECS Allowed Ports"
-  vpc_id      = aws_vpc.rbh-vpc
+  vpc_id      = aws_vpc.rbh-vpc.id
 }
 
 resource "aws_security_group_rule" "nginx-rule" {
-  security_group_id = aws_security_group.ECS-web
+  security_group_id = aws_security_group.ECS-web.id
   type              = "ingress"
   protocol          = "tcp"
   from_port         = "81"
@@ -16,7 +16,7 @@ resource "aws_security_group_rule" "nginx-rule" {
 }
 
 resource "aws_security_group_rule" "ssl-rule" {
-  security_group_id = aws_security_group.ECS-web
+  security_group_id = aws_security_group.ECS-web.id
   type              = "ingress"
   protocol          = "tcp"
   from_port         = "443"
@@ -26,7 +26,7 @@ resource "aws_security_group_rule" "ssl-rule" {
 }
 
 resource "aws_security_group_rule" "app-rule" {
-  security_group_id = aws_security_group.ECS-web
+  security_group_id = aws_security_group.ECS-web.id
   type              = "ingress"
   protocol          = "tcp"
   from_port         = "3000"
@@ -36,7 +36,7 @@ resource "aws_security_group_rule" "app-rule" {
 }
 
 resource "aws_security_group_rule" "http-rule" {
-  security_group_id = aws_security_group.ECS-web
+  security_group_id = aws_security_group.ECS-web.id
   type              = "ingress"
   protocol          = "tcp"
   from_port         = "80"
@@ -46,7 +46,7 @@ resource "aws_security_group_rule" "http-rule" {
 }
 
 resource "aws_security_group_rule" "ssh-rule" {
-  security_group_id = aws_security_group.ECS-web
+  security_group_id = aws_security_group.ECS-web.id
   type              = "ingress"
   protocol          = "tcp"
   from_port         = "22"
@@ -56,7 +56,7 @@ resource "aws_security_group_rule" "ssh-rule" {
 }
 
 resource "aws_security_group_rule" "outbound-all" {
-  security_group_id = aws_security_group.ECS-web
+  security_group_id = aws_security_group.ECS-web.id
   type              = "egress"
   protocol          = "all"
   from_port         = 0
@@ -67,7 +67,7 @@ resource "aws_security_group_rule" "outbound-all" {
 resource "aws_instance" "RBH-server" {
   ami                         = "ami-083cd4eb32643c8a0"
   instance_type               = "t2.micro"
-  vpc_security_group_ids      = [aws_security_group.RBH-ec2-rds, aws_security_group.ECS-web]
+  vpc_security_group_ids      = [aws_security_group.RBH-ec2-rds.id, aws_security_group.ECS-web.id]
   associate_public_ip_address = true
 }
 
@@ -79,8 +79,8 @@ resource "aws_eip" "RBH-web-ip" {
 }
 
 resource "aws_network_interface" "RBH-server-eni" {
-  subnet_id       = aws_subnet.rbh-public-1b
-  security_groups = [aws_security_group.RBH-ec2-rds, aws_security_group.ECS-web]
+  subnet_id       = aws_subnet.rbh-public-1b.id
+  security_groups = [aws_security_group.RBH-ec2-rds.id, aws_security_group.ECS-web.id]
   attachment {
     instance     = aws_instance.RBH-server
     device_index = 1
@@ -96,7 +96,7 @@ resource "aws_autoscaling_group" "EC2ServiceGroup" {
   health_check_grace_period = 0
   health_check_type         = "EC2"
   force_delete              = true
-  vpc_zone_identifier       = [aws_subnet.rbh-public-1a, aws_subnet.rbh-public-1a]
+  vpc_zone_identifier       = [aws_subnet.rbh-public-1a.id, aws_subnet.rbh-public-1a.id]
   launch_template {
     id      = aws_launch_template.ecs-ec2
     version = "$Latest"
@@ -107,5 +107,5 @@ resource "aws_launch_template" "ecs-ec2" {
   name_prefix            = "rbh"
   image_id               = "ami-083cd4eb32643c8a0"
   instance_type          = "t2.micro"
-  vpc_security_group_ids = [aws_security_group.RBH-ec2-rds, aws_security_group.ECS-web]
+  vpc_security_group_ids = [aws_security_group.RBH-ec2-rds.id, aws_security_group.ECS-web.id]
 }
