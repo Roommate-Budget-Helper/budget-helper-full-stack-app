@@ -1,6 +1,5 @@
 import { NextPage } from "next";
 import Head from "next/head";
-import React from "react";
 import Navbar from "@components/navbar";
 import { signOut } from "next-auth/react";
 import Button from "@components/button";
@@ -99,16 +98,17 @@ const UserPage: NextPage = () => {
                         <hr></hr>
                         <form onSubmit={onUpdatePaymentMethods} className="flex flex-col py-5">
                             <h3 className="text-xl font-bold text-evergreen-100">
-                                Set Payment Options
+                                Set Payment Methods
                             </h3>
                             {paymentMethods && [...Array(3)].map((_, i) => {
+                                const paymentMethod = paymentMethods.paymentMethods[i]; 
                                 return (
-                                    (paymentMethods[i] && paymentMethods[i].length > 0) ?
+                                    (paymentMethod && paymentMethod.length > 0) ?
                                         <FieldInput
                                             name={`paymentMethod${i + 1}`}
                                             type="text"
-                                            value={paymentMethods[i]}
-                                            placeholder={paymentMethods[i]}
+                                            value={paymentMethod}
+                                            placeholder={paymentMethod}
                                             key={i}
                                         />
                                     :
