@@ -121,7 +121,7 @@ const UserPage: NextPage = () => {
                                         <FieldInput
                                             name={`paymentMethod${i + 1}`}
                                             type="text"
-                                            value={paymentMethod}
+                                            defaultValue={paymentMethod}
                                             placeholder={paymentMethod}
                                             key={i}
                                         />
