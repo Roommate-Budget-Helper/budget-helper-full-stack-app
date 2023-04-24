@@ -60,7 +60,8 @@ const CreateChargePage: NextPage = () => {
         if(category.trim().length < 1) {
             setCategory("Other");
         }else{
-            setCategory(category);
+            const lowerCaseString = category.toLowerCase();
+            setCategory(lowerCaseString.charAt(0).toUpperCase() + lowerCaseString.slice(1));
         }
 
         setBillName(billName);
@@ -123,6 +124,7 @@ const CreateChargePage: NextPage = () => {
                       homeId: selectedHome,
                       amount: String(amountDue),
                       comment: billName, 
+                      category: category,
                       due: formattedDueDate,
                     });
                   }
