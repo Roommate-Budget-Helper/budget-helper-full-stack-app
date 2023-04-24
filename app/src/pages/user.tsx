@@ -4,6 +4,7 @@ import Navbar from "@components/navbar";
 import { signOut } from "next-auth/react";
 import Button from "@components/button";
 import FieldInput, { ImageFileFieldInput } from "@components/fieldinput";
+import Image from "next/image";
 import { trpc } from "utils/trpc";
 import { useRef } from "react";
 
@@ -12,6 +13,7 @@ const UserPage: NextPage = () => {
     const fileRef = useRef<HTMLInputElement>(null);
     const getPresignedURL = trpc.useMutation(["upload.getPresignedURL"]);
     const setProfileImage = trpc.useMutation(["user.setProfileImage"]);
+    const {data: profileImageURL, refetch: refetchProfileImage}= trpc.useQuery(["user.getProfileImage"]);
     const setPaymentMethods = trpc.useMutation(["user.setPaymentMethods"]);
     const {data: paymentMethods, refetch: refetchPaymentMethods} = trpc.useQuery(["user.getPaymentMethods"]);
     const logOut = () => {
@@ -68,6 +70,7 @@ const UserPage: NextPage = () => {
         await setProfileImage.mutateAsync({
             image: key,
         });
+        refetchProfileImage();
     };
     return (
         <>
@@ -87,7 +90,10 @@ const UserPage: NextPage = () => {
 
                 <div className="form-area flex flex-col justify-between items-center">
                     <div className="py-5 px-10 rounded-xl hover:shadow-xl">
-                        <form onSubmit={onUpdateNotificationSettings} className="flex flex-col py-5">
+                        <form
+                            onSubmit={onUpdateNotificationSettings}
+                            className="flex flex-col py-5"
+                        >
                             <h3 className="text-xl font-bold text-evergreen-100">
                                 Notifications
                             </h3>
@@ -99,14 +105,19 @@ const UserPage: NextPage = () => {
                             />
                         </form>
                         <hr></hr>
-                        <form onSubmit={onUpdatePaymentMethods} className="flex flex-col py-5">
+                        <form
+                            onSubmit={onUpdatePaymentMethods}
+                            className="flex flex-col py-5"
+                        >
                             <h3 className="text-xl font-bold text-evergreen-100">
                                 Set Payment Methods
                             </h3>
-                            {paymentMethods && [...Array(3)].map((_, i) => {
-                                const paymentMethod = paymentMethods.paymentMethods[i]; 
-                                return (
-                                    (paymentMethod && paymentMethod.length > 0) ?
+                            {paymentMethods &&
+                                [...Array(3)].map((_, i) => {
+                                    const paymentMethod =
+                                        paymentMethods.paymentMethods[i];
+                                    return paymentMethod &&
+                                        paymentMethod.length > 0 ? (
                                         <FieldInput
                                             name={`paymentMethod${i + 1}`}
                                             type="text"
@@ -114,15 +125,15 @@ const UserPage: NextPage = () => {
                                             placeholder={paymentMethod}
                                             key={i}
                                         />
-                                    :
+                                    ) : (
                                         <FieldInput
                                             name={`paymentMethod${i + 1}`}
                                             type="text"
                                             placeholder="Enter payment method here"
                                             key={i}
                                         />
-                                )
-                            })}
+                                    );
+                                })}
                             <Button
                                 classNames="bg-evergreen-80 text-dorian"
                                 value="Update Payment"
@@ -130,11 +141,29 @@ const UserPage: NextPage = () => {
                             />
                         </form>
                         <hr></hr>
-                        <form onSubmit={onUploadProfileImage} className="flex flex-col py-5">
+                        <form
+                            onSubmit={onUploadProfileImage}
+                            className="flex flex-col py-5"
+                        >
                             <h3 className="text-xl font-bold text-evergreen-100">
                                 Upload Profile Picture
                             </h3>
-                            <ImageFileFieldInput fileRef={fileRef} title="Upload a profile image" />
+                            {profileImageURL && (
+                                <div className="sm:bg-transparent md:bg-slate-600 items-center mx-10 my-5 rounded-xl flex flex-col sm:text-black md:text-dorian text-base justify-between">
+                                    <div className="rounded-full bg-evergreen-80 w-24 h-24 flex flex-col items-center justify-center">
+                                        <Image
+                                            src={profileImageURL}
+                                            alt="Profile Image"
+                                            width="64px"
+                                            height="64px"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                            <ImageFileFieldInput
+                                fileRef={fileRef}
+                                title="Upload a profile image"
+                            />
                             <Button
                                 classNames="bg-evergreen-80 text-dorian"
                                 value="Upload"
@@ -143,7 +172,7 @@ const UserPage: NextPage = () => {
                         </form>
                         <hr></hr>
                         <h3 className="py-5 text-xl font-bold text-evergreen-100">
-                            Sign out of your account 
+                            Sign out of your account
                         </h3>
                         <Button
                             onClick={logOut}

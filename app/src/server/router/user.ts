@@ -1,5 +1,6 @@
 import { createProtectedRouter } from "./context";
 import { z } from "zod";
+import { getSignedImage } from "./image-upload";
 
 export const userRouter = createProtectedRouter()
     .mutation("setProfileImage", {
@@ -15,6 +16,21 @@ export const userRouter = createProtectedRouter()
                     image: input.image,
                 },
             });
+        },
+    })
+    .query("getProfileImage", {
+        async resolve({ ctx }) {
+            const key =  await ctx.prisma.user.findUnique({
+                where: {
+                    id: ctx.session.user.id,
+                },
+                select: {
+                    image: true,
+                },
+            });
+            if (key?.image) {
+                return getSignedImage(key?.image);
+            }
         },
     })
     .query("getPaymentMethods", {
@@ -41,6 +57,6 @@ export const userRouter = createProtectedRouter()
                 data: {
                     paymentMethods: input.paymentMethods,
                 },
-            })
-        }
+            });
+        },
     });
