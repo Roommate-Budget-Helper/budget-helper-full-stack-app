@@ -2,6 +2,7 @@ import { canUserViewHome } from "../db/HomeService";
 import { canUserPayCharge, canUserConfirmCharge, handleSendChargeEmail } from "../db/ChargeService";
 import { z } from "zod";
 import { createProtectedRouter } from "./context";
+import { getSignedImage } from "./image-upload";
 
 export const billingRouter = createProtectedRouter()
 .mutation("sendCharge",
@@ -139,4 +140,50 @@ export const billingRouter = createProtectedRouter()
             }
         });
     }
-})
+}).query("getChargesHistory", {
+    async resolve({ ctx }){
+        const charges =  await ctx.prisma.charge.findMany({
+            where: {
+                OR: [
+                    {
+                        receiverId: ctx.session.user.id,
+                        chargerId: ctx.session.user.id,
+                    }
+                ]
+            },
+            select: {
+                chargeId: true,
+                home: true,
+                amountBeforeSplit: true,
+                amount: true,
+                dueDate: true,
+                created: true,
+                chargerId: true,
+                chargeUser: { // charger data
+                    select: {
+                        name: true,
+                        image: true
+                    }
+                },
+                receiverId: true,
+                receiveUser: { // receiver data
+                    select: {
+                        name: true,
+                        image: true
+                    }
+                },
+                paidDate: true,
+                comment: true
+            }
+        });
+        for(const charge of charges){
+            if(charge.chargeUser.image){
+                charge.chargeUser.image = await getSignedImage(charge.chargeUser.image);
+            }
+            if(charge.receiveUser.image){
+                charge.receiveUser.image = await getSignedImage(charge.receiveUser.image);
+            }
+        }
+        return charges;
+    }})
+
