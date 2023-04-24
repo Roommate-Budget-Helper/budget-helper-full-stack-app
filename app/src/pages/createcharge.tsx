@@ -173,8 +173,7 @@ const CreateChargePage: NextPage = () => {
                                   Splitting ${billAmount}
                               </h2>
                               <hr></hr>
-                              {occupants.data &&
-                                  occupants.data.map((occupant) => {
+                              { occupants?.data?.map((occupant) => {
                                       return (
                                           <div 
                                             key={occupant.user.id}

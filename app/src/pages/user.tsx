@@ -113,7 +113,7 @@ const UserPage: NextPage = () => {
                                 Set Payment Methods
                             </h3>
                             {paymentMethods &&
-                                [...Array(3)].map((_, i) => {
+                                [0, 1, 2].map((i) => {
                                     const paymentMethod =
                                         paymentMethods.paymentMethods[i];
                                     return paymentMethod &&
