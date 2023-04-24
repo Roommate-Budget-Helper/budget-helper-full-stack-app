@@ -152,10 +152,11 @@ const UserPage: NextPage = () => {
                                 <div className="sm:bg-transparent md:bg-slate-600 items-center mx-10 my-5 rounded-xl flex flex-col sm:text-black md:text-dorian text-base justify-between">
                                     <div className="rounded-full bg-evergreen-80 w-24 h-24 flex flex-col items-center justify-center">
                                         <Image
+                                            className="rounded-full"
                                             src={profileImageURL}
                                             alt="Profile Image"
-                                            width="64px"
-                                            height="64px"
+                                            width="96px"
+                                            height="96px"
                                         />
                                     </div>
                                 </div>
