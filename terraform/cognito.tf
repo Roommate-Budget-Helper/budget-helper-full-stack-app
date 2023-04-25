@@ -1,7 +1,7 @@
 
 resource "aws_cognito_user_pool" "rbh-cognito" {
   name             = "rbh-production-users"
-  alias_attributes = ["email", "preffered_username"]
+  alias_attributes = ["email", "preferred_username"]
   email_configuration {
     email_sending_account = "COGNITO_DEFAULT"
   }

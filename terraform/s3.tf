@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "rbh-bucket" {
-  bucket_prefix = "rbh-production-bucket"
+  bucket_prefix = "rbh-prod-bucket"
 }
 
 resource "aws_s3_bucket_cors_configuration" "rbh-cors" {

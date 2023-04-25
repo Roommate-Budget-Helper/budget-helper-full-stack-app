@@ -53,8 +53,8 @@ resource "aws_route_table" "RDS-Pvt-rt" {
 }
 # Subnets in Private Route Table
 resource "aws_route_table_association" "private-a" {
-  subnet_id      = aws_subnet.rds-private-subnet-1a
-  route_table_id = aws_route_table.RDS-Pvt-rt
+  subnet_id      = aws_subnet.rds-private-subnet-1a.id
+  route_table_id = aws_route_table.RDS-Pvt-rt.id
 }
 resource "aws_route_table_association" "private-b" {
   subnet_id      = aws_subnet.rds-private-subnet-1b.id
@@ -99,4 +99,37 @@ resource "aws_route_table_association" "RBH-public-a" {
 resource "aws_route_table_association" "RBH-public-b" {
   route_table_id = aws_route_table.RBH-public.id
   subnet_id      = aws_subnet.rbh-public-1b.id
+}
+
+
+output "rds-private-subnet-1a-id" {
+  value = aws_subnet.rds-private-subnet-1a.id
+}
+
+output "rds-private-subnet-1b-id" {
+  value = aws_subnet.rds-private-subnet-1b.id
+}
+
+output "rds-private-subnet-1c-id" {
+  value = aws_subnet.rds-private-subnet-1c.id
+}
+
+output "rds-private-subnet-1d-id" {
+  value = aws_subnet.rds-private-subnet-1d.id
+}
+
+output "rds-private-subnet-1f-id" {
+  value = aws_subnet.rds-private-subnet-1f.id
+}
+
+output "rds-public-subnet-1a-id" {
+  value = aws_subnet.rbh-public-1a.id
+}
+
+output "rds-public-subnet-1b-id" {
+  value = aws_subnet.rbh-public-1b.id
+}
+
+output "rbh-vpc-id" {
+  value = aws_vpc.rbh-vpc.id
 }
