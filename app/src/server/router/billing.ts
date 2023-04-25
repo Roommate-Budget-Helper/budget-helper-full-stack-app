@@ -155,14 +155,16 @@ export const billingRouter = createProtectedRouter()
     }
 }).query("getChargesHistory", {
     async resolve({ ctx }){
-        const charges =  await ctx.prisma.charge.findMany({
+        const charges = await ctx.prisma.charge.findMany({
             where: {
                 OR: [
                     {
-                        receiverId: ctx.session.user.id,
                         chargerId: ctx.session.user.id,
-                    }
-                ]
+                    },
+                    {
+                        receiverId: ctx.session.user.id,
+                    },
+                ],
             },
             select: {
                 chargeId: true,
@@ -171,23 +173,28 @@ export const billingRouter = createProtectedRouter()
                 amount: true,
                 dueDate: true,
                 created: true,
+                category: true,
+                paid: true,
+                confirmed: true,
                 chargerId: true,
-                chargeUser: { // charger data
+                chargeUser: {
+                    // charger data
                     select: {
                         name: true,
-                        image: true
-                    }
+                        image: true,
+                    },
                 },
                 receiverId: true,
-                receiveUser: { // receiver data
+                receiveUser: {
+                    // receiver data
                     select: {
                         name: true,
-                        image: true
-                    }
+                        image: true,
+                    },
                 },
                 paidDate: true,
-                comment: true
-            }
+                comment: true,
+            },
         });
         for(const charge of charges){
             if(charge.chargeUser.image){

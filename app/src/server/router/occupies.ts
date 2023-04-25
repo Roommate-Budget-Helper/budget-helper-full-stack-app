@@ -14,7 +14,7 @@ export const occupiesRouter = createProtectedRouter()
             if (!ctx.session?.user) {
                 return;
             }
-            return ctx.prisma.occupies.create({
+            return await ctx.prisma.occupies.create({
                 data: {
                     userId: ctx.session.user.id,
                     homeId: input.homeId,
@@ -27,7 +27,7 @@ export const occupiesRouter = createProtectedRouter()
             homeId: z.string(),
         }),
         async resolve({ ctx, input }) {
-            return ctx.prisma.occupies.delete({
+            return await ctx.prisma.occupies.delete({
                 where: {
                     userId_homeId: {
                         userId: ctx.session.user.id,
@@ -46,7 +46,7 @@ export const occupiesRouter = createProtectedRouter()
             if (!(await hasPermission(ctx.session.user.id, input.homeId, Permission.Owner, ctx.prisma))) {
                 return;
             }
-            return ctx.prisma.occupies.delete({
+            return await ctx.prisma.occupies.delete({
                 where: {
                     userId_homeId: {
                         userId: input.userId,
@@ -92,7 +92,7 @@ export const occupiesRouter = createProtectedRouter()
             homeId: z.string(),
         }),
         async resolve({ ctx, input }) {
-            return getUserPermissions(
+            return await getUserPermissions(
                 ctx.session.user.id,
                 input.homeId,
                 ctx.prisma
@@ -127,7 +127,7 @@ export const occupiesRouter = createProtectedRouter()
                 }
             });
 
-            return ctx.prisma.permission.createMany({
+            return await ctx.prisma.permission.createMany({
                 data: input.permissions.map((permission) => ({
                     name: permission,
                     occupiesUserId: input.user,
