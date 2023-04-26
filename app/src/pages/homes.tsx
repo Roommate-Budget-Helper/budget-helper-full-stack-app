@@ -90,8 +90,8 @@ const HomesPage: NextPage = () => {
         event.preventDefault();
         if(!selectedHome) return;
         const form = (event.target as HTMLFormElement);
-        if(!form.elements["User"]) return;
-        const formUserId = form.elements["User"].value as string;
+        if(!form.User) return;
+        const formUserId = form.User.value as string;
 
         const removeCheck = await removeUser.mutateAsync({
             homeId: selectedHome,
@@ -111,7 +111,7 @@ const HomesPage: NextPage = () => {
         }
 
         const form = (event.target as HTMLFormElement);
-        const permissionsInputs = form.elements["Permissions"].entries();
+        const permissionsInputs = form.Permissions.entries();
         const permissions: Permission[] = []
         for(const [_, input] of permissionsInputs){
             if(input.checked){
@@ -119,7 +119,7 @@ const HomesPage: NextPage = () => {
             }
         }
        const permissionCheck = await editPermissions.mutateAsync({
-            user: form.elements["User"].value as string,
+            user: form.User.value as string,
             homeId: selectedHome,
             permissions,
         });
@@ -134,13 +134,13 @@ const HomesPage: NextPage = () => {
         event.preventDefault();
         const form = (event.target as HTMLFormElement);
         if(!selectedHome) return;
-        if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(form.elements["email"].value)) {
+        if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(form.email.value)) {
             setModalError("This is not a valid email!");
             return;
         }
         const checkInvite = await inviteRoommate.mutateAsync({
             homeId: selectedHome,
-            email: form.elements["email"].value,
+            email: form.email.value,
         });
         if(checkInvite === "bad") {
             setModalError("The invite failed.\n Make sure the user is not already invited to the home,\n in the home or that you did not invite yourself!");
@@ -249,7 +249,7 @@ const HomesPage: NextPage = () => {
                         (<select name="User">
                             {occupants?.map(occupant => {
                                 // get the current user id and compare it to the occupant id
-                                if(session && session.user && occupant.user.id !== session.user.id){
+                                if(occupant?.user?.id !== session?.user?.id){
                                     return (
                                         <option
                                             key={occupant.user.id}
