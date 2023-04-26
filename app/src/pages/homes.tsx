@@ -18,7 +18,7 @@ import { useSession } from "next-auth/react";
 
 const HomesPage: NextPage = () => {
     const { data: session } = useSession();
-    const [error, setError] = useState<string | null>(null);
+    const [modalError, setModalError] = useState<string | null>(null);
     const [isMenuOpen, setMenuOpen] = useState<boolean>(false);
     const [isDeleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
     const [isLeaveModalOpen, setLeaveModalOpen] = useState<boolean>(false);
@@ -61,7 +61,10 @@ const HomesPage: NextPage = () => {
         getOccupants();
     }, [selectedHome, getPermissions, getOccupants]);
 
-    const handleToggleModal = (setterFunction: React.Dispatch<React.SetStateAction<boolean>>) => () => setterFunction(state => !state);
+    const handleToggleModal = (setterFunction: React.Dispatch<React.SetStateAction<boolean>>) => () => {
+        setterFunction(state => !state);
+        setModalError(null);
+    }
     
     const handleDelete = async () => {
         setDeleteModalOpen(false);
@@ -117,11 +120,16 @@ const HomesPage: NextPage = () => {
         event.preventDefault();
         const form = (event.target as HTMLFormElement);
         if(!selectedHome) return;
-        await inviteRoommate.mutateAsync({
+        const checkInvite = await inviteRoommate.mutateAsync({
             homeId: selectedHome,
             email: form.elements["email"].value,
         });
-        setInviteModalOpen(false);
+        if(checkInvite === "bad") {
+            setModalError("The invite failed.\n Make sure the user is not already invited to the home,\n in the home or that you did not invite yourself!");
+            return;
+        } else {
+            setInviteModalOpen(false);
+        }
     }
 
     return (
@@ -166,7 +174,6 @@ const HomesPage: NextPage = () => {
                                 </div>
                             </div>
                         </div>
-                        {error&&<p className="text-xl font-light text-red-600">{error}</p>}
                     </div> :
                     <div className="form-area flex flex-col justify-between items-center">
                         <div className="p-5">
@@ -186,7 +193,6 @@ const HomesPage: NextPage = () => {
                             Feel free to create more homes using the plus button, or
                             contact your home creator to invite you!
                         </div>
-                        {error&&<p className="text-xl font-light text-red-600">{error}</p>}
                     </div>}
                 </div>              
             </div>
@@ -236,6 +242,7 @@ const HomesPage: NextPage = () => {
                         </select>) : (<p className="text-2xl font-bold">You are the only occupant in this home</p>)
                     }
                     </div>
+                    {modalError&&<p className="text-xl font-light text-red-600">{modalError}</p>}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button classNames="bg-red-600" onClick={handleToggleModal(setRemovalModalOpen)} value="Cancel"/>
@@ -265,6 +272,7 @@ const HomesPage: NextPage = () => {
                             {permission}
                         </div>
                     ))}
+                    {modalError&&<p className="text-xl font-light text-red-600">{modalError}</p>}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button classNames="bg-red-600" onClick={handleToggleModal(setEditPermissionsModalOpen)} value="Cancel"/>
@@ -281,6 +289,7 @@ const HomesPage: NextPage = () => {
                         <FieldInput
                         name="email"
                         placeholder="email"/>
+                    {modalError&&<p className="text-xl font-light text-red-600">{modalError}</p>}
                     </Modal.Body>
                     <Modal.Footer>
                         <Button classNames="bg-red-600" onClick={handleToggleModal(setInviteModalOpen)} value="Cancel"/>
