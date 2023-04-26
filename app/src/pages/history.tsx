@@ -32,7 +32,7 @@ const HistoryPage: NextPage = () => {
                             // Payment
                             <div
                                 key={charge.chargeId}
-                                className="py-5 px-10 rounded-xl hover:shadow-xl"
+                                className="py-5 px-3 rounded-xl hover:shadow-xl"
                             >
                                 <div className="flex items-center gap-3 p-2">
                                     {charge.receiveUser.image ? (
@@ -54,12 +54,13 @@ const HistoryPage: NextPage = () => {
                                         </p>
                                     )}
                                     <h3 className="text-black text-sm dark:text-gray-600">
+                                        you charged {" "}
                                         <a
                                             className="hover:text-blue-400"
                                         >
                                             {charge.receiveUser.name}
                                         </a>{" "}
-                                        paid you ${charge.amount}
+                                        ${charge.amount}
                                     </h3>
                                 </div>
                                 <div className="p-4 rounded border border-gray-700 bg-gray-50 h-auto">
@@ -116,7 +117,7 @@ const HistoryPage: NextPage = () => {
                             // Charge
                             <div
                                 key={charge.chargeId}
-                                className="py-5 px-10 rounded-xl hover:shadow-xl"
+                                className="py-5 px-3 rounded-xl hover:shadow-xl"
                             >
                                 <div className="flex items-center gap-3 p-2">
                                     {charge.receiveUser.image ? (
@@ -143,7 +144,7 @@ const HistoryPage: NextPage = () => {
                                         >
                                             {charge.receiveUser.name}
                                         </a>{" "}
-                                        paid you ${charge.amount}
+                                        charged you ${charge.amount}
                                     </h3>
                                 </div>
                                 <div className="p-4 rounded border border-gray-700 bg-gray-50 h-auto">
