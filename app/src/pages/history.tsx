@@ -23,7 +23,7 @@ const HistoryPage: NextPage = () => {
             <Navbar />
             <div className="body flex flex-col items-center text-center text-3xl p-5">
                 <h1 className="text-5xl my-10 font-bold text-evergreen-100">
-                    Billing
+                    Charge History
                 </h1>
                 <div className="sm:w-88 lg:w-[32rem]">
                     <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
