@@ -29,6 +29,12 @@ export const occupiesRouter = createProtectedRouter()
             if(!(await moreThanOneOwner(ctx.session.user.id, input.homeId, ctx.prisma))) {
                 return "bad";
             }
+            await ctx.prisma.permission.deleteMany({
+                where: {
+                    occupiesHomeId: input.homeId,
+                    occupiesUserId: ctx.session.user.id
+                }
+            })
             return await ctx.prisma.occupies.delete({
                 where: {
                     userId_homeId: {
@@ -51,6 +57,12 @@ export const occupiesRouter = createProtectedRouter()
                 !(await moreThanOneOwner(input.userId, input.homeId, ctx.prisma)))) {
                 return "bad";
             }
+            await ctx.prisma.permission.deleteMany({
+                where: {
+                    occupiesHomeId: input.homeId,
+                    occupiesUserId: input.userId
+                }
+            })
             return await ctx.prisma.occupies.delete({
                 where: {
                     userId_homeId: {
@@ -102,8 +114,9 @@ export const occupiesRouter = createProtectedRouter()
         }),
         async resolve({ ctx, input }){
             if(!(await canUserViewHome(ctx.session.user.id, input.homeId, ctx.prisma)) ||
-               !(await hasPermission(ctx.session.user.id, input.homeId, Permission.Owner, ctx.prisma)))
-               return; 
+               !(await hasPermission(ctx.session.user.id, input.homeId, Permission.Owner, ctx.prisma)) ||
+               (await ctx.session.user.id === input.user))
+               return "bad"; 
             await ctx.prisma.permission.deleteMany({
                 where: {
                    occupiesHomeId: input.homeId,

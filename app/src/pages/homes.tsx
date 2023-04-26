@@ -75,10 +75,11 @@ const HomesPage: NextPage = () => {
 
     const handleLeave = async () => {
         setLeaveModalOpen(false);
-        if(selectedHome !== null) {
+        if(selectedHome !== null && session?.user?.id) {
             const leaveCheck = await leaveHome.mutateAsync({homeId: selectedHome});
             if(leaveCheck === "bad"){
-                setModalError("You are the only Owner. You cannot leave the home unless you delete it or pass on Owner permission!")
+                setModalError("You are the only Owner. You cannot leave the home unless you delete it or pass on Owner permission!");
+                return;
             }
         }
         await refetchHomes();
@@ -117,12 +118,16 @@ const HomesPage: NextPage = () => {
                 permissions.push(input.value);
             }
         }
-       await editPermissions.mutateAsync({
+       const permissionCheck = await editPermissions.mutateAsync({
             user: form.elements["User"].value as string,
             homeId: selectedHome,
             permissions,
         });
-        setEditPermissionsModalOpen(false);
+        if(permissionCheck === "bad") {
+            setModalError("You cannot change your own Permissions!");
+        } else {
+            setEditPermissionsModalOpen(false);
+        }
     }
 
     const handleInvite = async (event: React.FormEvent<HTMLFormElement>) => {
