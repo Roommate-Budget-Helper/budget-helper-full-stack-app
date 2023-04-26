@@ -139,4 +139,44 @@ export const billingRouter = createProtectedRouter()
             }
         });
     }
-})
+}).query("getChargesThisMonth", {
+    async resolve({ ctx }){
+        const charges = await ctx.prisma.charge.findMany({
+            select: {
+                chargeId: true,
+                home: true,
+                amountBeforeSplit: true,
+                amount: true,
+                dueDate: true,
+                created: true,
+                category: true,
+                receiverId: true,
+                receiveUser: { // receiver data
+                  select: {
+                    name: true,
+                    email: true,
+                    image: true
+                  }
+                },
+                paidDate: true,
+                comment: true
+            },
+            where: {
+                chargerId: ctx.session.user.id,
+                created: {
+                    gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+                    lte: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)
+                }
+            }
+        });
+
+        console.log(charges);
+        const categoryCountMap = new Map<string, number>();
+        charges.map((charge) => {
+            const count = categoryCountMap.get(charge.category);
+            count ? categoryCountMap.set(charge.category, count + 1) : categoryCountMap.set(charge.category, 1);
+        });
+
+        return { charges: charges, categoryCount: categoryCountMap };
+    }
+});

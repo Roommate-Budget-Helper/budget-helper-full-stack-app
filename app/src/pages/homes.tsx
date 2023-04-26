@@ -45,6 +45,8 @@ const HomesPage: NextPage = () => {
         homeId: selectedHome ?? ''
     }], { enabled: false})
 
+    const {data: thisMonthsCharges, refetch: getThisMonthsCharges} = trpc.useQuery(["bill.getChargesThisMonth"]);
+
     const hasPermission = useCallback((permission: Permission) => {
         if(permission === Permission.Owner)
             return !! userPermissions?.find(perm => perm.name === permission);
