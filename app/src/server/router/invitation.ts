@@ -1,6 +1,6 @@
 import { Permission } from "../../types/permissions";
 import { canUserViewHome, userIsInvited, userIsInHome } from "../db/HomeService";
-import { hasPermission } from "../db/UserService";
+import { hasPermission, getUserByEmail } from "../db/UserService";
 import { sendEmail } from "../services/email/invitation";
 import { z } from "zod";
 import { createProtectedRouter } from "./context";
@@ -14,12 +14,12 @@ export const invitationRouter = createProtectedRouter()
         homeId: z.string()
     }),
     async resolve({ ctx, input }){
+        const userId = await getUserByEmail(input.email, ctx.prisma);
         if(!(await hasPermission(ctx.session.user.id, input.homeId, Permission.Edit, ctx.prisma)) ||
            !(await canUserViewHome(ctx.session.user.id,input.homeId, ctx.prisma)) ||
            await userIsInvited(input.email, input.homeId, ctx.prisma) ||
-           await userIsInHome(input.email, input.homeId, ctx.prisma) ||
-           ctx.session.user.email == input.email ||
-           ctx.session.user.id == input.email)
+           !userId ||
+           await userIsInHome(userId.id, input.homeId, ctx.prisma))
                 return "bad";
         const home = await ctx.prisma.home.findFirst({
             select: {

@@ -1,8 +1,8 @@
 import { createProtectedRouter } from "./context";
 import { z } from "zod";
-import { getUserPermissions, hasPermission } from "../db/UserService";
+import { getUserPermissions, hasPermission, isOwner } from "../db/UserService";
 import { Permission } from "../../types/permissions";
-import { canUserViewHome } from "../db/HomeService";
+import { canUserViewHome, moreThanOneOwner, userIsInHome } from "../db/HomeService";
 
 export const occupiesRouter = createProtectedRouter()
     .mutation("addUserToHome", {
@@ -26,6 +26,9 @@ export const occupiesRouter = createProtectedRouter()
             homeId: z.string(),
         }),
         async resolve({ ctx, input }) {
+            if(!(await moreThanOneOwner(ctx.session.user.id, input.homeId, ctx.prisma))) {
+                return "bad";
+            }
             return await ctx.prisma.occupies.delete({
                 where: {
                     userId_homeId: {
@@ -42,8 +45,11 @@ export const occupiesRouter = createProtectedRouter()
             userId: z.string(),
         }),
         async resolve({ ctx, input }) {
-            if (!(await hasPermission(ctx.session.user.id, input.homeId, Permission.Owner, ctx.prisma))) {
-                return;
+            if (!(await hasPermission(ctx.session.user.id, input.homeId, Permission.Owner, ctx.prisma)) ||
+                !(await userIsInHome(input.userId, input.homeId, ctx.prisma)) ||
+                ((await isOwner(input.userId, input.homeId, ctx.prisma)) && 
+                !(await moreThanOneOwner(input.userId, input.homeId, ctx.prisma)))) {
+                return "bad";
             }
             return await ctx.prisma.occupies.delete({
                 where: {

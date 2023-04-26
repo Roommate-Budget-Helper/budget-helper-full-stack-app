@@ -75,7 +75,12 @@ const HomesPage: NextPage = () => {
 
     const handleLeave = async () => {
         setLeaveModalOpen(false);
-        if(selectedHome !== null) await leaveHome.mutateAsync({homeId: selectedHome});
+        if(selectedHome !== null) {
+            const leaveCheck = await leaveHome.mutateAsync({homeId: selectedHome});
+            if(leaveCheck === "bad"){
+                setModalError("You are the only Owner. You cannot leave the home unless you delete it or pass on Owner permission!")
+            }
+        }
         await refetchHomes();
         setSelectedHome(homes.length > 0 && homes[0] ? homes[0].id : null);
     }
@@ -87,11 +92,15 @@ const HomesPage: NextPage = () => {
         if(!form.elements["User"]) return;
         const formUserId = form.elements["User"].value as string;
 
-        await removeUser.mutateAsync({
+        const removeCheck = await removeUser.mutateAsync({
             homeId: selectedHome,
             userId: formUserId,
         });
-        setRemovalModalOpen(false);
+        if(removeCheck === "bad") {
+            setModalError("The User is not in the home or they are the only Owner!");
+        } else{
+            setRemovalModalOpen(false);
+        }
     }
 
     const handleUpdatePermission = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -120,6 +129,10 @@ const HomesPage: NextPage = () => {
         event.preventDefault();
         const form = (event.target as HTMLFormElement);
         if(!selectedHome) return;
+        if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(form.elements["email"].value)) {
+            setModalError("This is not a valid email!");
+            return;
+        }
         const checkInvite = await inviteRoommate.mutateAsync({
             homeId: selectedHome,
             email: form.elements["email"].value,
@@ -210,7 +223,10 @@ const HomesPage: NextPage = () => {
                 <Modal.Header onHide={handleToggleModal(setLeaveModalOpen)}>
                     Leave Home 
                 </Modal.Header>
-                <Modal.Body>Are you sure you want to leave this home? Leaving will remove yourself from this home, and cannot be undone without another user to invite you back.</Modal.Body>
+                <Modal.Body>
+                    <div>Are you sure you want to leave this home? Leaving will remove yourself from this home, and cannot be undone without another user to invite you back.</div>
+                    {modalError&&<p className="text-xl font-light text-red-600">{modalError}</p>}
+                </Modal.Body>
                 <Modal.Footer>
                     <Button classNames="bg-red-600" onClick={handleToggleModal(setLeaveModalOpen)} value="Cancel"/>
                     <Button classNames="bg-evergreen-80" onClick={handleLeave} value="Leave" />
