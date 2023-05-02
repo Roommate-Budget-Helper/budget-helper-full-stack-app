@@ -47,10 +47,9 @@ const Navbar: React.FC = () => {
                 <WrappedIcon activepath="/billing" currentpath={router.asPath} path={mdiCashMultiple} size="35px" />
             </a>
         </Link>
-        {/* TODO: This part of the navbar should be the charge history. */}
-        <Link href="#">
+        <Link href="/history">
             <a className={navItemStyle+ " bg-gray-700"}>
-              <Icon path={mdiFileDocumentOutline} size="35px" />
+              <WrappedIcon activepath="/history" currentpath={router.asPath} path={mdiFileDocumentOutline} size="35px" />
             </a>
         </Link>
         <div className="bg-gray-700 relative h-12 w-24">

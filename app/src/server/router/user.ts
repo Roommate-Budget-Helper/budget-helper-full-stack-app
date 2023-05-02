@@ -8,7 +8,7 @@ export const userRouter = createProtectedRouter()
             image: z.any(),
         }),
         async resolve({ ctx, input }) {
-            return await ctx.prisma.user.update({
+            return ctx.prisma.user.update({
                 where: {
                     id: ctx.session.user.id,
                 },
@@ -20,7 +20,7 @@ export const userRouter = createProtectedRouter()
     })
     .query("getProfileImage", {
         async resolve({ ctx }) {
-            const key =  await ctx.prisma.user.findUnique({
+            const key = await ctx.prisma.user.findUnique({
                 where: {
                     id: ctx.session.user.id,
                 },
