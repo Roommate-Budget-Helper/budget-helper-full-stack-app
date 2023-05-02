@@ -39,6 +39,7 @@ model User {
   email          String       @unique
   emailVerified  DateTime?
   image          String?
+  paymentMethods String[]
   accounts       Account[]
   ReceiveCharges Charge[]     @relation("chargeUser")
   SentCharges    Charge[]     @relation("receiveUser")
