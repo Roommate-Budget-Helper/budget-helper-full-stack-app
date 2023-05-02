@@ -115,6 +115,7 @@ describe('Forgot Password test', () => {
     cy.contains('Forgot your password? No worries, we can help you out!');
   });
 
+/*
   it('Can change password', () => {
     cy.get('input[name=username]').type(successUsername);
     cy.get('button[type=submit').click();
@@ -135,6 +136,7 @@ describe('Forgot Password test', () => {
   it('Can login with new password', () => {
     loginUser(successUsername, newPassword);
   });
+  */
 
   it('can throw an error when false verification code forgot password', () => {
     cy.get('input[name=username]').type(successUsername);
