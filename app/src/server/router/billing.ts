@@ -2,6 +2,7 @@ import { canUserViewHome } from "../db/HomeService";
 import { canUserPayCharge, canUserConfirmCharge, handleSendChargeEmail } from "../db/ChargeService";
 import { z } from "zod";
 import { createProtectedRouter } from "./context";
+import { getSignedImage } from "./image-upload";
 
 export const billingRouter = createProtectedRouter()
 .mutation("sendCharge",
@@ -83,7 +84,7 @@ export const billingRouter = createProtectedRouter()
     async resolve({ ctx }){
         if(!ctx.session.user.email) return;
 
-        return await ctx.prisma.charge.findMany({
+        const charges =  await ctx.prisma.charge.findMany({
             select: {
                 chargeId: true,
                 home: true,
@@ -106,14 +107,20 @@ export const billingRouter = createProtectedRouter()
                 paid: false
             }
         });
-        
+        // get signed image urls
+        for(const charge of charges){
+            if(charge.chargeUser.image){
+                charge.chargeUser.image = await getSignedImage(charge.chargeUser.image);
+            }
+        }
+        return charges;
     }
 })
 .query("getUnconfirmedCharges", { 
     async resolve({ ctx }){
         if(!ctx.session.user.email) return;
 
-        return await ctx.prisma.charge.findMany({
+        const charges = await ctx.prisma.charge.findMany({
             select: {
                 chargeId: true,
                 home: true,
@@ -138,6 +145,13 @@ export const billingRouter = createProtectedRouter()
                 confirmed: false,
             }
         });
+        // get signed image urls
+        for(const charge of charges){
+            if(charge.receiveUser.image){
+                charge.receiveUser.image = await getSignedImage(charge.receiveUser.image);
+            }
+        }
+        return charges;
     }
 }).query("getChargesThisMonth", {
     async resolve({ ctx }){
