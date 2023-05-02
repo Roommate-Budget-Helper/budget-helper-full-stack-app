@@ -1,8 +1,8 @@
 import { createProtectedRouter } from "./context";
 import { z } from "zod";
-import { getUserPermissions, hasPermission } from "../db/UserService";
+import { getUserPermissions, hasPermission, isOwner } from "../db/UserService";
 import { Permission } from "../../types/permissions";
-import { canUserViewHome } from "../db/HomeService";
+import { canUserViewHome, moreThanOneOwner } from "../db/HomeService";
 import { getSignedImage } from "./image-upload";
 
 export const occupiesRouter = createProtectedRouter()
@@ -27,6 +27,15 @@ export const occupiesRouter = createProtectedRouter()
             homeId: z.string(),
         }),
         async resolve({ ctx, input }) {
+            if(!(await moreThanOneOwner(ctx.session.user.id, input.homeId, ctx.prisma))) {
+                return "bad";
+            }
+            await ctx.prisma.permission.deleteMany({
+                where: {
+                    occupiesHomeId: input.homeId,
+                    occupiesUserId: ctx.session.user.id
+                }
+            })
             return await ctx.prisma.occupies.delete({
                 where: {
                     userId_homeId: {
@@ -43,9 +52,18 @@ export const occupiesRouter = createProtectedRouter()
             userId: z.string(),
         }),
         async resolve({ ctx, input }) {
-            if (!(await hasPermission(ctx.session.user.id, input.homeId, Permission.Owner, ctx.prisma))) {
-                return;
+            if (!(await hasPermission(ctx.session.user.id, input.homeId, Permission.Owner, ctx.prisma)) ||
+                !(await canUserViewHome(input.userId, input.homeId, ctx.prisma)) ||
+                ((await isOwner(input.userId, input.homeId, ctx.prisma)) && 
+                !(await moreThanOneOwner(input.userId, input.homeId, ctx.prisma)))) {
+                return "bad";
             }
+            await ctx.prisma.permission.deleteMany({
+                where: {
+                    occupiesHomeId: input.homeId,
+                    occupiesUserId: input.userId
+                }
+            })
             return await ctx.prisma.occupies.delete({
                 where: {
                     userId_homeId: {
@@ -105,21 +123,11 @@ export const occupiesRouter = createProtectedRouter()
             homeId: z.string(),
             permissions: z.array(z.nativeEnum(Permission)),
         }),
-        async resolve({ ctx, input }) {
-            if (
-                !(await canUserViewHome(
-                    ctx.session.user.id,
-                    input.homeId,
-                    ctx.prisma
-                )) ||
-                !(await hasPermission(
-                    ctx.session.user.id,
-                    input.homeId,
-                    Permission.Owner,
-                    ctx.prisma
-                ))
-            )
-                return;
+        async resolve({ ctx, input }){
+            if(!(await canUserViewHome(ctx.session.user.id, input.homeId, ctx.prisma)) ||
+               !(await hasPermission(ctx.session.user.id, input.homeId, Permission.Owner, ctx.prisma)) ||
+               (await ctx.session.user.id === input.user))
+               return "bad"; 
             await ctx.prisma.permission.deleteMany({
                 where: {
                     occupiesHomeId: input.homeId,
