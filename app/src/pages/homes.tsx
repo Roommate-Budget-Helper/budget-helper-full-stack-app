@@ -26,6 +26,7 @@ const HomesPage: NextPage = () => {
     const [isRemovalModalOpen, setRemovalModalOpen] = useState<boolean>(false);
     const [isEditPermissionsModalOpen, setEditPermissionsModalOpen] = useState<boolean>(false);
 
+    const [selectedUser, setSelectedUser] = useState<string | null>(null);
     const homes = useHomeContext((s) => s.homes);
     const selectedHome = useHomeContext((s) => s.selectedHome);
     const setSelectedHome = useHomeContext((s) => s.setSelectedHome);
@@ -37,7 +38,12 @@ const HomesPage: NextPage = () => {
     const editPermissions = trpc.useMutation(["occupies.UpdatePermissions"]);
     const removeUser = trpc.useMutation(["occupies.removeUserFromHomeById"]);
 
-    const { data: userPermissions, refetch: getPermissions } = trpc.useQuery(["occupies.getPermissions", {
+    const { data: selectedUserPermissions, refetch: getSelectedUserPermissions } = trpc.useQuery(["occupies.getPermissionsById", {
+        homeId: selectedHome ?? '',
+        userId: selectedUser ?? ''
+    }]);
+
+    const { data: currentUserPermissions, refetch: getCurrentUserPermissions } = trpc.useQuery(["occupies.getPermissions", {
         homeId: selectedHome ?? ''
     }], {  enabled: false });
 
@@ -45,11 +51,12 @@ const HomesPage: NextPage = () => {
         homeId: selectedHome ?? ''
     }], { enabled: false})
 
+    occupants && occupants.length > 0 && !selectedUser && setSelectedUser(occupants[0]?.user.id ?? null);
     const hasPermission = useCallback((permission: Permission) => {
         if(permission === Permission.Owner)
-            return !! userPermissions?.find(perm => perm.name === permission);
-        return !! userPermissions?.find(perm => ([Permission.Owner, Permission.Admin, permission] as string[]).includes(perm.name));
-    }, [userPermissions]);
+            return !! currentUserPermissions?.find(perm => perm.name === permission);
+        return !! currentUserPermissions?.find(perm => ([Permission.Owner, Permission.Admin, permission] as string[]).includes(perm.name));
+    }, [currentUserPermissions]);
 
     const homeData = useMemo(() => {
         return homes.find(home => home.id === selectedHome);
@@ -57,9 +64,11 @@ const HomesPage: NextPage = () => {
 
     useEffect(() => {
         if(!selectedHome) return;
-        getPermissions();
+        getCurrentUserPermissions();
+        getSelectedUserPermissions();
         getOccupants();
-    }, [selectedHome, getPermissions, getOccupants]);
+    }, [selectedHome, selectedUser, getSelectedUserPermissions, getCurrentUserPermissions, getOccupants]);
+
 
     const handleToggleModal = (setterFunction: React.Dispatch<React.SetStateAction<boolean>>) => () => setterFunction(state => !state);
     
@@ -249,7 +258,10 @@ const HomesPage: NextPage = () => {
                 </Modal.Header>
                 <form onSubmit={handleUpdatePermission}>
                 <Modal.Body>
-                    <p>User: <select name="User">
+                    <p>User: <select name="User"
+                        onChange={ (e) => {
+                            setSelectedUser(e.target.value);
+                        }}>
                         {occupants?.map(occupant => (
                         <option 
                             key={occupant.user.id} 
@@ -261,7 +273,9 @@ const HomesPage: NextPage = () => {
                             <input
                                 name="Permissions"
                                 value={permission} 
-                                type="checkbox" />
+                                type="checkbox" 
+                                defaultChecked={ selectedUserPermissions?.find(selectedUserPermission => selectedUserPermission.name === permission) ? true : false }
+                                />
                             {permission}
                         </div>
                     ))}

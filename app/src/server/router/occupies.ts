@@ -99,6 +99,20 @@ export const occupiesRouter = createProtectedRouter()
             );
         },
     })
+    .query("getPermissionsById", {
+        input: z.object({
+            homeId: z.string(),
+            userId: z.string(),
+        }),
+        async resolve({ ctx, input }) {
+            return await ctx.prisma.permission.findMany({
+                where: {
+                    occupiesHomeId: input.homeId,
+                    occupiesUserId: input.userId,
+                },
+            });
+        },
+    })
     .mutation("UpdatePermissions", {
         input: z.object({
             user: z.string(),
