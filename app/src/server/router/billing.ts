@@ -140,10 +140,14 @@ export const billingRouter = createProtectedRouter()
         });
     }
 }).query("getChargesThisMonth", {
-    async resolve({ ctx }){
+    input: z.object({
+        homeId: z.string()
+    }),
+    async resolve({ ctx, input }){
         return await ctx.prisma.charge.findMany({
             where: {
                 chargerId: ctx.session.user.id,
+                homeId: input.homeId,
                 created: {
                     gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
                     lte: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)

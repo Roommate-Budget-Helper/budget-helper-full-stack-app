@@ -162,7 +162,7 @@ const HomesPage: NextPage = () => {
                                 <div className="py-5">
                                     <h3 className="text-xl font-bold text-evergreen-100"> This Month&apos;s Spendings</h3>
                                     <hr className="py-3"></hr>
-                                    <ChartComponent />
+                                    <ChartComponent home={selectedHome}/>
                                 </div>
                             </div>
                         </div>

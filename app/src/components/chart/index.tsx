@@ -20,7 +20,7 @@ const getRandomColor = () => {
     return "#000000".slice(0, -color.length) + color;
 };
 
-const DoughnutChart = ( props: {charges: Charge[]}) => {
+const DoughnutChart = (props: { charges: Charge[] }) => {
     const categoryCount = new Map<string, number>();
     props.charges.forEach((charge) => {
         const current = categoryCount.get(charge.category);
@@ -41,18 +41,18 @@ const DoughnutChart = ( props: {charges: Charge[]}) => {
             },
         },
     };
-    
+
     const chartData = {
         labels: Array.from(categoryCount.keys()),
         datasets: [
             {
                 label: "Amount in Categories",
                 data: Array.from(categoryCount.values()),
-                backgroundColor: Array.from(categoryCount.keys()).map(
-                    (key) => colorMap.get(key)
+                backgroundColor: Array.from(categoryCount.keys()).map((key) =>
+                    colorMap.get(key)
                 ),
-                borderColor: Array.from(categoryCount.keys()).map(
-                    (key) => colorMap.get(key)
+                borderColor: Array.from(categoryCount.keys()).map((key) =>
+                    colorMap.get(key)
                 ),
                 borderWidth: 1,
             },
@@ -62,7 +62,7 @@ const DoughnutChart = ( props: {charges: Charge[]}) => {
     return <Doughnut data={chartData} options={chartOptions} />;
 };
 
-const VerticalBarChart = (props: {charges: Charge[]}) => {
+const VerticalBarChart = (props: { charges: Charge[] }) => {
     const chartOptions = {
         responsive: true,
         indexAxis: "y" as const,
@@ -94,38 +94,39 @@ const VerticalBarChart = (props: {charges: Charge[]}) => {
             {
                 label: "Amount in Categories in Dollars",
                 data: Array.from(categorySum.values()),
-                backgroundColor: Array.from(categorySum.keys()).map(
-                    () => getRandomColor()
+                backgroundColor: Array.from(categorySum.keys()).map(() =>
+                    getRandomColor()
                 ),
             },
         ],
     };
 
-    return (
-        <Bar data={chartData} options={chartOptions} />
-    )
-}
+    return <Bar data={chartData} options={chartOptions} />;
+};
 
-export const ChartComponent = () => {
-    const thisMonthsCharges = trpc.useQuery(["bill.getChargesThisMonth"]);
-    console.log(thisMonthsCharges.data);
+export const ChartComponent = (props: { home: string }) => {
+    const thisMonthsCharges = trpc.useQuery([
+        "bill.getChargesThisMonth",
+        { homeId: props.home },
+    ]);
+
     return (
         <div>
             {thisMonthsCharges.isLoading && <div>Loading...</div>}
-        {
-            thisMonthsCharges.data && thisMonthsCharges.data?.length > 0 ? (
+            {thisMonthsCharges.data && thisMonthsCharges.data?.length > 0 ? (
                 <div>
-                <VerticalBarChart charges={thisMonthsCharges?.data}/>
-                <br></br>
-                <hr className="py-5"></hr>
-                <DoughnutChart charges={thisMonthsCharges?.data}/>
-                <br></br>
-                <hr className="py-5"></hr>
+                    <VerticalBarChart charges={thisMonthsCharges?.data} />
+                    <br></br>
+                    <hr className="py-5"></hr>
+                    <DoughnutChart charges={thisMonthsCharges?.data} />
+                    <br></br>
+                    <hr className="py-5"></hr>
                 </div>
             ) : (
-                <div className="py-5">There are no charges so far this month! 💸</div>
-            )
-        }
+                <div className="py-5">
+                    There are no charges so far this month! 💸
+                </div>
+            )}
         </div>
     );
 };
