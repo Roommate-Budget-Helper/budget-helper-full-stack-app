@@ -82,6 +82,7 @@ const CreationPage: NextPage = () => {
             name: nameVal,
             address: addressVal,
         });
+        setError(null);
     };
 
     return (
