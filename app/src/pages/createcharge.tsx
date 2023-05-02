@@ -3,10 +3,13 @@ import { NextPage } from "next";
 import Head from "next/head";
 import { trpc } from "utils/trpc";
 import Button from "@components/button";
-import FieldInput from "@components/fieldinput";
+import FieldInput, { DateFieldInput, MoneyFieldInput } from "@components/fieldinput";
+import Image from "next/image";
 import { useEffect } from "react";
 import { useState } from "react";
 import { useHomeContext } from "@stores/HomeStore";
+import { router } from "@trpc/server";
+import { useRouter } from "next/router";
 
 const CreateChargePage: NextPage = () => {
     const [error, setError] = useState<string | null>(null);
@@ -15,8 +18,10 @@ const CreateChargePage: NextPage = () => {
     const [billAmount, setBillAmount] = useState<number>(0);
     const [billId, setBillId] = useState<string>("");
     const [dueDate, setDueDate] = useState<string>("");
+    const [category, setCategory] = useState<string>("");
 
     const selectedHome = useHomeContext((s) => s.selectedHome);
+    const router = useRouter();
 
     // Get the selected home somehow so that you can get the occupants
     const occupants = trpc.useQuery([
@@ -40,6 +45,24 @@ const CreateChargePage: NextPage = () => {
         const billName = form.elements["name"].value;
         const billAmount = form.elements["amount"].value;
         const dueDate = form.elements["dueDate"].value;
+        const category = form.elements["category"].value;
+
+        if(billName.trim().length < 1) {
+            setError("The charge must have a name, it cannot be empty.");
+            return;
+        }
+
+        if(billAmount < 0.01) {
+            setError("The bill amount must be greater than 0.01");
+            return;
+        }
+
+        if(category.trim().length < 1) {
+            setCategory("Other");
+        }else{
+            const lowerCaseString = category.toLowerCase();
+            setCategory(lowerCaseString.charAt(0).toUpperCase() + lowerCaseString.slice(1));
+        }
 
         setBillName(billName);
         setBillAmount(billAmount);
@@ -63,12 +86,28 @@ const CreateChargePage: NextPage = () => {
         if(checkedId === 1){
           setSplittingPage(true);
           setError(null);
+        } else {
+            setError("You must have exactly one occupant as payer for a charge.");
+            return;
         }
     };
 
     const onSplitCharge = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const form = event.target as HTMLFormElement;
+
+        // check that the sum of the split amounts is equal to the total amount
+        let sum = 0;
+        occupants.data?.forEach((occupant) => {
+            if (form.elements[occupant.user.id]) {
+               sum += Number(form.elements[occupant.user.id].value);
+            }
+        });
+
+        if(sum !== Number(billAmount)){
+            setError("The sum of the split amounts must be equal to the total amount");
+            return;
+        }
 
         const formattedDueDate = new Date(dueDate);
         occupants.data?.forEach((occupant) => {
@@ -85,6 +124,7 @@ const CreateChargePage: NextPage = () => {
                       homeId: selectedHome,
                       amount: String(amountDue),
                       comment: billName, 
+                      category: category,
                       due: formattedDueDate,
                     });
                   }
@@ -96,7 +136,7 @@ const CreateChargePage: NextPage = () => {
             }
         });
 
-        setSplittingPage(false);
+        router.push("/billing");
     };
 
     // Loading page for when the home hasn't loaded in yet
@@ -107,9 +147,9 @@ const CreateChargePage: NextPage = () => {
                     <title>RBH Create Charge</title>
                     <meta name="description" content="Create Charges" />
                 </Head>
-                <div className="body flex flex-col text-center">
-                    <Navbar />
-                    <div> Please select/create a home to create a charge.</div>
+                <Navbar />
+                <div className="body flex flex-col text-center text-2xl p-5">
+                    <div>Please select/create a home to create a charge.</div>
                 </div>
             </>
         );
@@ -123,33 +163,78 @@ const CreateChargePage: NextPage = () => {
                   <title>RBH Create Charge</title>
                   <meta name="description" content="Create Charges" />
               </Head>
-              <div className="body flex flex-col text-center">
-                  <Navbar/>
-                  <h1 className="text-5xl my-10 font-bold text-evergreen-100">Create Charge</h1>
-
+              <Navbar />
+              <div className="body flex flex-col text-center text-2xl p-5">
+                  <h1 className="text-5xl my-10 font-bold text-evergreen-100">
+                      Create Charge
+                  </h1>
                   <div className="form-area flex flex-col justify-between items-center ">
                       <form method="post" onSubmit={onSplitCharge}>
-                        <div className="bg-evergreen-100 mx-10 my-10 p-3 rounded-xl text-base">
-                          <h2 className="text-2xl mb-2 font-bold text-dorian">Splitting ${billAmount}</h2>
-                          <hr></hr>
-                          {occupants.data && occupants.data.map((occupant) => {
-                              return (<div key={occupant.user.id}> 
-                                <div className="text-dorian"> {occupant.user.name} </div>
-                                <input type="number" name={occupant.user.id} placeholder="0.00" step="0.01" min="0.01" max={billAmount}/>
-                              </div>);
-                          })}
+                          <div className="bg-evergreen-100 mx-10 my-10 p-3 rounded-xl text-base">
+                              <h2 className="text-2xl mb-2 font-bold text-dorian">
+                                  Splitting ${billAmount}
+                              </h2>
+                              <hr></hr>
+                              {occupants.data &&
+                                  occupants.data.map((occupant) => {
+                                      return (
+                                          <div 
+                                            key={occupant.user.id}
+                                            className="sm:bg-transparent md:bg-slate-600 items-center mx-10 my-10 rounded-xl flex flex-col sm:text-black md:text-dorian text-base justify-between"
+                                            >
+                                              <div className="rounded-full bg-evergreen-80 w-24 h-24 flex flex-col items-center justify-center">
+                                                  {occupant.user.image ? (
+                                                      <Image
+                                                          src={
+                                                              occupant.user
+                                                                  .image
+                                                          }
+                                                          alt={
+                                                              occupant.user.name
+                                                          }
+                                                          width="64px"
+                                                          height="64px"
+                                                      />
+                                                  ) : (
+                                                      <p>
+                                                          {occupant.user.name
+                                                              .split(" ")
+                                                              .reduce(
+                                                                  (a, c) => {
+                                                                      a += c[0];
+                                                                      return a.toUpperCase();
+                                                                  },
+                                                                  ""
+                                                              )}
+                                                      </p>
+                                                  )}
+                                              </div>
+                                              <div className="text-dorian mt-10">
+                                                  {occupant.user.name}
+                                              </div>
+                                              <MoneyFieldInput
+                                                  name={occupant.user.id}
+                                                  placeholder="0.00"
+                                                  max={String(billAmount)}
+                                              />
+                                          </div>
+                                      );
+                                  })}
 
-                        <Button
-                            classNames="bg-evergreen-80 text-dorian"
-                            value="Send Charge"
-                            type="submit"
-                        />
-                        </div>
+                              <Button
+                                  classNames="bg-evergreen-80 text-dorian"
+                                  value="Send Charge"
+                                  type="submit"
+                              />
+                          </div>
                       </form>
-                      
-                      {error &&<p className="text-xl font-light text-red-600">{error}</p>}
+
+                      {error && (
+                          <p className="text-xl font-light text-red-600">
+                              {error}
+                          </p>
+                      )}
                   </div>
-                  
               </div>
           </>
       );
@@ -162,12 +247,12 @@ const CreateChargePage: NextPage = () => {
                 <title>RBH Create Charge</title>
                 <meta name="description" content="Create Charges" />
             </Head>
-            <div className="body flex flex-col text-center">
-                <Navbar/>
+            <Navbar />
+            <div className="body flex flex-col text-center text-2xl p-5">
+                <h1 className="text-5xl mt-10 font-bold text-evergreen-100">
+                    Create Charge
+                </h1>
                 <div className="form-area flex flex-col justify-between items-center ">
-
-                    <h1 className="text-5xl mt-10 font-bold text-evergreen-100">Create Charge</h1>
-                    <br></br>
                     <form method="post" onSubmit={onCreateCharge}>
                         <br></br>
                         <FieldInput
@@ -176,25 +261,35 @@ const CreateChargePage: NextPage = () => {
                             placeholder="Enter Charge Description"
                         />
                         <br></br>
-                        <input type="number" className="bg-evergreen-60 w-96 my-4 text-xl py-2 px-4 rounded-lg" 
-                          name="amount" placeholder="Amount" step="0.01" min="0.01" max="1000000" />
+                        <FieldInput
+                            type="text"
+                            name="category"
+                            placeholder="Charge Category"
+                        />
                         <br></br>
-                        <input type="date" className="bg-evergreen-60 w-96 my-4 text-xl py-2 px-4 rounded-lg" name="dueDate" min={new Date().toISOString().split('T')[0]}/>
-                        <h2 className="text-3xl mt-5 font-bold text-evergreen-100">Who is Paying?</h2>
+                        <MoneyFieldInput
+                            placeholder="0.00"
+                            name="amount"
+                            max="1000000"
+                        />
+                        <br></br>
+                        <DateFieldInput name="dueDate" />
+                        <h2 className="text-3xl mt-5 font-bold text-evergreen-100">
+                            Who Paid the Charge?
+                        </h2>
                         {occupants.data?.map((occupant) => {
                             if (occupant.user.name) {
                                 return (
                                     <div
                                         key={occupant.user.id}
-                                        className="bg-slate-600 w-96 my-10 p-3 rounded-xl text-dorian text-base"
+                                        className="bg-slate-600 w-88 my-10 p-3 rounded-xl text-dorian text-base"
                                     >
-                                    <input
-                                        type="checkbox"
-                                        name={occupant.user.id}
-                                        className="mr-4"
-                                    />
-                                    
-                                    {occupant.user.name}
+                                        <input
+                                            type="checkbox"
+                                            name={occupant.user.id}
+                                            className="mr-4"
+                                        />
+                                        {occupant.user.name}
                                     </div>
                                 );
                             }
@@ -206,12 +301,22 @@ const CreateChargePage: NextPage = () => {
                         />
                     </form>
                     <br></br>
-                    <div className="text-2xl text-evergreen-100 font-bold mt-5">Step 1 of 2</div>
-                    <div className="flex items-center justify-between"> 
-                      <span className="text-dorian bg-slate-800 rounded-full h-10 w-10 my-7 mr-3">1</span>
-                      <span className="text-dorian bg-slate-600 rounded-full h-10 w-10">2</span>
+                    <div className="text-evergreen-100 font-bold mt-5">
+                        Step 1 of 2
                     </div>
-                    {error &&<p className="text-xl font-light text-red-600">{error}</p>}
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-center w-10 h-10 bg-evergreen-100 rounded-full my-2 mx-2">
+                            <span className="text-dorian">1</span>
+                        </div>
+                        <div className="flex items-center justify-center w-10 h-10 bg-evergreen-80 rounded-full my-2 mx-2">
+                            <span className="text-dorian">2</span>
+                        </div>
+                    </div>
+                    {error && (
+                        <p className="text-xl font-light text-red-600">
+                            {error}
+                        </p>
+                    )}
                 </div>
             </div>
         </>

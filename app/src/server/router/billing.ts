@@ -13,7 +13,8 @@ export const billingRouter = createProtectedRouter()
         amountBeforeSplit: z.string(),
         amount: z.string(),
         due: z.date(),
-        comment: z.string()
+        comment: z.string(),
+        category: z.string(),
     }),
     async resolve({ ctx, input }){
         if(!await canUserViewHome(ctx.session.user.id, input.homeId, ctx.prisma)) return;
@@ -28,7 +29,8 @@ export const billingRouter = createProtectedRouter()
                 created: new Date(),
                 dueDate: input.due,
                 paid: false,
-                confirmed: false
+                confirmed: false,
+                category: input.category,
             }
         });
 
