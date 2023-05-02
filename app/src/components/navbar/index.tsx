@@ -40,13 +40,6 @@ const Navbar: React.FC = () => {
         setSelecting(false);
     }
 
-<<<<<<< HEAD
-    function signOutAndGoToLogin() {
-        clearSelectedHome();
-        signOut();
-    }
-=======
->>>>>>> main
 
     return (
         <div className="overflow-show rounded-b-lg flex">
