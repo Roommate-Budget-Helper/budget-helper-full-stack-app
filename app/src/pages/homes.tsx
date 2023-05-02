@@ -14,7 +14,7 @@ import Link from "next/link";
 import FieldInput from "@components/fieldinput";
 import { Permission } from "types/permissions";
 import { useSession } from "next-auth/react";
-
+import { ChartComponent } from "@components/chart";
 
 const HomesPage: NextPage = () => {
     const { data: session } = useSession();
@@ -44,8 +44,6 @@ const HomesPage: NextPage = () => {
     const { data: occupants, refetch: getOccupants} = trpc.useQuery(["occupies.getUsersInHome", {
         homeId: selectedHome ?? ''
     }], { enabled: false})
-
-    const {data: thisMonthsCharges, refetch: getThisMonthsCharges} = trpc.useQuery(["bill.getChargesThisMonth"]);
 
     const hasPermission = useCallback((permission: Permission) => {
         if(permission === Permission.Owner)
@@ -161,10 +159,10 @@ const HomesPage: NextPage = () => {
                                 </div>}
                                 <div className="p-5">{homeData.name}</div>
                                 <div className="p-1 text-sm">📍Address: {homeData.address}</div>
-                                <div className="p-5" >This is the roommates cost chart</div>
-                                <br></br>
-                                <div>
-                                    This Month&apos;s Spendings
+                                <div className="py-5">
+                                    <h3 className="text-xl font-bold text-evergreen-100"> This Month&apos;s Spendings</h3>
+                                    <hr className="py-3"></hr>
+                                    <ChartComponent />
                                 </div>
                             </div>
                         </div>

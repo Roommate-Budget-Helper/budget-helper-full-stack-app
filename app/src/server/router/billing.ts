@@ -141,26 +141,7 @@ export const billingRouter = createProtectedRouter()
     }
 }).query("getChargesThisMonth", {
     async resolve({ ctx }){
-        const charges = await ctx.prisma.charge.findMany({
-            select: {
-                chargeId: true,
-                home: true,
-                amountBeforeSplit: true,
-                amount: true,
-                dueDate: true,
-                created: true,
-                category: true,
-                receiverId: true,
-                receiveUser: { // receiver data
-                  select: {
-                    name: true,
-                    email: true,
-                    image: true
-                  }
-                },
-                paidDate: true,
-                comment: true
-            },
+        return await ctx.prisma.charge.findMany({
             where: {
                 chargerId: ctx.session.user.id,
                 created: {
@@ -170,13 +151,5 @@ export const billingRouter = createProtectedRouter()
             }
         });
 
-        console.log(charges);
-        const categoryCountMap = new Map<string, number>();
-        charges.map((charge) => {
-            const count = categoryCountMap.get(charge.category);
-            count ? categoryCountMap.set(charge.category, count + 1) : categoryCountMap.set(charge.category, 1);
-        });
-
-        return { charges: charges, categoryCount: categoryCountMap };
     }
 });
