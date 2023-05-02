@@ -37,7 +37,6 @@ export const registerUser = (username, password) => {
     cy.waitForEmail(successInboxId).then(email => {
       successInboxId = inbox.id;
       successEmailId = email.id;
-      console.log("Email: ", email.id, email);
       assert.isDefined(email);
       assert.strictEqual(/Your (confirmation|verification) code is/.test(email.body), true);
       const code = email.body.match(/\d+/)[0];
