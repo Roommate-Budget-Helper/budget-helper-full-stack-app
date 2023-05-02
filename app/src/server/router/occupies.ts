@@ -2,7 +2,7 @@ import { createProtectedRouter } from "./context";
 import { z } from "zod";
 import { getUserPermissions, hasPermission, isOwner } from "../db/UserService";
 import { Permission } from "../../types/permissions";
-import { canUserViewHome, moreThanOneOwner, userIsInHome } from "../db/HomeService";
+import { canUserViewHome, moreThanOneOwner } from "../db/HomeService";
 import { getSignedImage } from "./image-upload";
 
 export const occupiesRouter = createProtectedRouter()
@@ -53,7 +53,7 @@ export const occupiesRouter = createProtectedRouter()
         }),
         async resolve({ ctx, input }) {
             if (!(await hasPermission(ctx.session.user.id, input.homeId, Permission.Owner, ctx.prisma)) ||
-                !(await userIsInHome(input.userId, input.homeId, ctx.prisma)) ||
+                !(await canUserViewHome(input.userId, input.homeId, ctx.prisma)) ||
                 ((await isOwner(input.userId, input.homeId, ctx.prisma)) && 
                 !(await moreThanOneOwner(input.userId, input.homeId, ctx.prisma)))) {
                 return "bad";
