@@ -3,7 +3,6 @@ import Link from "next/link";
 import Icon from '@mdi/react';
 import { mdiCashMultiple, mdiFileDocumentOutline, mdiBellOutline, mdiAccountCircleOutline, mdiPlus } from '@mdi/js';
 import { useHomeContext } from "@stores/HomeStore";
-import { signOut } from 'next-auth/react';
 import { useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import { IconProps } from "@mdi/react/dist/IconProps";
@@ -41,10 +40,13 @@ const Navbar: React.FC = () => {
         setSelecting(false);
     }
 
+<<<<<<< HEAD
     function signOutAndGoToLogin() {
         clearSelectedHome();
         signOut();
     }
+=======
+>>>>>>> main
 
     return (
         <div className="overflow-show rounded-b-lg flex">
@@ -53,6 +55,7 @@ const Navbar: React.FC = () => {
                 <WrappedIcon activepath="/billing" currentpath={router.asPath} path={mdiCashMultiple} size="35px" />
             </a>
         </Link>
+        {/* TODO: This part of the navbar should be the charge history. */}
         <Link href="#">
             <a className={navItemStyle+ " bg-gray-700"}>
               <Icon path={mdiFileDocumentOutline} size="35px" />
@@ -90,9 +93,9 @@ const Navbar: React.FC = () => {
                 <WrappedIcon activepath="/notifications" currentpath={router.asPath} path={mdiBellOutline} size="35px" />
             </a>
         </Link>
-        <Link href="/login" >
-            <a onClick={signOutAndGoToLogin} className={navItemStyle+ " bg-gray-700"} >
-                <Icon path={mdiAccountCircleOutline} size="35px" />
+        <Link href="/user" >
+            <a className={navItemStyle+ " bg-gray-700"} >
+                <WrappedIcon activepath="/user" currentpath={router.asPath} path={mdiAccountCircleOutline} size="35px" />
             </a>
         </Link>
     </div>
