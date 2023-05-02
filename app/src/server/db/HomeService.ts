@@ -1,4 +1,3 @@
-import { Permission } from "@aws-sdk/client-s3";
 import { PrismaClient } from "@prisma/client";
 
 export const canUserViewHome = async (id: string, homeId: string, db: PrismaClient) => {
