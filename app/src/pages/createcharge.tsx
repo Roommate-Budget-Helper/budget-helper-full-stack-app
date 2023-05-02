@@ -175,8 +175,7 @@ const CreateChargePage: NextPage = () => {
                                   Splitting ${billAmount}
                               </h2>
                               <hr></hr>
-                              {occupants.data &&
-                                  occupants.data.map((occupant) => {
+                              { occupants?.data?.map((occupant) => {
                                       return (
                                           <div 
                                             key={occupant.user.id}
@@ -185,6 +184,7 @@ const CreateChargePage: NextPage = () => {
                                               <div className="rounded-full bg-evergreen-80 w-24 h-24 flex flex-col items-center justify-center">
                                                   {occupant.user.image ? (
                                                       <Image
+                                                        className="rounded-full"
                                                           src={
                                                               occupant.user
                                                                   .image
@@ -192,8 +192,8 @@ const CreateChargePage: NextPage = () => {
                                                           alt={
                                                               occupant.user.name
                                                           }
-                                                          width="64px"
-                                                          height="64px"
+                                                          width="96px"
+                                                          height="96px"
                                                       />
                                                   ) : (
                                                       <p>
