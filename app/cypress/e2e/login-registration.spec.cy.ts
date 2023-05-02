@@ -165,7 +165,7 @@ describe('Forgot Password test', () => {
     cy.wait(600);
     cy.waitForEmail(successInboxId).then(email => {
       assert.isDefined(email);
-      assert.strictEqual(/Your (confirmation|verification) code is/.test(email.body), true);
+      assert.strictEqual(/Your (confirmation|verification|password reset code) code is/.test(email.body), true);
       const code = email.body.match(/\d+/)[0];
       cy.get('input[name=verification-code]').type(code);
       cy.get('input[name=new-password]').type(newPassword);
