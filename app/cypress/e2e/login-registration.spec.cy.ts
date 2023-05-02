@@ -5,6 +5,46 @@ const successPassword = "Abc@12345";
 let successInboxId:string;
 let successVerificationCode:string;
 
+export const loginUser = (username, password) => {
+  cy.visit('http://localhost:3000/login');
+  cy.get('input[name=username]').type(username);
+  cy.get('input[name=password]').type(password);
+  cy.get('button[type=submit]').click();
+  cy.url().should('contain', '/homes');
+};
+
+export const registerUser = (username, password) => {
+  cy.visit('http://localhost:3000/login');
+  cy.contains("Sign Up").click();
+  let emailAddress: string;
+  // see commands.js custom commands
+  cy.createInbox().then(inbox => {
+    // verify a new inbox was created
+    assert.isDefined(inbox)
+
+    // save the inboxId for later checking the emails
+    successInboxId = inbox.id
+    emailAddress = inbox.emailAddress;
+
+    // sign up with inbox email address and the password
+    cy.get('input[name=email]').type(emailAddress);
+    cy.get('input[name=password]').type(password);
+    cy.get('input[name=confirmPassword]').type(password);
+    cy.get('input[name=username]').type(username);
+    cy.get('button[type=submit]').click();
+
+    cy.waitForEmail(successInboxId).then(email => {
+      successInboxId = inbox.id
+      assert.isDefined(email);
+      assert.strictEqual(/Your (confirmation|verification) code is/.test(email.body), true);
+      const code = email.body.match(/\d+/)[0];
+      successVerificationCode = code;
+      cy.get('input[name=verification-code]').type(`${code}{enter}`)
+      cy.wait(600);
+    })
+  });
+}
+
 describe('Registration Test', () => {
   beforeEach(() => {
     cy.visit('http://localhost:3000/register');
@@ -156,42 +196,3 @@ describe('Forgot Password test', () => {
     
 });
 
-export const loginUser = (username, password) => {
-  cy.visit('http://localhost:3000/login');
-  cy.get('input[name=username]').type(username);
-  cy.get('input[name=password]').type(password);
-  cy.get('button[type=submit]').click();
-  cy.url().should('contain', '/homes');
-};
-
-export const registerUser = (username, password) => {
-  cy.visit('http://localhost:3000/login');
-  cy.contains("Sign Up").click();
-  let emailAddress: string;
-  // see commands.js custom commands
-  cy.createInbox().then(inbox => {
-    // verify a new inbox was created
-    assert.isDefined(inbox)
-
-    // save the inboxId for later checking the emails
-    successInboxId = inbox.id
-    emailAddress = inbox.emailAddress;
-
-    // sign up with inbox email address and the password
-    cy.get('input[name=email]').type(emailAddress);
-    cy.get('input[name=password]').type(password);
-    cy.get('input[name=confirmPassword]').type(password);
-    cy.get('input[name=username]').type(username);
-    cy.get('button[type=submit]').click();
-
-    cy.waitForEmail(successInboxId).then(email => {
-      successInboxId = inbox.id
-      assert.isDefined(email);
-      assert.strictEqual(/Your (confirmation|verification) code is/.test(email.body), true);
-      const code = email.body.match(/\d+/)[0];
-      successVerificationCode = code;
-      cy.get('input[name=verification-code]').type(`${code}{enter}`)
-      cy.wait(600);
-    })
-  });
-}
