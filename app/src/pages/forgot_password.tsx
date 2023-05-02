@@ -5,11 +5,13 @@ import Button from "@components/button";
 import Head from "next/head";
 import { trpc } from "utils/trpc";
 import { signIn } from 'next-auth/react';
+import { useHomeContext } from "stores/HomeStore";
 
 const ForgotPasswordPage: NextPage = () => {
     const [username, setUsername] = useState<string>("");
     const [validatedUsername, setValidatedUsername] = useState<string>("");
     const [emailSent, setEmailSent] = useState<boolean>(false);
+    const clearSelectedHome = useHomeContext((s) => s.clearSelectedHome);
 
     const sendForgotPasswordCode = trpc.useMutation(
         ["auth.sendForgotPasswordVerificationCode"],
@@ -64,6 +66,7 @@ const ForgotPasswordPage: NextPage = () => {
             password: password,
             redirect: false
         })
+        clearSelectedHome();
     };
 
     if (emailSent) {

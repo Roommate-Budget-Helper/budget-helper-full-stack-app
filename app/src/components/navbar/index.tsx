@@ -28,6 +28,7 @@ const Navbar: React.FC = () => {
     const selectedHome = useHomeContext(s => s.selectedHome);
     const homes = useHomeContext(s => s.homes);
     const setSelectedHome = useHomeContext(s => s.setSelectedHome);
+    const clearSelectedHome = useHomeContext((s) => s.clearSelectedHome);
     const [isSelecting, setSelecting] = useState<boolean>(false);
     const onItemClicked = (id: string) => (event: React.MouseEvent) => {
         event.preventDefault();
@@ -41,6 +42,7 @@ const Navbar: React.FC = () => {
     }
 
     function signOutAndGoToLogin() {
+        clearSelectedHome();
         signOut();
     }
 
