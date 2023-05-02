@@ -2,8 +2,9 @@ import { generateUsername } from "unique-username-generator";
 
 const successUsername = generateUsername();
 const successPassword = "Abc@12345";
-let successInboxId:string;
-let successVerificationCode:string;
+let successInboxId: string;
+let successVerificationCode: string;
+let successEmailId: string;
 
 export const loginUser = (username, password) => {
   cy.visit('http://localhost:3000/login');
@@ -34,7 +35,9 @@ export const registerUser = (username, password) => {
     cy.get('button[type=submit]').click();
 
     cy.waitForEmail(successInboxId).then(email => {
-      successInboxId = inbox.id
+      successInboxId = inbox.id;
+      successEmailId = email.id;
+      console.log("Email: ", email.id, email);
       assert.isDefined(email);
       assert.strictEqual(/Your (confirmation|verification) code is/.test(email.body), true);
       const code = email.body.match(/\d+/)[0];
@@ -155,11 +158,10 @@ describe('Forgot Password test', () => {
     cy.contains('Forgot your password? No worries, we can help you out!');
   });
 
-/*
   it('Can change password', () => {
     cy.get('input[name=username]').type(successUsername);
     cy.get('button[type=submit').click();
-
+    cy.deleteEmail(successEmailId);
     cy.wait(600);
     cy.waitForEmail(successInboxId).then(email => {
       assert.isDefined(email);
@@ -176,7 +178,7 @@ describe('Forgot Password test', () => {
   it('Can login with new password', () => {
     loginUser(successUsername, newPassword);
   });
-  */
+  
 
   it('can throw an error when false verification code forgot password', () => {
     cy.get('input[name=username]').type(successUsername);
