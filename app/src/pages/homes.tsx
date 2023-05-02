@@ -14,6 +14,7 @@ import Link from "next/link";
 import FieldInput from "@components/fieldinput";
 import { Permission } from "types/permissions";
 import { useSession } from "next-auth/react";
+import { z } from "zod";
 
 
 const HomesPage: NextPage = () => {
@@ -134,13 +135,14 @@ const HomesPage: NextPage = () => {
         event.preventDefault();
         const form = (event.target as HTMLFormElement);
         if(!selectedHome) return;
-        if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(form.email.value)) {
+        const emailSchema = z.string().email().safeParse(form.email.value);
+        if (!emailSchema.success) {
             setModalError("This is not a valid email!");
             return;
         }
         const checkInvite = await inviteRoommate.mutateAsync({
             homeId: selectedHome,
-            email: form.email.value,
+            email: emailSchema.data,
         });
         if(checkInvite === "bad") {
             setModalError("The invite failed.\n Make sure the user is not already invited to the home,\n in the home or that you did not invite yourself!");
