@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getUserPermissions, hasPermission, isOwner } from "../db/UserService";
 import { Permission } from "../../types/permissions";
 import { canUserViewHome, moreThanOneOwner, userIsInHome } from "../db/HomeService";
+import { getSignedImage } from "./image-upload";
 
 export const occupiesRouter = createProtectedRouter()
     .mutation("addUserToHome", {
@@ -81,7 +82,7 @@ export const occupiesRouter = createProtectedRouter()
             if (!input.homeId) {
                 return [];
             }
-            return await ctx.prisma.occupies.findMany({
+            const users = await ctx.prisma.occupies.findMany({
                 select: {
                     user: {
                         select: {
@@ -96,15 +97,25 @@ export const occupiesRouter = createProtectedRouter()
                     homeId: input.homeId,
                 },
             });
+            for(const user of users) {
+                if (user.user.image) {
+                    user.user.image = await getSignedImage(user.user.image);
+                }
+            }
+            return users;
         },
     })
     .query("getPermissions", {
         input: z.object({
             homeId: z.string(),
         }),
-        async resolve({ ctx, input }){
-            return await getUserPermissions(ctx.session.user.id, input.homeId, ctx.prisma)
-        }
+        async resolve({ ctx, input }) {
+            return await getUserPermissions(
+                ctx.session.user.id,
+                input.homeId,
+                ctx.prisma
+            );
+        },
     })
     .mutation("UpdatePermissions", {
         input: z.object({
@@ -119,17 +130,17 @@ export const occupiesRouter = createProtectedRouter()
                return "bad"; 
             await ctx.prisma.permission.deleteMany({
                 where: {
-                   occupiesHomeId: input.homeId,
-                   occupiesUserId: input.user,
+                    occupiesHomeId: input.homeId,
+                    occupiesUserId: input.user,
                 }
             });
-            
+
             return await ctx.prisma.permission.createMany({
-                data: input.permissions.map(permission => ({
+                data: input.permissions.map((permission) => ({
                     name: permission,
                     occupiesUserId: input.user,
-                    occupiesHomeId: input.homeId
-                }))
+                    occupiesHomeId: input.homeId,
+                })),
             });
-        }
+        },
     });
