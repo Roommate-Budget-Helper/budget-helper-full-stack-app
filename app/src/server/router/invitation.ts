@@ -1,5 +1,5 @@
 import { Permission } from "../../types/permissions";
-import { canUserViewHome, userIsInvited, userIsInHome } from "../db/HomeService";
+import { canUserViewHome, userIsInvited } from "../db/HomeService";
 import { hasPermission, getUserByEmail } from "../db/UserService";
 import { sendEmail } from "../services/email/invitation";
 import { z } from "zod";
@@ -19,7 +19,7 @@ export const invitationRouter = createProtectedRouter()
            !(await canUserViewHome(ctx.session.user.id,input.homeId, ctx.prisma)) ||
            await userIsInvited(input.email, input.homeId, ctx.prisma) ||
            !userId ||
-           await userIsInHome(userId.id, input.homeId, ctx.prisma))
+           await canUserViewHome(userId.id, input.homeId, ctx.prisma))
                 return "bad";
         const home = await ctx.prisma.home.findFirst({
             select: {
