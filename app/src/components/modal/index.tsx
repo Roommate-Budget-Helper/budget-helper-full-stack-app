@@ -22,19 +22,15 @@ const Modal: ModalType & ModalSubComponents =(props: React.PropsWithChildren<Mod
             zIndex: 300,
         }}
         tabIndex={-1} 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-modal md:h-full"
+        className="top-0 absolute left-0 w-full h-full bg-black bg-opacity-60 flex justify-center items-center"
     >
-            <div className="relative w-full h-full max-w-2xl md:h-auto">
+            <div className="top-[25%] relative w-full max-w-md h-full">
                 {/* <!-- Modal content --> */}
-                <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <div className="relative bg-white rounded-lg">
                     {props.children}
                 </div>
             </div>
         </div>
-        <div style={{
-            zIndex: 200,
-            }} 
-            className='absolute inset-0 bg-black bg-opacity-60'></div>
         </>)
 }
 
@@ -46,11 +42,11 @@ type ModalHeaderType = React.FC<ModalHeaderProps & { children?: React.ReactNode 
 
 export const ModalHeader: ModalHeaderType = (props: React.PropsWithChildren<ModalHeaderProps>) => {
     return (
-        <div className="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+        <div className="flex items-center justify-between p-4 border-b rounded-t">
+            <h3 className="text-lg font-semibold text-gray-900">
                 {props.children}
             </h3>
-            <button onClick={props.onHide} type="button" className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
+            <button onClick={props.onHide} type="button" className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg p-2 inline-flex items-center">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"></path></svg>
                 <span className="sr-only">Close modal</span>
             </button>
@@ -62,8 +58,8 @@ export const ModalHeader: ModalHeaderType = (props: React.PropsWithChildren<Moda
 
 export const ModalBody: React.FC<{ children?: React.ReactNode | string}> = (props) => {
     return (
-        <div className="p-6 space-y-6">        
-            <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+        <div className="p-4 sm:p-6">        
+            <p className="text-base leading-relaxed text-gray-500">
                 {props.children}
             </p>
         </div>
@@ -73,7 +69,7 @@ export const ModalBody: React.FC<{ children?: React.ReactNode | string}> = (prop
 
 export const ModalFooter = (props: React.PropsWithChildren) => {
     return (
-    <div className="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+    <div className="flex items-center p-4 sm:p-6 border-t">
         {props.children}           
     </div>
     );
