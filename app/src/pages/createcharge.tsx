@@ -168,20 +168,20 @@ const CreateChargePage: NextPage = () => {
                   <h1 className="text-5xl my-10 font-bold text-evergreen-100">
                       Create Charge
                   </h1>
-                  <div className="form-area flex flex-col justify-between items-center ">
+                  <div className="form-area flex flex-col justify-between items-center">
                       <form method="post" onSubmit={onSplitCharge}>
-                          <div className="bg-evergreen-100 mx-10 my-10 p-3 rounded-xl text-base">
-                              <h2 className="text-2xl mb-2 font-bold text-dorian">
+                          <div className="mx-10 my-10 p-3 rounded-xl text-base hover:shadow-xl">
+                              <h2 className="text-2xl mb-2 font-bold text-evergreen-100">
                                   Splitting ${billAmount}
                               </h2>
                               <hr></hr>
-                              { occupants?.data?.map((occupant) => {
+                              {occupants?.data?.map((occupant) => {
                                       return (
                                           <div 
                                             key={occupant.user.id}
                                             className="sm:bg-transparent md:bg-slate-600 items-center mx-10 my-10 rounded-xl flex flex-col sm:text-black md:text-dorian text-base justify-between"
                                             >
-                                              <div className="rounded-full bg-evergreen-80 w-24 h-24 flex flex-col items-center justify-center">
+                                              <div className="rounded-full bg-evergreen-80 w-24 h-24 flex flex-col items-center justify-center font-bold">
                                                   {occupant.user.image ? (
                                                       <Image
                                                         className="rounded-full"
@@ -209,7 +209,7 @@ const CreateChargePage: NextPage = () => {
                                                       </p>
                                                   )}
                                               </div>
-                                              <div className="text-dorian mt-10">
+                                              <div className="text-evergreen-100 font-bold mt-10">
                                                   {occupant.user.name}
                                               </div>
                                               <MoneyFieldInput
@@ -252,8 +252,10 @@ const CreateChargePage: NextPage = () => {
                 <h1 className="text-5xl mt-10 font-bold text-evergreen-100">
                     Create Charge
                 </h1>
-                <div className="form-area flex flex-col justify-between items-center ">
+                <div className="form-area flex flex-col justify-between items-center hover:shadow-xl">
                     <form method="post" onSubmit={onCreateCharge}>
+
+                          <div className="mx-10 my-10 p-3 rounded-xl text-base hover:shadow-xl">
                         <br></br>
                         <FieldInput
                             type="text"
@@ -299,6 +301,7 @@ const CreateChargePage: NextPage = () => {
                             value="Create"
                             type="submit"
                         />
+                        </div>
                     </form>
                     <br></br>
                     <div className="text-evergreen-100 font-bold mt-5">
