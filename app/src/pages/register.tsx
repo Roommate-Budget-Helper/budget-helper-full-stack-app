@@ -5,12 +5,14 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import { trpc } from "utils/trpc";
 import { signIn } from 'next-auth/react';
+import { useHomeContext } from "stores/HomeStore";
 
 const RegisterPage: NextPage = () => {
     const [registered, setRegistered] = useState<boolean>(false);
     const [registeredUsername, setRegisteredUsername] = useState<string | null>(null);
     const [registeredPassword, setRegisteredPassword] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const clearSelectedHome = useHomeContext((s) => s.clearSelectedHome);
     const createUser = trpc.useMutation(["auth.createUser"], {
         onError: (error) => {
             setError(error.message);
@@ -73,7 +75,8 @@ const RegisterPage: NextPage = () => {
             username: registeredUsername,
             password: registeredPassword,
             redirect: false
-        })
+        });
+        clearSelectedHome();
     };
 
     if(registered){

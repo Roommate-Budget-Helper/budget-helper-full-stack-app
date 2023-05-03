@@ -43,11 +43,16 @@ const UpdatePage: NextPage = () => {
         const form = event.target as HTMLFormElement;
 
         const fileList = fileRef.current?.files
-        let imageFile = null
-        if(fileList){
-            imageFile = fileList[0]
-        }   
-        let key;
+        if(!fileList){
+            return;
+        }
+        const imageFile = fileList[0];
+        if(imageFile && imageFile.size > 1000000){
+            setError("The image file is too large, it must be less than 1MB.");
+            return;
+        }
+
+        let key = null; 
         if(!homeData){
             return;
         }
@@ -81,6 +86,7 @@ const UpdatePage: NextPage = () => {
             name: name,
             address: address,
         });
+        setError(null);
     };
 
     return (
