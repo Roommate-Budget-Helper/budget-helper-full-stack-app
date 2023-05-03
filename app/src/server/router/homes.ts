@@ -105,6 +105,11 @@ export const homesRouter = createProtectedRouter()
                     homeId: input.id,
                 }
             }); 
+            await ctx.prisma.permission.deleteMany({
+                where: {
+                    occupiesHomeId: input.id,
+                }
+            })
             return await ctx.prisma.home.delete({
                 where: {
                     id: input.id,
