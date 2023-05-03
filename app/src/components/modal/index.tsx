@@ -22,11 +22,11 @@ const Modal: ModalType & ModalSubComponents =(props: React.PropsWithChildren<Mod
             zIndex: 300,
         }}
         tabIndex={-1} 
-        className="fixed top-28 left-0 w-full h-full bg-black bg-opacity-60 flex justify-center items-center"
+        className="top-0 absolute left-0 w-full h-full bg-black bg-opacity-60 flex justify-center items-center"
     >
-            <div className="relative w-full max-w-md h-full">
+            <div className="top-[25%] relative w-full max-w-md h-full">
                 {/* <!-- Modal content --> */}
-                <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <div className="relative bg-white rounded-lg">
                     {props.children}
                 </div>
             </div>
