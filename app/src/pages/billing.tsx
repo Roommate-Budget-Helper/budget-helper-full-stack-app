@@ -80,6 +80,7 @@ const BillingPage: NextPage = () => {
                                             <div className="rounded-full bg-evergreen-80 w-24 h-24 flex items-center flex-col justify-center">
                                                 {charge.chargeUser.image ? (
                                                     <Image
+                                                    className="rounded-full"
                                                         src={
                                                             charge.chargeUser
                                                                 .image
@@ -88,8 +89,8 @@ const BillingPage: NextPage = () => {
                                                             charge.chargeUser
                                                                 .name
                                                         }
-                                                        width="64px"
-                                                        height="64px"
+                                                        width="96px"
+                                                        height="96px"
                                                     />
                                                 ) : (
                                                     <p>
