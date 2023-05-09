@@ -4,6 +4,7 @@ import { Bar } from "react-chartjs-2";
 import { trpc } from "../../utils/trpc";
 import { Charge } from "@prisma/client";
 import React from "react";
+import LoadingSpinner from "@components/loadingspinner";
 
 ChartJS.register(
     ArcElement,
@@ -112,7 +113,7 @@ export const ChartComponent = (props: { home: string }) => {
 
     return (
         <div>
-            {thisMonthsCharges.isLoading && <div>Loading...</div>}
+            {thisMonthsCharges.isLoading && <LoadingSpinner />}
             {thisMonthsCharges.data && thisMonthsCharges.data?.length > 0 ? (
                 <div>
                     <VerticalBarChart charges={thisMonthsCharges?.data} />
