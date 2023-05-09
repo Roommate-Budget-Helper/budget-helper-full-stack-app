@@ -31,7 +31,7 @@ const HomesPage: NextPage = () => {
     const selectedHome = useHomeContext((s) => s.selectedHome);
     const setSelectedHome = useHomeContext((s) => s.setSelectedHome);
     const refetchHomes = useHomeContext((s) => s.refetchHomes);
-    
+   
     const deleteHome = trpc.useMutation(["home.deleteHome"]);
     const leaveHome = trpc.useMutation(["occupies.removeUserFromHome"]);
     const inviteRoommate = trpc.useMutation(["invite.sendInvitation"]);
@@ -279,13 +279,13 @@ const HomesPage: NextPage = () => {
                 </Modal.Header>
                 <form onSubmit={handleUpdatePermission}>
                 <Modal.Body>
-                    <p>User: <select name="User">
+                    <div>User: <select name="User">
                         {occupants?.map(occupant => (
                         <option 
                             key={occupant.user.id} 
                             value={occupant.user.id}
                          >{occupant.user.name}</option>))}
-                    </select></p>
+                    </select></div>
                     {Object.values(Permission).map(permission => (
                         <div key={permission}>
                             <input

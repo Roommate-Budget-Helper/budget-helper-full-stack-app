@@ -8,6 +8,7 @@ import Image from "next/image";
 import { trpc } from "utils/trpc";
 import { useRef } from "react";
 import { useState } from "react";
+import LoadingSpinner from "@components/loadingspinner";
 
 
 const UserPage: NextPage = () => {
@@ -17,7 +18,7 @@ const UserPage: NextPage = () => {
     const setProfileImage = trpc.useMutation(["user.setProfileImage"]);
     const {data: profileImageURL, refetch: refetchProfileImage}= trpc.useQuery(["user.getProfileImage"]);
     const setPaymentMethods = trpc.useMutation(["user.setPaymentMethods"]);
-    const {data: paymentMethods, refetch: refetchPaymentMethods} = trpc.useQuery(["user.getPaymentMethods"]);
+    const {data: paymentMethods, refetch: refetchPaymentMethods, isLoading: paymentMethodsLoading} = trpc.useQuery(["user.getPaymentMethods"]);
     const logOut = () => {
         signOut();
     };
@@ -119,7 +120,8 @@ const UserPage: NextPage = () => {
                             <h3 className="text-xl font-bold text-evergreen-100">
                                 Set Payment Methods
                             </h3>
-                            {paymentMethods &&
+                            {!paymentMethodsLoading &&
+                                paymentMethods &&
                                 [0, 1, 2].map((i) => {
                                     const paymentMethod =
                                         paymentMethods.paymentMethods[i];
@@ -141,6 +143,7 @@ const UserPage: NextPage = () => {
                                         />
                                     );
                                 })}
+                            {paymentMethodsLoading && <LoadingSpinner />}
                             <Button
                                 classNames="bg-evergreen-80 text-dorian"
                                 value="Update Payment"
