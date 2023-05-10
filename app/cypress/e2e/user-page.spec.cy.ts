@@ -1,5 +1,5 @@
 import { generateUsername } from "unique-username-generator";
-import { registerUser } from "./login-registration.spec.cy";
+import { registerUser, loginUser } from "./login-registration.spec.cy";
 import "cypress-file-upload";
 
 const successUsername = generateUsername();
@@ -12,6 +12,8 @@ describe("User Tests", () => {
     });
 
     beforeEach(() => {
+        cy.visit("http://localhost:3000/login");
+        loginUser(successUsername, successPassword);
         cy.visit("http://localhost:3000/user");
     });
 
@@ -22,9 +24,8 @@ describe("User Tests", () => {
     // TODO: Add waits to get the payment methods
     it("Set payment method", () => {
         const paymentMethod1 = "https://venmo.com/?txn=pay&audience=friends";
-        cy.contains("input[name=paymentMethod1]");
         cy.get("input[name=paymentMethod1]").type(paymentMethod1);
-        cy.get("button[value=Update Payment]").click();
+        cy.get("button[value='Update Payment']").click();
         cy.reload();
         cy.get("input[name=paymentMethod1]").should(
             "have.value",
@@ -33,9 +34,8 @@ describe("User Tests", () => {
     });
 
     it("Upload image, successful PNG", () => {
-        cy.contains("input[name=image]");
         cy.fixture("sample_profile_picture_success.png").then((fileContent) => {
-            cy.get('input[type="image"]').attachFile({
+            cy.get('input[name="image"]').attachFile({
                 fileContent: fileContent.toString(),
                 fileName: "sample_profile_picture_success.png",
                 mimeType: "image/png",
@@ -45,9 +45,8 @@ describe("User Tests", () => {
     });
 
     it("Upload image, successful JPG", () => {
-        cy.contains("input[name=image]");
         cy.fixture("sample_profile_picture_success.jpg").then((fileContent) => {
-            cy.get('input[type="image"]').attachFile({
+            cy.get('input[name="image"]').attachFile({
                 fileContent: fileContent.toString(),
                 fileName: "sample_profile_picture_success.jpg",
                 mimeType: "image/jpg",
@@ -57,12 +56,11 @@ describe("User Tests", () => {
     });
 
     it("Upload image, image too big", () => {
-        cy.contains("input[name=image]");
-        cy.fixture("sample_profile_picture_too_large.jpg").then(
+        cy.fixture("sample_profile_picture_image_too_large.jpg").then(
             (fileContent) => {
-                cy.get('input[type="image"]').attachFile({
+                cy.get('input[name="image"]').attachFile({
                     fileContent: fileContent.toString(),
-                    fileName: "sample_profile_picture_too_large.jpg",
+                    fileName: "sample_profile_picture_image_too_large.jpg",
                     mimeType: "image/jpg",
                 });
             }
@@ -72,7 +70,7 @@ describe("User Tests", () => {
     });
 
     it("Sign out", () => {
-        cy.get("button[value=Sign Out]").click();
+        cy.get("button[value='Sign Out']").click();
         cy.location("pathname").should("eq", "/login")
         // TODO: Verify that it redirects pages
     });
