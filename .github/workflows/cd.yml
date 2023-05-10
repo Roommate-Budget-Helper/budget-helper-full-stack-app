@@ -19,10 +19,14 @@ jobs:
   deploy:
     name: Deploy RBH
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./app
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Build container image
         run: docker build -t rbh-app .
-        working-directory: ./app
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
