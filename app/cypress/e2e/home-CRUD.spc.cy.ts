@@ -1,7 +1,6 @@
 import { generateUsername } from "unique-username-generator";
 import { loginUser, registerUser } from "./login-registration.spec.cy";
 
-// TODO: Put a tag on the error messages so we can check if there are the proper error messages being displayed.
 describe("Home CRUD Test", () => {
     const usernameForTest = generateUsername();
     const password = "123Test!";
@@ -34,8 +33,6 @@ describe("Home CRUD Test", () => {
         cy.url().should("include", "/createhome");
     });
 
-    // TODO: Add more navbar tests from the home page
-
     // Test create home page
 
     const homeName = generateUsername();
@@ -44,7 +41,6 @@ describe("Home CRUD Test", () => {
     const address = generateUsername();
 
     it("Can generate a new Home", () => {
-        // cy.get('div > #createHome').click();
         cy.visit("http://localhost:3000/createhome");
         cy.get("input[name=image]").attachFile(image);
         cy.get("input[name=name]").type(homeName);
@@ -89,11 +85,11 @@ describe("Home CRUD Test", () => {
       cy.get("input[name=address]").type(address2);
       cy.get("button[type=submit]").click();
 
-      // Check if we get an error. If so, test passes
+      cy.contains("The home name must be short, it cannot be greater than 32 characters.");
 
     });
 
-    it("Will fail creation on no image input", () => {
+    it("Will pass creation on no image input", () => {
       const homeName2 = generateUsername();
       const address2 = generateUsername();
       
@@ -102,17 +98,15 @@ describe("Home CRUD Test", () => {
       cy.get("input[name=address]").type(address2);
       cy.get("button[type=submit]").click();
 
-      // Check if we get an error. If so, test passes
+      cy.wait(500).contains(homeName2);
 
     });
 
     it("Will fail creation on no text inputs", () => {
       cy.visit("http://localhost:3000/createhome");
-    //   cy.get("input[name=name]").type("");
-    //   cy.get("input[name=address]").type("");
       cy.get("button[type=submit]").click();
 
-      // Check if we get an error. If so, test passes
+      cy.contains("The home must have a name, it cannot be empty.");
 
     });
 
@@ -134,9 +128,8 @@ describe("Home CRUD Test", () => {
         cy.get("input[name=name]").type(homeName2);
         cy.get("input[name=address]").type(address2);
         cy.get("button[type=submit]").click();
-        cy.contains(homeName2);
 
-        // Check if we get an error. If so, test passes
+        cy.contains("You already have a home with these same specs!");
 
     });
 
