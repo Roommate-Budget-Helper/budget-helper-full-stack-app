@@ -108,8 +108,8 @@ describe("Home CRUD Test", () => {
 
     it("Will fail creation on no text inputs", () => {
       cy.visit("http://localhost:3000/createhome");
-      cy.get("input[name=name]").type("");
-      cy.get("input[name=address]").type("");
+    //   cy.get("input[name=name]").type("");
+    //   cy.get("input[name=address]").type("");
       cy.get("button[type=submit]").click();
 
       // Check if we get an error. If so, test passes
