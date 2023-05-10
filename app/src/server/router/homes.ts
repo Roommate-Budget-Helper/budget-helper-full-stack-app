@@ -83,6 +83,9 @@ export const homesRouter = createProtectedRouter()
             if(!(await hasPermission(ctx.session.user.id, input.id, Permission.Edit, ctx.prisma)) ||
                !(await canUserViewHome(ctx.session.user.id,input.id, ctx.prisma)))
                 return;
+            if(await homeAlreadyExists(input.name, input.address, ctx.prisma)) {
+                return "bad";
+            }
             return await ctx.prisma.home.update({
                 where: {
                     id: input.id,

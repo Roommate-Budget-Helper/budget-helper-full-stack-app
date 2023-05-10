@@ -1,6 +1,22 @@
 import { generateUsername } from "unique-username-generator";
 import { loginUser, registerUser } from "./login-registration.spec.cy";
 
+export const createAHome = (image, homeName, address) =>{
+    cy.visit("http://localhost:3000/createhome");
+    cy.get("input[name=image]").attachFile(image);
+    cy.get("input[name=name]").type(homeName);
+    cy.get("input[name=address]").type(address);
+    cy.get("button[type=submit]").click();
+    cy.contains(homeName);
+}
+
+export const viewAHome = (homeCheck, homeName, address) => {
+    cy.get("div > #Home").wait(500).click();
+    cy.get(homeCheck).click();
+    cy.contains(homeName);
+    cy.contains(address);
+}
+
 describe("Home CRUD Test", () => {
     const usernameForTest = generateUsername();
     const password = "123Test!";
@@ -41,21 +57,13 @@ describe("Home CRUD Test", () => {
     const address = generateUsername();
 
     it("Can generate a new Home", () => {
-        cy.visit("http://localhost:3000/createhome");
-        cy.get("input[name=image]").attachFile(image);
-        cy.get("input[name=name]").type(homeName);
-        cy.get("input[name=address]").type(address);
-        cy.get("button[type=submit]").click();
-        cy.contains(homeName);
+        createAHome(image,homeName,address);
     });
 
     const homeCheck = "div > #" + homeName;
 
     it("Can view the created home", () => {
-        cy.get("div > #Home").wait(500).click();
-        cy.get(homeCheck).click();
-        cy.contains(homeName);
-        cy.contains(address);
+        viewAHome(homeCheck, homeName, address);
     });
 
     it('Will allow creation of multiple homes', () => {
@@ -64,11 +72,7 @@ describe("Home CRUD Test", () => {
       const image2 = "/images/logo.png";
       const address2 = generateUsername();
 
-      cy.visit("http://localhost:3000/createhome");
-      cy.get("input[name=image]").attachFile(image2);
-      cy.get("input[name=name]").type(homeName2);
-      cy.get("input[name=address]").type(address2);
-      cy.get("button[type=submit]").click();
+      createAHome(image2, homeName2, address2);
 
     });
 
@@ -115,12 +119,7 @@ describe("Home CRUD Test", () => {
         const image2 = "/images/logo.png";
         const address2 = generateUsername();
 
-        cy.visit("http://localhost:3000/createhome");
-        cy.get("input[name=image]").attachFile(image2);
-        cy.get("input[name=name]").type(homeName2);
-        cy.get("input[name=address]").type(address2);
-        cy.get("button[type=submit]").click();
-        cy.contains(homeName2);
+        createAHome(image2, homeName2, address2);
 
         // create a second home with the same info
         cy.visit("http://localhost:3000/createhome");

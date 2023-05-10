@@ -32,6 +32,10 @@ const UpdatePage: NextPage = () => {
         },
         onSuccess: async (home) => {
             if(!home) return;
+            if(home === "bad") {
+                setError("You already have a home with these same specs!");
+                return;
+            }
             await refetchHomes();
             setSelectedHome(home.id);
             router.push("/homes");
@@ -80,13 +84,25 @@ const UpdatePage: NextPage = () => {
         const name = form.elements["name"].value;
         const address = form.elements["address"].value;
 
+        if(name.trim().length < 1) {
+            setError("The home must have a name, it cannot be empty.");
+            return;
+        }
+        if(name.trim().length < 1) {
+            setError("The home must have an address, it cannot be empty.");
+            return;
+        }
+        if(name.trim().length > 32) {
+            setError("The home name must be short, it cannot be greater than 32 characters.");
+            return;
+        }
+
         await updateHome.mutateAsync({
             id: homeData.id,
             image: key,
             name: name,
             address: address,
         });
-        setError(null);
     };
 
     return (
