@@ -8,7 +8,7 @@ const successPassword = "Abc@12345";
 export const signoutOfApplication = () => {
     cy.visit("http://localhost:3000/user");
     cy.get("button[value='Sign Out']").click();
-    cy.location("pathname").should("eq", "/login");
+    cy.wait(500).location("pathname").should("eq", "/login");
 };
 
 describe("User Tests", () => {
