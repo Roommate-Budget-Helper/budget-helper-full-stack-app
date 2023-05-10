@@ -5,11 +5,11 @@ import { createAHome, viewAHome } from "./home-CRUD.spec.cy";
 describe("Home Maintenance Test", () => {
     const usernameForTest = generateUsername();
     const password = "123Test!";
-    let homeName = generateUsername();
+    const homeName = generateUsername();
     //give an image
     const image = "/images/logo.png";
-    let address = generateUsername();
-    let homeCheck = "div > #" + homeName;
+    const address = generateUsername();
+    const homeCheck = "div > #" + homeName;
 
     // Register once, Login each test
     before(() => {
