@@ -5,6 +5,12 @@ import "cypress-file-upload";
 const successUsername = generateUsername();
 const successPassword = "Abc@12345";
 
+export const signoutOfApplication = () => {
+    cy.visit("http://localhost:3000/user");
+    cy.get("button[value='Sign Out']").click();
+    cy.location("pathname").should("eq", "/login");
+};
+
 describe("User Tests", () => {
     before(() => {
         cy.visit("http://localhost:3000/register");
@@ -70,8 +76,7 @@ describe("User Tests", () => {
     });
 
     it("Sign out", () => {
-        cy.get("button[value='Sign Out']").click();
-        cy.location("pathname").should("eq", "/login")
+        signoutOfApplication();
         // TODO: Verify that it redirects pages
     });
 });
