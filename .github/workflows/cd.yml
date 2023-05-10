@@ -12,9 +12,6 @@ env:
   GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
   GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET}}
   S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
-  TF_VAR_GOOGLE_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET}}
-  TF_VAR_GOOGLE_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-  TF_VAR_url: ${{ secrets.URL }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
@@ -32,14 +29,6 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-      - name: Terraform Init
-        run: terraform init
-      - name: Terraform Plan
-        run: terraform plan
-      - name: Terraform apply
-        run: terraform apply -auto-approve
       - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1

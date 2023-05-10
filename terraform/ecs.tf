@@ -101,3 +101,6 @@ resource "aws_ecs_service" "rbh-web" {
   desired_count   = 1
 }
 
+output "NEXTAUTH_SECRET" {
+  value = random_password.next-auth-secret.result
+}
