@@ -2,6 +2,7 @@
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.245.2/containers/typescript-node
 {
 	"name": "Node.js & TypeScript",
+	"appPort": [3000],
 	"build": {
 		"dockerfile": "Dockerfile",
 		// Update 'VARIANT' to pick a Node version: 18, 16, 14.
@@ -30,7 +31,8 @@
 				"WillLuke.nextjs",
 				"Prisma.prisma",
 				"esbenp.prettier-vscode",
-				"ms-azuretools.vscode-docker"
+				"ms-azuretools.vscode-docker",
+				"hashicorp.terraform"
 			]
 		}
 	},

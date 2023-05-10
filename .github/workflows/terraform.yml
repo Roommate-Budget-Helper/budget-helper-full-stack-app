@@ -1,0 +1,65 @@
+name: Terraform Infrastructure
+on:
+  workflow_dispatch:
+env:
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET}}
+  NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
+  COGNITO_CLIENT_ID: ${{ secrets.COGNITO_CLIENT_ID }}
+  COGNITO_USER_POOL: ${{ secrets.COGNITO_USER_POOL }}
+  GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+  GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET}}
+  S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+  TF_VAR_GOOGLE_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET}}
+  TF_VAR_GOOGLE_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+  TF_VAR_url: ${{ secrets.URL }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    name: "Create infrastructure"
+    steps:
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+      - name: Terraform Init
+        run: terraform init
+      - name: Terraform Plan
+        run: terraform plan
+      - name: Terraform apply
+        run: terraform apply -auto-approve
+      - name: Update environment variables
+        run: |
+          export DATABASE_URL=$(terraform output DATABASE_URL)
+          export COGNITO_CLIENT_ID=$(terraform output COGNITO_CLIENT_ID)
+          export COGNITO_USER_POOL=$(terraform output COGNITO_USER_POOL)
+          export NEXTAUTH_SECRET=$(terraform output NEXTAUTH_SECRET)
+      - name: Update DB URL
+        uses: hmanzur/actions-set-secret@v2.0.0
+        with:
+          name: "DATABASE_URL"
+          value: ${{ env.DATABASE_URL }}
+          repository: "Roommate-Budget-Helper/budget-helper-full-stack-app"
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Update Cognito pool
+        uses: hmanzur/actions-set-secret@v2.0.0
+        with:
+          name: "COGNITO_USER_POOL"
+          value: ${{ env.COGNITO_USER_POOL }}
+          repository: "Roommate-Budget-Helper/budget-helper-full-stack-app"
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Update Cognito ID
+        uses: hmanzur/actions-set-secret@v2.0.0
+        with:
+          name: "COGNITO_CLIENT_ID"
+          value: ${{ env.COGNITO_CLIENT_ID }}
+          repository: "Roommate-Budget-Helper/budget-helper-full-stack-app"
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Update NEXTAUTH_SECRET
+        uses: hmanzur/actions-set-secret@v2.0.0
+        with:
+          name: "NEXTAUTH_SECRET"
+          value: ${{ env.NEXTAUTH_SECRET }}
+          repository: "Roommate-Budget-Helper/budget-helper-full-stack-app"
+          token: ${{ secrets.GITHUB_TOKEN }}
