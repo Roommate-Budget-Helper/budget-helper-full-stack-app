@@ -13,6 +13,12 @@ resource "aws_cognito_user_pool" "rbh-cognito" {
     require_uppercase                = true
     temporary_password_validity_days = 3
   }
+  account_recovery_setting {
+    recovery_mechanism {
+      name     = "verified_email"
+      priority = 1
+    }
+  }
 }
 
 

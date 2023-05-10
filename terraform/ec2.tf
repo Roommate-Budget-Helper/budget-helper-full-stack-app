@@ -61,6 +61,7 @@ resource "aws_security_group_rule" "outbound-all" {
   protocol          = "all"
   from_port         = 0
   to_port           = 65535
+  cidr_blocks       = ["0.0.0.0/0"]
   description       = "All outbound traffic"
 }
 

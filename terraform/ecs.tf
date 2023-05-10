@@ -58,22 +58,6 @@ resource "aws_ecs_task_definition" "task" {
   )
 }
 
-resource "aws_iam_role" "ecs" {
-  name                = "ecsTaskExecutionRole"
-  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonRDSFullAccess", "arn:aws:iam::aws:policy/AmazonSESFullAccess", "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"]
-  assume_role_policy = jsonencode({
-    Version = "2008-10-17"
-    Statement = [{
-      Sid    = "",
-      Effect = "Allow"
-      Principal = {
-        Service = "ecs-tasks.amazonaws.com"
-      }
-      Action = ["sts:AssumeRole", aws_iam_policy.s3_partial.arn]
-    }]
-  })
-}
-
 
 resource "aws_iam_policy" "s3_partial" {
   name = "S3PartialAccess"
@@ -94,6 +78,23 @@ resource "aws_iam_policy" "s3_partial" {
   })
 }
 
+
+resource "aws_iam_role" "ecs" {
+  name                = "ecsTaskExecutionRole"
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonRDSFullAccess", "arn:aws:iam::aws:policy/AmazonSESFullAccess", "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy", aws_iam_policy.s3_partial.arn]
+  assume_role_policy = jsonencode({
+    Version = "2008-10-17"
+    Statement = [{
+      Sid    = "",
+      Effect = "Allow"
+      Principal = {
+        Service = "ecs-tasks.amazonaws.com"
+      }
+      Action = ["sts:AssumeRole"]
+    }]
+  })
+}
+
 resource "aws_ecs_service" "rbh-web" {
   name            = "rbh-web"
   cluster         = aws_ecs_cluster.web-cluster.id
@@ -102,5 +103,6 @@ resource "aws_ecs_service" "rbh-web" {
 }
 
 output "NEXTAUTH_SECRET" {
-  value = random_password.next-auth-secret.result
+  value     = random_password.next-auth-secret.result
+  sensitive = true
 }
