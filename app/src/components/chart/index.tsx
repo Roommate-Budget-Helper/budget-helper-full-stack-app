@@ -3,8 +3,8 @@ import { Doughnut } from "react-chartjs-2";
 import { Bar } from "react-chartjs-2";
 import { trpc } from "../../utils/trpc";
 import { Charge } from "@prisma/client";
-import React from "react";
 import LoadingSpinner from "@components/loadingspinner";
+import React, { useEffect } from "react";
 
 ChartJS.register(
     ArcElement,
@@ -109,7 +109,11 @@ export const ChartComponent = (props: { home: string }) => {
     const thisMonthsCharges = trpc.useQuery([
         "bill.getChargesThisMonth",
         { homeId: props.home },
-    ]);
+    ], { enabled: false } );
+
+    useEffect(() => {
+        thisMonthsCharges.refetch();
+    }, [props.home]); 
 
     return (
         <div>
