@@ -5,12 +5,14 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import { trpc } from "utils/trpc";
 import { signIn } from 'next-auth/react';
+import { useHomeContext } from "stores/HomeStore";
 
 const RegisterPage: NextPage = () => {
     const [registered, setRegistered] = useState<boolean>(false);
     const [registeredUsername, setRegisteredUsername] = useState<string | null>(null);
     const [registeredPassword, setRegisteredPassword] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const clearSelectedHome = useHomeContext((s) => s.clearSelectedHome);
     const createUser = trpc.useMutation(["auth.createUser"], {
         onError: (error) => {
             setError(error.message);
@@ -20,17 +22,16 @@ const RegisterPage: NextPage = () => {
             setRegistered(true);
             setRegisteredUsername(username);
             setRegisteredPassword(password);
-            // Login the user
-            // signIn("credentials", {});
+            setError(null);
         },
     });
     const verifyEmail = trpc.useMutation(["auth.verifyEmailCode"], {
-        // onError: (error) => {
-        //     console.error(error);
-        // },
-        // onSuccess: () => {
-        //     console.log("User verified")
-        // }
+        onError: (error) => {
+          setError(error.message);
+        },
+        onSuccess: () => {
+          setError(null);
+        }
     })
 
     const onRegister = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -45,8 +46,6 @@ const RegisterPage: NextPage = () => {
             return;
         }
 
-        // TODO: Handle errors that come from the server when creating a user account with trpc
-        // ex. username already exists, email already exists, password not long enough, etc.
         createUser.mutate({
             email,
             username,
@@ -58,19 +57,26 @@ const RegisterPage: NextPage = () => {
         event.preventDefault();
         const form = event.target as HTMLFormElement;
         const verification = form.elements["verification-code"].value;
+
         if(!registeredUsername){
             return;
         }
+
         verifyEmail.mutate({
             code: verification,
             username: registeredUsername
         })
 
+        if(error){
+          return;
+        }
+
         await signIn("credentials", {
             username: registeredUsername,
             password: registeredPassword,
             redirect: false
-        })
+        });
+        clearSelectedHome();
     };
 
     if(registered){
@@ -90,6 +96,11 @@ const RegisterPage: NextPage = () => {
                     <p className="text-xl py-4 font-light">
                         Enter the verification code that we sent to your email below
                     </p>
+                    {error && (
+                        <p className="text-xl font-light text-red-600">
+                            Something went wrong! {error}
+                        </p>
+                    )}
                 </div>
             <form method="post" onSubmit={onVerify} className='grid grid-rows-2 gap-4 place-content-center'>
                 <FieldInput
@@ -127,7 +138,7 @@ const RegisterPage: NextPage = () => {
                         account!
                     </p>
                 </div>
-                {error !== null && (
+                {error && (
                     <p className="text-xl font-light text-red-600">
                         Something went wrong! {error}
                     </p>

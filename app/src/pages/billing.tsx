@@ -6,15 +6,16 @@ import Button from "@components/button";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import LoadingSpinner from "@components/loadingspinner";
 
 const BillingPage: NextPage = () => {
     const router = useRouter();
     const [error, setError] = useState<string | null>(null);
-    const { data: unpaidCharges, refetch: refetchUnpaidCharges } = trpc.useQuery([
+    const { data: unpaidCharges, refetch: refetchUnpaidCharges, isLoading: unpaidChargesLoading } = trpc.useQuery([
         "bill.getUnpaidCharges",
     ]);
 
-    const { data: unconfirmedCharges, refetch: refetchUnconfirmedCharges } = trpc.useQuery([
+    const { data: unconfirmedCharges, refetch: refetchUnconfirmedCharges, isLoading: unconfirmedChargesLoading } = trpc.useQuery([
         "bill.getUnconfirmedCharges",
     ]);
 
@@ -69,7 +70,8 @@ const BillingPage: NextPage = () => {
                         <h2 className="text-3xl mt-5 font-bold text-evergreen-100">
                             Charges to Pay
                         </h2>
-                        {unpaidCharges && unpaidCharges.length > 0 ? (
+                        { unpaidChargesLoading && <LoadingSpinner/> }
+                        {!unpaidChargesLoading && unpaidCharges && unpaidCharges.length > 0 ? (
                             <div>
                                 {unpaidCharges.map((charge) => (
                                     <div
@@ -80,6 +82,7 @@ const BillingPage: NextPage = () => {
                                             <div className="rounded-full bg-evergreen-80 w-24 h-24 flex items-center flex-col justify-center">
                                                 {charge.chargeUser.image ? (
                                                     <Image
+                                                    className="rounded-full"
                                                         src={
                                                             charge.chargeUser
                                                                 .image
@@ -88,8 +91,8 @@ const BillingPage: NextPage = () => {
                                                             charge.chargeUser
                                                                 .name
                                                         }
-                                                        width="64px"
-                                                        height="64px"
+                                                        width="96px"
+                                                        height="96px"
                                                     />
                                                 ) : (
                                                     <p>
@@ -141,7 +144,8 @@ const BillingPage: NextPage = () => {
                         <h2 className="text-3xl mt-5 font-bold text-evergreen-100">
                             Charges to Confirm
                         </h2>
-                        {unconfirmedCharges && unconfirmedCharges.length > 0 ? (
+                        { unconfirmedChargesLoading && <LoadingSpinner/> }
+                        {!unconfirmedChargesLoading && unconfirmedCharges && unconfirmedCharges.length > 0 ? (
                             <div>
                                 {unconfirmedCharges.map((charge) => (
                                     <div

@@ -45,10 +45,19 @@ const CreationPage: NextPage = () => {
         }
 
         const fileList = fileRef.current?.files
-        if(!fileList){
+        if(!fileList){ // Image is not required
+            await createHome.mutateAsync({
+                name: nameVal,
+                address: addressVal,
+            });
             return;
         }
+
         const imageFile = fileList[0];
+        if(imageFile && imageFile.size > 1000000){
+            setError("The image file is too large, it must be less than 1MB.");
+            return;
+        }
         let key = null;
         if(imageFile){
             const { url, fields } = await getPresignedURL.mutateAsync(imageFile.name);
@@ -73,6 +82,7 @@ const CreationPage: NextPage = () => {
             name: nameVal,
             address: addressVal,
         });
+        setError(null);
     };
 
     return (

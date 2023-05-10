@@ -1,6 +1,6 @@
 import { createProtectedRouter } from "./context";
 import { z } from "zod";
-import { getHomesByUserId, canUserViewHome } from "../db/HomeService";
+import { canUserViewHome } from "../db/HomeService";
 import { getSignedImage } from "./image-upload";
 import { hasPermission } from "../db/UserService";
 import { Permission } from "../../types/permissions";
@@ -49,32 +49,6 @@ export const homesRouter = createProtectedRouter()
                 home.image = homeImage.image;
             }
             return homes;
-        },
-    })
-    .query("getHomeById", {
-        input: z.object({
-            homeId: z.string(),
-        }),
-        async resolve({ctx, input}) {
-            if(!ctx.session.user || !(await canUserViewHome(ctx.session.user.id, input.homeId, ctx.prisma))){
-                return;
-            }            
-            const home = await ctx.prisma.home.findFirst({
-                select: {
-                    id:true,
-                    name: true,
-                    image: true,
-                    address: true,
-                },
-                where: {
-                    id: {
-                        in: input.homeId,
-                    },
-                },
-            });
-            if(!home) return;
-            if(home.image) home.image = await getSignedImage(home.image);
-            return home;
         },
     })
     .mutation("createHome", {
@@ -149,6 +123,11 @@ export const homesRouter = createProtectedRouter()
                     homeId: input.id,
                 }
             }); 
+            await ctx.prisma.permission.deleteMany({
+                where: {
+                    occupiesHomeId: input.id,
+                }
+            })
             return await ctx.prisma.home.delete({
                 where: {
                     id: input.id,

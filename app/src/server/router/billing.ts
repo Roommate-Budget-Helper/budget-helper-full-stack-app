@@ -2,6 +2,7 @@ import { canUserViewHome } from "../db/HomeService";
 import { canUserPayCharge, canUserConfirmCharge, handleSendChargeEmail } from "../db/ChargeService";
 import { z } from "zod";
 import { createProtectedRouter } from "./context";
+import { getSignedImage } from "./image-upload";
 
 export const billingRouter = createProtectedRouter()
 .mutation("sendCharge",
@@ -13,7 +14,8 @@ export const billingRouter = createProtectedRouter()
         amountBeforeSplit: z.string(),
         amount: z.string(),
         due: z.date(),
-        comment: z.string()
+        comment: z.string(),
+        category: z.string(),
     }),
     async resolve({ ctx, input }){
         if(!await canUserViewHome(ctx.session.user.id, input.homeId, ctx.prisma)) return;
@@ -28,7 +30,8 @@ export const billingRouter = createProtectedRouter()
                 created: new Date(),
                 dueDate: input.due,
                 paid: false,
-                confirmed: false
+                confirmed: false,
+                category: input.category,
             }
         });
 
@@ -81,7 +84,7 @@ export const billingRouter = createProtectedRouter()
     async resolve({ ctx }){
         if(!ctx.session.user.email) return;
 
-        return await ctx.prisma.charge.findMany({
+        const charges =  await ctx.prisma.charge.findMany({
             select: {
                 chargeId: true,
                 home: true,
@@ -104,14 +107,20 @@ export const billingRouter = createProtectedRouter()
                 paid: false
             }
         });
-        
+        // get signed image urls
+        for(const charge of charges){
+            if(charge.chargeUser.image){
+                charge.chargeUser.image = await getSignedImage(charge.chargeUser.image);
+            }
+        }
+        return charges;
     }
 })
 .query("getUnconfirmedCharges", { 
     async resolve({ ctx }){
         if(!ctx.session.user.email) return;
 
-        return await ctx.prisma.charge.findMany({
+        const charges = await ctx.prisma.charge.findMany({
             select: {
                 chargeId: true,
                 home: true,
@@ -136,5 +145,81 @@ export const billingRouter = createProtectedRouter()
                 confirmed: false,
             }
         });
+        // get signed image urls
+        for(const charge of charges){
+            if(charge.receiveUser.image){
+                charge.receiveUser.image = await getSignedImage(charge.receiveUser.image);
+            }
+        }
+        return charges;
     }
-})
+}).query("getChargesThisMonth", {
+    input: z.object({
+        homeId: z.string()
+    }),
+    async resolve({ ctx, input }){
+        return await ctx.prisma.charge.findMany({
+            where: {
+                chargerId: ctx.session.user.id,
+                homeId: input.homeId,
+                created: {
+                    gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+                    lte: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)
+                }
+            }
+        });
+
+    }
+}).query("getChargesHistory", {
+    async resolve({ ctx }){
+        const charges = await ctx.prisma.charge.findMany({
+            where: {
+                OR: [
+                    {
+                        chargerId: ctx.session.user.id,
+                    },
+                    {
+                        receiverId: ctx.session.user.id,
+                    },
+                ],
+            },
+            select: {
+                chargeId: true,
+                home: true,
+                amountBeforeSplit: true,
+                amount: true,
+                dueDate: true,
+                created: true,
+                category: true,
+                paid: true,
+                confirmed: true,
+                chargerId: true,
+                chargeUser: {
+                    // charger data
+                    select: {
+                        name: true,
+                        image: true,
+                    },
+                },
+                receiverId: true,
+                receiveUser: {
+                    // receiver data
+                    select: {
+                        name: true,
+                        image: true,
+                    },
+                },
+                paidDate: true,
+                comment: true,
+            },
+        });
+        for(const charge of charges){
+            if(charge.chargeUser.image){
+                charge.chargeUser.image = await getSignedImage(charge.chargeUser.image);
+            }
+            if(charge.receiveUser.image){
+                charge.receiveUser.image = await getSignedImage(charge.receiveUser.image);
+            }
+        }
+        return charges;
+    }})

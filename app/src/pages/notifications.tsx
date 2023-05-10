@@ -5,10 +5,11 @@ import { trpc } from "utils/trpc";
 import Image from "next/image";
 import Button from "@components/button";
 import { useHomeContext } from "@stores/HomeStore";
+import LoadingSpinner from "@components/loadingspinner";
 
 const NotificationsPage: NextPage = () => {
     
-    const { data: invitations, refetch: refetchInvitations } = trpc.useQuery(["invite.getInvitations"]);
+    const { data: invitations, refetch: refetchInvitations, isLoading: invitationsLoading } = trpc.useQuery(["invite.getInvitations"]);
     
     const acceptInvite = trpc.useMutation(["invite.acceptInvitation"]);
     const refetchHomes = useHomeContext(home => home.refetchHomes);
@@ -37,7 +38,7 @@ const NotificationsPage: NextPage = () => {
                     <h2 className="my-2 font-bold text-evergreen-100">
                         Invitations
                     </h2>
-                    {invitations && invitations.length > 0 ? (
+                    {!invitationsLoading && invitations && invitations.length > 0 ? (
                         <div>
                             {invitations.map((home) => (
                                 <div
@@ -78,6 +79,7 @@ const NotificationsPage: NextPage = () => {
                     ) : (
                         <div>You have no invitations.</div>
                     )}
+                    {invitationsLoading && <LoadingSpinner/> }
                     <hr/>
                     <h2 className="my-1 font-bold text-evergreen-100">
                         Reminders
