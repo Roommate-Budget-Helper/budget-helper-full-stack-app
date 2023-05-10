@@ -4,10 +4,11 @@ import Navbar from '@components/navbar'
 import { trpc } from 'utils/trpc'
 import Image from 'next/image'
 import { useSession } from 'next-auth/react'
+import LoadingSpinner, { LoadingPage } from '@components/loadingspinner'
 
 const HistoryPage: NextPage = () => {
     const session = useSession();
-    const {data: chargeHistory, refetch: refetchChargeHistory} = trpc.useQuery([
+    const {data: chargeHistory, isLoading} = trpc.useQuery([
         "bill.getChargesHistory",
     ]);
 
@@ -27,7 +28,7 @@ const HistoryPage: NextPage = () => {
                 </h1>
                 <div className="sm:w-88 lg:w-[32rem]">
                     <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
-                    {chargeHistory?.map((charge) =>
+                    {!isLoading && chargeHistory?.map((charge) =>
                         charge.chargerId === session.data?.user?.id ? (
                             // Payment
                             <div
@@ -199,6 +200,7 @@ const HistoryPage: NextPage = () => {
                             </div>
                         )
                     )}
+                    {isLoading && <LoadingSpinner />}
                 </div>
             </div>
         </>
