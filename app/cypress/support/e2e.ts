@@ -33,3 +33,7 @@ Cypress.Commands.add("waitForEmail", (inboxId: string) => {
     return mailslurp.waitForLatestEmail(inboxId, timeout);
 });
 
+Cypress.Commands.add("deleteEmail", (emailId: string) => {
+       return mailslurp.deleteEmail(emailId);
+   });
+

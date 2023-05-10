@@ -1,16 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 
-export const getHomesByUserId = async (id: string, db: PrismaClient): Promise<string[]> => {
-    return (await db.occupies.findMany({
-        select: {
-            homeId: true,
-        },
-        where: {
-            userId:id,
-        },
-    })).map(homeObj => homeObj.homeId);
-}
-
 export const canUserViewHome = async (id: string, homeId: string, db: PrismaClient) => {
     return !!(await db.occupies.findFirst({
         select: {
@@ -21,4 +10,31 @@ export const canUserViewHome = async (id: string, homeId: string, db: PrismaClie
             userId: id
         }
     }));
+}
+
+export const userIsInvited = async (email: string, homeId: string, db: PrismaClient) => {
+    return !!(await db.invitation.findFirst({
+        select: {
+            homeId: true,
+        },
+        where: {
+            homeId: homeId,
+            email: email
+        }
+    }))
+}
+
+export const moreThanOneOwner = async (userId:string, homeId: string, db: PrismaClient) => {
+    const homeOwners = await db.permission.findMany({
+        select: {
+            occupiesUserId: true
+        },
+        where: {
+            occupiesHomeId: homeId,
+            name: "OWNER"
+        }
+    })
+    if(homeOwners.length > 1) return true; 
+    if(homeOwners[0]?.occupiesUserId !== userId) return true;
+    return false;
 }

@@ -3,7 +3,6 @@ import Link from "next/link";
 import Icon from '@mdi/react';
 import { mdiCashMultiple, mdiFileDocumentOutline, mdiBellOutline, mdiAccountCircleOutline, mdiPlus } from '@mdi/js';
 import { useHomeContext } from "@stores/HomeStore";
-import { signOut } from 'next-auth/react';
 import { useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import { IconProps } from "@mdi/react/dist/IconProps";
@@ -28,6 +27,7 @@ const Navbar: React.FC = () => {
     const selectedHome = useHomeContext(s => s.selectedHome);
     const homes = useHomeContext(s => s.homes);
     const setSelectedHome = useHomeContext(s => s.setSelectedHome);
+    const clearSelectedHome = useHomeContext((s) => s.clearSelectedHome);
     const [isSelecting, setSelecting] = useState<boolean>(false);
     const onItemClicked = (id: string) => (event: React.MouseEvent) => {
         event.preventDefault();
@@ -40,9 +40,6 @@ const Navbar: React.FC = () => {
         setSelecting(false);
     }
 
-    function signOutAndGoToLogin() {
-        signOut();
-    }
 
     return (
         <div className="overflow-show rounded-b-lg flex">
@@ -51,9 +48,9 @@ const Navbar: React.FC = () => {
                 <WrappedIcon activepath="/billing" currentpath={router.asPath} path={mdiCashMultiple} size="35px" />
             </a>
         </Link>
-        <Link href="#">
+        <Link href="/history">
             <a className={navItemStyle+ " bg-gray-700"}>
-              <Icon path={mdiFileDocumentOutline} size="35px" />
+              <WrappedIcon activepath="/history" currentpath={router.asPath} path={mdiFileDocumentOutline} size="35px" />
             </a>
         </Link>
         <div className="bg-gray-700 relative h-12 w-24">
@@ -67,7 +64,7 @@ const Navbar: React.FC = () => {
                 className="rounded-full bg-slate-300 w-24 h-24 flex items-center justify-center" 
                 onClick={onItemClicked(home.id)}    
             >
-                {home.image ?<Image src={home.image} alt="home icon" width="64px" height="64px" />:<p>{home.name.split(" ").reduce((a,c) => {
+                {home.image ?<Image className="rounded-full" src={home.image} alt="home icon" width="96px" height="96px" />:<p>{home.name.split(" ").reduce((a,c) => {
                     a += c[0];
                     return a;
                 }, "")}</p>}
@@ -88,9 +85,9 @@ const Navbar: React.FC = () => {
                 <WrappedIcon activepath="/notifications" currentpath={router.asPath} path={mdiBellOutline} size="35px" />
             </a>
         </Link>
-        <Link href="/login" >
-            <a onClick={signOutAndGoToLogin} className={navItemStyle+ " bg-gray-700"} >
-                <Icon path={mdiAccountCircleOutline} size="35px" />
+        <Link href="/user" >
+            <a className={navItemStyle+ " bg-gray-700"} >
+                <WrappedIcon activepath="/user" currentpath={router.asPath} path={mdiAccountCircleOutline} size="35px" />
             </a>
         </Link>
     </div>

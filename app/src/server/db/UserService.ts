@@ -13,6 +13,17 @@ export const getUserPermissions = async (user: string, homeId: string, db: Prism
     }))?.permissions;
 }
 
+export const getUserByEmail = async (email: string, db: PrismaClient) => {
+    return (await db.user.findFirst({
+        select: {
+            id: true
+        },
+        where: {
+            email: email
+        }
+    }))
+}
+
 export const hasPermission = async (user: string, homeId: string, permission: Permission, db: PrismaClient) => {
     const conditions = [
         {
@@ -35,4 +46,19 @@ export const hasPermission = async (user: string, homeId: string, permission: Pe
             occupiesHomeId: homeId,
         }
     }))
+}
+
+export const isOwner = async (userId:string, homeId: string, db: PrismaClient) => {
+    const homeOwners = await db.permission.findFirst({
+        select: {
+            occupiesUserId: true
+        },
+        where: {
+            occupiesHomeId: homeId,
+            name: "OWNER",
+            occupiesUserId: userId
+        }
+    })
+    if(homeOwners) return true;
+    return false;
 }

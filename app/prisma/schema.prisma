@@ -39,12 +39,13 @@ model User {
   email          String       @unique
   emailVerified  DateTime?
   image          String?
+  paymentMethods String[]
   accounts       Account[]
-  Occupies       Occupies[]
-  sessions       Session[]
-  Invitation     Invitation[]
   ReceiveCharges Charge[]     @relation("chargeUser")
   SentCharges    Charge[]     @relation("receiveUser")
+  Invitation     Invitation[]
+  Occupies       Occupies[]
+  sessions       Session[]
 }
 
 model Home {
@@ -52,9 +53,9 @@ model Home {
   name       String
   image      String?
   address    String
-  Occupies   Occupies[]
-  Invitation Invitation[]
   Charges    Charge[]
+  Invitation Invitation[]
+  Occupies   Occupies[]
 }
 
 model Occupies {
@@ -90,16 +91,17 @@ model Charge {
   chargerId         String
   receiverId        String
   homeId            String
-  amountBeforeSplit String
   amount            String
+  category          String
   comment           String
   created           DateTime
   dueDate           DateTime
   paid              Boolean
   paidDate          DateTime?
   confirmed         Boolean
-  home              Home      @relation(fields: [homeId], references: [id], onDelete: Cascade)
+  amountBeforeSplit String
   chargeUser        User      @relation("chargeUser", fields: [chargerId], references: [id], onDelete: Cascade)
+  home              Home      @relation(fields: [homeId], references: [id], onDelete: Cascade)
   receiveUser       User      @relation("receiveUser", fields: [receiverId], references: [id], onDelete: Cascade)
 
   @@unique([homeId, receiverId, chargeId])
@@ -108,7 +110,7 @@ model Charge {
 model Permission {
   id             String    @id @default(cuid())
   name           String
-  Occupies       Occupies? @relation(fields: [occupiesUserId, occupiesHomeId], references: [userId, homeId])
   occupiesUserId String?
   occupiesHomeId String?
+  Occupies       Occupies? @relation(fields: [occupiesUserId, occupiesHomeId], references: [userId, homeId])
 }

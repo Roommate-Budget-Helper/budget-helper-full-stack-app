@@ -35,7 +35,8 @@ declare global {
   namespace Cypress {
     interface Chainable {
       createInbox(): Promise<InboxDto>,
-      waitForEmail(inboxId: string): Promise<Email>
+      waitForEmail(inboxId: string): Promise<Email>,
+      deleteEmail(emailId: string): Promise<void>
     }
   }
 }

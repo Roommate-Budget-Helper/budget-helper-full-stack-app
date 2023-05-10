@@ -10,7 +10,7 @@ interface ButtonProps {
 const Button: React.FC<Partial<ButtonProps>> = (props) => {
     return (
     <button
-        className={`${props.classNames ?? ""} py-2 px-10 w-96 rounded-xl text-xl`}
+        className={`${props.classNames ?? ""} py-2 px-10 w-88 rounded-xl text-xl`}
         value={props.value}
         type={props.type}
         onClick={props.onClick}>
