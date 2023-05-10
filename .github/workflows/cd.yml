@@ -49,7 +49,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
       - name: Tag docker image
         env:
-          ECR_REGISTRY: ${{steps.login-ecr.registry}}
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: docker tag rbh-app:latest $ECR_REGISTRY/rbh-app:latest
       - name: Push image to Amazon ECR
         env:
