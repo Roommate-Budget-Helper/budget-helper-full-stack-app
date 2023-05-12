@@ -61,32 +61,9 @@ resource "aws_security_group_rule" "outbound-all" {
   protocol          = "all"
   from_port         = 0
   to_port           = 65535
+  cidr_blocks       = ["0.0.0.0/0"]
   description       = "All outbound traffic"
 }
-
-resource "aws_instance" "RBH-server" {
-  ami                         = "ami-083cd4eb32643c8a0"
-  instance_type               = "t2.micro"
-  vpc_security_group_ids      = [module.rds.sg-RBH-ec2-rds, aws_security_group.ECS-web.id]
-  associate_public_ip_address = true
-}
-
-# elastic ip
-
-resource "aws_eip" "RBH-web-ip" {
-  instance = aws_instance.RBH-server.id
-  vpc      = true
-}
-
-resource "aws_network_interface" "RBH-server-eni" {
-  subnet_id       = module.vpc.rds-public-subnet-1b-id
-  security_groups = [module.rds.sg-RBH-ec2-rds, aws_security_group.ECS-web.id]
-  attachment {
-    instance     = aws_instance.RBH-server.id
-    device_index = 1
-  }
-}
-
 
 resource "aws_autoscaling_group" "EC2ServiceGroup" {
   name                      = "rbh-ecs"
@@ -103,9 +80,18 @@ resource "aws_autoscaling_group" "EC2ServiceGroup" {
   }
 }
 
+resource "aws_iam_instance_profile" "ecsProfile" {
+  name = "ecs-agent"
+  role = aws_iam_role.ecs.name
+}
+
 resource "aws_launch_template" "ecs-ec2" {
   name_prefix            = "rbh"
   image_id               = "ami-083cd4eb32643c8a0"
   instance_type          = "t2.micro"
   vpc_security_group_ids = [module.rds.sg-RBH-ec2-rds, aws_security_group.ECS-web.id]
+  user_data              = filebase64("./ecs-user-data.sh")
+  iam_instance_profile {
+    arn = aws_iam_instance_profile.ecsProfile.arn
+  }
 }
