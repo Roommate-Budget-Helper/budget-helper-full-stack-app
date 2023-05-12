@@ -1,15 +1,8 @@
 import { generateUsername } from "unique-username-generator";
-import { registerUser, loginUser } from "./login-registration.spec.cy";
-import "cypress-file-upload";
+import { registerUser } from "./login-registration.spec.cy";
 
 const successUsername = generateUsername();
 const successPassword = "Abc@12345";
-
-export const signoutOfApplication = () => {
-    cy.visit("http://localhost:3000/user");
-    cy.get("button[value='Sign Out']").click();
-    cy.wait(500).location("pathname").should("eq", "/login");
-};
 
 describe("User Tests", () => {
     before(() => {
@@ -19,7 +12,7 @@ describe("User Tests", () => {
 
     beforeEach(() => {
         cy.visit("http://localhost:3000/login");
-        loginUser(successUsername, successPassword);
+        cy.login(successUsername, successPassword);
         cy.visit("http://localhost:3000/user");
     });
 
@@ -76,7 +69,7 @@ describe("User Tests", () => {
     });
 
     it("Sign out", () => {
-        signoutOfApplication();
+        cy.signoutOfApplication();
         // TODO: Verify that it redirects pages
     });
 });

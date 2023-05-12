@@ -36,7 +36,12 @@ declare global {
     interface Chainable {
       createInbox(): Promise<InboxDto>,
       waitForEmail(inboxId: string): Promise<Email>,
-      deleteEmail(emailId: string): Promise<void>
+      deleteEmail(emailId: string): Promise<void>,
+      login(username: string, password: string): Promise<void>,
+      createAHome(image: string, homeName: string, address: string): Promise<void>,
+      viewAHome(homeCheck: string, homeName: string, address: string): Promise<void>,
+      inviteARoommate(homeCheck: string, homeName: string, address: string, inviteEmail: string): Promise<void>,
+      signoutOfApplication(): Promise<void>
     }
   }
 }

@@ -213,6 +213,7 @@ const CreateChargePage: NextPage = () => {
                                                   {occupant.user.name}
                                               </div>
                                               <MoneyFieldInput
+                                                  id={occupant.user.name}
                                                   name={occupant.user.id}
                                                   placeholder="0.00"
                                                   max={String(billAmount)}
@@ -287,6 +288,7 @@ const CreateChargePage: NextPage = () => {
                                         className="bg-slate-600 w-88 my-10 p-3 rounded-xl text-dorian text-base"
                                     >
                                         <input
+                                            id={occupant.user.name}
                                             type="checkbox"
                                             name={occupant.user.id}
                                             className="mr-4"

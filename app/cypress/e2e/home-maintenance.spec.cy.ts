@@ -1,6 +1,5 @@
 import { generateUsername } from "unique-username-generator";
-import { loginUser, registerUser } from "./login-registration.spec.cy";
-import { createAHome, viewAHome } from "./home-CRUD.spec.cy";
+import { registerUser } from "./login-registration.spec.cy";
 
 describe("Home Maintenance Test", () => {
     const usernameForTest = generateUsername();
@@ -16,26 +15,26 @@ describe("Home Maintenance Test", () => {
         cy.visit("http://localhost:3000/login");
         registerUser(usernameForTest, password);
         cy.visit("http://localhost:3000/login");
-        loginUser(usernameForTest, password);
-        createAHome(image, homeName, address);
+        cy.login(usernameForTest, password);
+        cy.createAHome(image, homeName, address);
     });
 
     beforeEach(() => {
         cy.visit("http://localhost:3000/login");
-        loginUser(usernameForTest, password);
+        cy.login(usernameForTest, password);
         cy.visit("http://localhost:3000/homes");
     });
 
     // Test Home Page
 
     it("Title exists", () => {
-        viewAHome(homeCheck, homeName, address);
+        cy.viewAHome(homeCheck, homeName, address);
         cy.contains(homeName);
         cy.contains(address);
     });
 
     it("Will pull up the home maintenence tab", () => {
-        viewAHome(homeCheck, homeName, address);
+        cy.viewAHome(homeCheck, homeName, address);
         cy.get("div > #drop-down").click();
         cy.contains("Leave Home")
     });
@@ -44,33 +43,21 @@ describe("Home Maintenance Test", () => {
     const fakeInviteEmail = "fakeEmail@gmail.com";
 
     it("Can invite a roommate", () => {
-        viewAHome(homeCheck, homeName, address);
-        cy.get("div > #drop-down").click();
-        cy.get("div > #invite").click();
-        cy.get("input[name=email]").type(fakeInviteEmail);
-        cy.get("button[type=submit]").click();
+        cy.inviteARoommate(homeCheck, homeName, address, fakeInviteEmail);
     });
 
     it("Can not invite a roommate twice", () => {
-        viewAHome(homeCheck, homeName, address);
-        cy.get("div > #drop-down").click();
-        cy.get("div > #invite").click();
-        cy.get("input[name=email]").type(fakeInviteEmail);
-        cy.get("button[type=submit]").click();
+        cy.inviteARoommate(homeCheck, homeName, address, fakeInviteEmail);
         cy.wait(500).contains("The invite failed. Make sure the user is not already invited to the home, in the home or that you did not invite yourself!");
     });
 
     it("Can not invite a non email", () => {
-        viewAHome(homeCheck, homeName, address);
-        cy.get("div > #drop-down").click();
-        cy.get("div > #invite").click();
-        cy.get("input[name=email]").type("guts");
-        cy.get("button[type=submit]").click();
+        cy.inviteARoommate(homeCheck, homeName, address, "guts");
         cy.contains("This is not a valid email!");
     });
 
     it("Can not update your own permissions", () => {
-        viewAHome(homeCheck, homeName, address);
+        cy.viewAHome(homeCheck, homeName, address);
         cy.get("div > #drop-down").click();
         cy.get("div > #owner").click();
         cy.get("button[type=submit]").click();
@@ -83,7 +70,7 @@ describe("Home Maintenance Test", () => {
     const homeCheck2 = "div > #" + homeName2;
 
     it("Can update home", () => {
-        viewAHome(homeCheck, homeName, address);
+        cy.viewAHome(homeCheck, homeName, address);
         cy.get("div > #drop-down").click();
         cy.get("div > #edit").click();
         cy.get("input[name=name]").clear();
@@ -97,7 +84,7 @@ describe("Home Maintenance Test", () => {
     });
 
     it("Can not update home with empty string", () => {
-        viewAHome(homeCheck2, homeName2, address2);
+        cy.viewAHome(homeCheck2, homeName2, address2);
         cy.get("div > #drop-down").click();
         cy.get("div > #edit").click();
         cy.get("input[name=name]").clear();
@@ -107,7 +94,7 @@ describe("Home Maintenance Test", () => {
     });
 
     it("Can not update home with long string", () => {
-        viewAHome(homeCheck2, homeName2, address2);
+        cy.viewAHome(homeCheck2, homeName2, address2);
         cy.get("div > #drop-down").click();
         cy.get("div > #edit").click();
         cy.get("input[name=image").attachFile(image);
@@ -118,7 +105,7 @@ describe("Home Maintenance Test", () => {
     });
 
     it("Can not leave home as only owner", () => {
-        viewAHome(homeCheck2, homeName2, address2);
+        cy.viewAHome(homeCheck2, homeName2, address2);
         cy.get("div > #drop-down").click();
         cy.get("div > #leave").click();
         cy.contains("Are you sure you want to leave this home? Leaving will remove yourself from this home, and cannot be undone without another user to invite you back.");
@@ -128,7 +115,7 @@ describe("Home Maintenance Test", () => {
     });
 
     it("Can delete home", () => {
-        viewAHome(homeCheck2, homeName2, address2);
+        cy.viewAHome(homeCheck2, homeName2, address2);
         cy.get("div > #drop-down").click();
         cy.get("div > #delete").click();
         cy.contains("Are you sure you want to delete this home? Deleting will remove this home for all occupants, and cannot be undone.");

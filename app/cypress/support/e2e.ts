@@ -37,3 +37,40 @@ Cypress.Commands.add("deleteEmail", (emailId: string) => {
        return mailslurp.deleteEmail(emailId);
    });
 
+Cypress.Commands.add("login", (username: string, password: string) => {
+    cy.visit('http://localhost:3000/login');
+    cy.get('input[name=username]').type(username);
+    cy.get('input[name=password]').type(password);
+    cy.get('button[type=submit]').click();
+    cy.url().should('contain', '/homes');
+})
+
+Cypress.Commands.add("createAHome", (image: string, homeName: string, address: string) => {
+    cy.visit("http://localhost:3000/createhome");
+    cy.get("input[name=image]").attachFile(image);
+    cy.get("input[name=name]").type(homeName);
+    cy.get("input[name=address]").type(address);
+    cy.get("button[type=submit]").click();
+    cy.contains(homeName);
+})
+
+Cypress.Commands.add("viewAHome", (homeCheck: string, homeName: string, address: string) => {
+    cy.get("div > #Home").wait(500).click();
+    cy.get(homeCheck).click();
+    cy.contains(homeName);
+    cy.contains(address);
+})
+
+Cypress.Commands.add("inviteARoommate", (homeCheck: string, homeName: string, address: string, inviteEmail: string) => {
+    cy.viewAHome(homeCheck, homeName, address);
+    cy.get("div > #drop-down").click();
+    cy.get("div > #invite").click();
+    cy.get("input[name=email]").type(inviteEmail);
+    cy.get("button[type=submit]").click();
+})
+
+Cypress.Commands.add("signoutOfApplication", () => {
+    cy.visit("http://localhost:3000/user");
+    cy.get("button[value='Sign Out']").click();
+    cy.wait(500).location("pathname").should("eq", "/login");
+})

@@ -1,21 +1,5 @@
 import { generateUsername } from "unique-username-generator";
-import { loginUser, registerUser } from "./login-registration.spec.cy";
-
-export const createAHome = (image, homeName, address) =>{
-    cy.visit("http://localhost:3000/createhome");
-    cy.get("input[name=image]").attachFile(image);
-    cy.get("input[name=name]").type(homeName);
-    cy.get("input[name=address]").type(address);
-    cy.get("button[type=submit]").click();
-    cy.contains(homeName);
-}
-
-export const viewAHome = (homeCheck, homeName, address) => {
-    cy.get("div > #Home").wait(500).click();
-    cy.get(homeCheck).click();
-    cy.contains(homeName);
-    cy.contains(address);
-}
+import { registerUser } from "./login-registration.spec.cy";
 
 describe("Home CRUD Test", () => {
     const usernameForTest = generateUsername();
@@ -29,7 +13,7 @@ describe("Home CRUD Test", () => {
 
     beforeEach(() => {
         cy.visit("http://localhost:3000/login");
-        loginUser(usernameForTest, password);
+        cy.login(usernameForTest, password);
         cy.visit("http://localhost:3000/homes");
     });
 
@@ -57,13 +41,13 @@ describe("Home CRUD Test", () => {
     const address = generateUsername();
 
     it("Can generate a new Home", () => {
-        createAHome(image,homeName,address);
+        cy.createAHome(image,homeName,address);
     });
 
     const homeCheck = "div > #" + homeName;
 
     it("Can view the created home", () => {
-        viewAHome(homeCheck, homeName, address);
+        cy.viewAHome(homeCheck, homeName, address);
     });
 
     it('Will allow creation of multiple homes', () => {
@@ -72,7 +56,7 @@ describe("Home CRUD Test", () => {
       const image2 = "/images/logo.png";
       const address2 = generateUsername();
 
-      createAHome(image2, homeName2, address2);
+      cy.createAHome(image2, homeName2, address2);
 
     });
 
@@ -119,7 +103,7 @@ describe("Home CRUD Test", () => {
         const image2 = "/images/logo.png";
         const address2 = generateUsername();
 
-        createAHome(image2, homeName2, address2);
+        cy.createAHome(image2, homeName2, address2);
 
         // create a second home with the same info
         cy.visit("http://localhost:3000/createhome");
