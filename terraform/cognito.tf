@@ -13,6 +13,12 @@ resource "aws_cognito_user_pool" "rbh-cognito" {
     require_uppercase                = true
     temporary_password_validity_days = 3
   }
+  account_recovery_setting {
+    recovery_mechanism {
+      name     = "verified_email"
+      priority = 1
+    }
+  }
 }
 
 
@@ -21,7 +27,7 @@ resource "aws_cognito_user_pool_client" "webapp" {
   user_pool_id                         = aws_cognito_user_pool.rbh-cognito.id
   callback_urls                        = ["${var.url}/api/auth/credentials"]
   allowed_oauth_flows_user_pool_client = true
-  allowed_oauth_flows                  = ["code", "implicit", "client_credentials"]
+  allowed_oauth_flows                  = ["code", "implicit"]
   allowed_oauth_scopes                 = ["email", "profile", "openid", "phone"]
   supported_identity_providers         = ["COGNITO"]
 }

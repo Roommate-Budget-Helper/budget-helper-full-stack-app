@@ -6,7 +6,7 @@
     - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
     - [VSCode](https://code.visualstudio.com/)
 2. Clone the repository using the following command  
-   `git clone git@github.com:Roommate-Budget-Helper/budget-helper-webui.git` - Note if you do not have SSH key setup for GitHub, follow this guide before running the above command: [Adding SSH key to GitHub](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)
+   `git clone git@github.com:Roommate-Budget-Helper/budget-helper-full-stack-app.git` - Note if you do not have SSH key setup for GitHub, follow this guide before running the above command: [Adding SSH key to GitHub](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)
 3. Open VSCode
 4. Make sure you have the following extensions installed:
     - Docker
@@ -46,7 +46,7 @@ GOOGLE_CLIENT_SECRET=<google-client-secret-here>
    `{ "API_KEY": "<replace-this-with-your-actual-api-key>" }`
 3. Go to [MailSlurp](https://www.mailslurp.com/) and create an account
 4. After logging in confirm you see a dashboard similar to this:
-   ![MailSlurp Dashboard](../docs/mailslurp.png)
+   ![MailSlurp Dashboard](../docs/resources/mailslurp.png)
 5. Copy the API Access key and place it in the `cypress.env.json`  
    You should now be able run the project
 6. Run `npx cypress install` in the /app folder to prepare cypress for the first time
@@ -56,12 +56,18 @@ GOOGLE_CLIENT_SECRET=<google-client-secret-here>
 -   Windows: [Xming](https://sourceforge.net/projects/xming/)
 -   Linux: Install `xorg-xhost` package if not already on your system. In docker desktop, enable file sharing for `/tmp/.X11-unix` Run `xhost + local:docker`
 
-### Notes for Windows: 
-   # Change your DISPLAY location for xming
+### Notes for Windows:
+
+# Change your DISPLAY location for xming
+
       export DISPLAY=<your ip address>:0
-   # Run the xming application in your local computer
+
+# Run the xming application in your local computer
+
       <xming executable location in explorer> :0 -ac
-   # Run the e2e test in dev container
+
+# Run the e2e test in dev container
+
       npm run e2e
 
 ## Commands
@@ -71,9 +77,9 @@ GOOGLE_CLIENT_SECRET=<google-client-secret-here>
 `npm run e2e` => Runs the cypress test suite  
 `npm run lint` => Runs the linter  
 `npm run build` => Runs the build command  
-`npx prisma generate` => Rebuilds the prisma client for accessing the database from typescript 
+`npx prisma generate` => Rebuilds the prisma client for accessing the database from typescript
 `npx prisma db push` => Synchronize the database with the prisma schema  
-`npx prisma studio` => Opens prisma studio for debugging 
+`npx prisma studio` => Opens prisma studio for debugging
 
 ## Troubleshooting
 

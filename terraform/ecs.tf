@@ -1,28 +1,7 @@
+data "aws_caller_identity" "current" {}
+
 resource "aws_ecs_cluster" "web-cluster" {
   name = "rbh-web-production"
-}
-
-resource "aws_ecs_cluster_capacity_providers" "web-cluster-providers" {
-  cluster_name       = aws_ecs_cluster.web-cluster.name
-  capacity_providers = [aws_ecs_capacity_provider.asg-provider.name]
-
-  default_capacity_provider_strategy {
-    base              = 1
-    weight            = 100
-    capacity_provider = aws_ecs_capacity_provider.asg-provider.name
-  }
-}
-
-resource "aws_ecs_capacity_provider" "asg-provider" {
-  name = "asg-provider"
-
-  auto_scaling_group_provider {
-    auto_scaling_group_arn         = aws_autoscaling_group.EC2ServiceGroup.arn
-    managed_termination_protection = "ENABLED"
-    managed_scaling {
-      target_capacity = 1
-    }
-  }
 }
 
 resource "random_password" "next-auth-secret" {
@@ -48,30 +27,15 @@ data "template_file" "task_definition" {
 
 resource "aws_ecs_task_definition" "task" {
   family                   = "RBH"
-  network_mode             = "awsvpc"
+  network_mode             = "bridge"
   execution_role_arn       = aws_iam_role.ecs.arn
   requires_compatibilities = ["EC2"]
+  memory                   = 819
   container_definitions = jsonencode(
     jsondecode(
       data.template_file.task_definition.rendered
     ).containerDefinitions
   )
-}
-
-resource "aws_iam_role" "ecs" {
-  name                = "ecsTaskExecutionRole"
-  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonRDSFullAccess", "arn:aws:iam::aws:policy/AmazonSESFullAccess", "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"]
-  assume_role_policy = jsonencode({
-    Version = "2008-10-17"
-    Statement = [{
-      Sid    = "",
-      Effect = "Allow"
-      Principal = {
-        Service = "ecs-tasks.amazonaws.com"
-      }
-      Action = ["sts:AssumeRole", aws_iam_policy.s3_partial.arn]
-    }]
-  })
 }
 
 
@@ -93,6 +57,48 @@ resource "aws_iam_policy" "s3_partial" {
     }]
   })
 }
+resource "aws_iam_policy" "ec2-connect" {
+  name = "EC2Connect"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid      = ""
+      Effect   = "Allow"
+      Action   = "ec2-instance-connect:SendSSHPublicKey"
+      Resource = "arn:aws:ec2:${var.aws_region}:${data.aws_caller_identity.current.account_id}:instance/*"
+      }, {
+      Sid      = ""
+      Effect   = "Allow"
+      Action   = "ec2:DescribeInstances"
+      Resource = "*"
+    }]
+  })
+}
+
+
+resource "aws_iam_role" "ecs" {
+  name                = "ecsTaskExecutionRole"
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonRDSFullAccess", "arn:aws:iam::aws:policy/AmazonSESFullAccess", "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy", "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role", aws_iam_policy.s3_partial.arn, aws_iam_policy.ec2-connect.arn]
+  assume_role_policy = jsonencode({
+    Version = "2008-10-17"
+    Statement = [{
+      Sid    = "",
+      Effect = "Allow"
+      Principal = {
+        Service = "ecs-tasks.amazonaws.com"
+      }
+      Action = ["sts:AssumeRole"]
+      }, {
+      Sid    = "",
+      Effect = "Allow"
+      Principal = {
+        Service = "ec2.amazonaws.com"
+      }
+      Action = ["sts:AssumeRole"]
+    }]
+  })
+}
+
 
 resource "aws_ecs_service" "rbh-web" {
   name            = "rbh-web"
@@ -102,5 +108,6 @@ resource "aws_ecs_service" "rbh-web" {
 }
 
 output "NEXTAUTH_SECRET" {
-  value = random_password.next-auth-secret.result
+  value     = random_password.next-auth-secret.result
+  sensitive = true
 }
