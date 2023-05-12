@@ -82,7 +82,6 @@ const HomesPage: NextPage = () => {
     useEffect(() => {
         const initialEditPermissionState = makeInitialEditPermissionState();
         for(const key in Permission){
-            console.log("checking", Permission[key], "selected", selectedUserPermissions)
             initialEditPermissionState[Permission[key]] = !!selectedUserPermissions?.find(perm => perm.name === Permission[key]) 
         }
         setEditState(initialEditPermissionState);
