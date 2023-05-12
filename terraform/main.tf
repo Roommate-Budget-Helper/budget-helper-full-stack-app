@@ -27,3 +27,12 @@ module "rds" {
 module "vpc" {
   source = "./vpc"
 }
+
+output "DATABASE_URL" {
+  value     = module.rds.DATABASE_URL
+  sensitive = true
+}
+
+output "S3_BUCKET_NAME" {
+  value = aws_s3_bucket.rbh-bucket.bucket
+}

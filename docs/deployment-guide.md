@@ -92,4 +92,39 @@ Before continuing with Terraform, you must create google oauth credentials.
 11. Verify terraform creates a valid plan
 12. run `terraform apply` to provision the infrastructure
 13. Type `yes` to approve the creation
-14.
+14. Log back into AWS after the infrastructure is created
+15. Navigate to EC2
+16. Create a new elastic IP
+17. Attach it to the running ec2 instance
+
+### Push App image
+
+1. Navigate to app folder of the repository in your terminal
+2. Log into AWS and navigate to ECR
+3. Click on "rbh-app" under private repositories
+4. Click view push commands
+5. Run each of the push commands
+
+## Integrate with Github Actions
+
+1. Set the following secrets in Github Actions on the repository
+
+```
+AWS_ACCESS_KEY_ID = <access key of terraform user>
+AWS_SECRET_ACCESS_KEY = <secret key of terraform user>
+COGNITO_CLIENT_ID = <from terraform output>
+COGNITO_USER_POOL = <from terraform output>
+CYPRESS_API_KEY = <from mailslurp - Read Dev Guide 'Setting up testing'>
+DATABASE_URL = <from terraform output>
+GOOGLE_CLIENT_ID = <from google setup>
+GOOGLE_CLIENT_SECRET = <from google setup>
+NEXTAUTH_SECRET = <from terraform output>
+NEXTAUTH_URL = <base url of domain e.x https://roommatebudgethelper.tk>
+S3_BUCKET_NAME = <from terraform output>
+SLACK_TOKEN = <see make slack token>
+URL = <base url of domain e.x https://roommatebudgethelper.tk>
+```
+
+### Useful commands
+
+`terraform output <name of output>` - Provides the value of terraform output field, will show sensitive information

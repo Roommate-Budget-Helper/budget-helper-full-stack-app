@@ -80,9 +80,18 @@ resource "aws_autoscaling_group" "EC2ServiceGroup" {
   }
 }
 
+resource "aws_iam_instance_profile" "ecsProfile" {
+  name = "ecs-agent"
+  role = aws_iam_role.ecs.name
+}
+
 resource "aws_launch_template" "ecs-ec2" {
   name_prefix            = "rbh"
   image_id               = "ami-083cd4eb32643c8a0"
   instance_type          = "t2.micro"
   vpc_security_group_ids = [module.rds.sg-RBH-ec2-rds, aws_security_group.ECS-web.id]
+  user_data              = filebase64("./ecs-user-data.sh")
+  iam_instance_profile {
+    arn = aws_iam_instance_profile.ecsProfile.arn
+  }
 }
