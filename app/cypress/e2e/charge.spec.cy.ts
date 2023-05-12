@@ -92,7 +92,7 @@ describe('Charge Test', () => {
         cy.get("button[type=submit]").click();
 
         cy.wait(500).contains("Splitting $35");
-        cy.get("input[id=" + successUsername2 + "]").type("35");
+        cy.get("input[name=" + successUsername2 + "]").type("35");
         cy.get("button[value='Send Charge']").click();
         cy.signoutOfApplication();
         cy.login(successUsername2, successPassword);
