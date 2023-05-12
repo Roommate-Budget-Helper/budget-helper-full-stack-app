@@ -41,7 +41,7 @@
                 },
                 {
                     "name": "S3_BUCKET_NAME",
-                    "value": "${BUCKET_NAME}"
+                    "value": "${S3_BUCKET_NAME}"
                 },
                 {
                     "name": "COGNITO_CLIENT_ID",
