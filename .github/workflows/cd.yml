@@ -62,4 +62,4 @@ jobs:
         run: docker logout ${{ steps.login-ecr.outputs.registry }}
       - name: Force deployment
         run: |
-          aws ecs update-service --cluster rbh-web-production --service rbh-web --force-new-deployment
+          aws ecs stop-task --cluster "rbh-web-production" --task $(aws ecs list-tasks --cluster "rbh-web-production" --service "rbh-web" --output text --query taskArns[0])

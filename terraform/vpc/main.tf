@@ -47,9 +47,6 @@ resource "aws_subnet" "rds-private-subnet-1f" {
 # Route Table Private
 resource "aws_route_table" "RDS-Pvt-rt" {
   vpc_id = aws_vpc.rbh-vpc.id
-  route {
-    cidr_block = "10.0.0.0/16"
-  }
 }
 # Subnets in Private Route Table
 resource "aws_route_table_association" "private-a" {
@@ -81,9 +78,6 @@ resource "aws_internet_gateway" "RBH-public-gateway" {
 # Public route table
 resource "aws_route_table" "RBH-public" {
   vpc_id = aws_vpc.rbh-vpc.id
-  route {
-    cidr_block = "10.0.0.0/16"
-  }
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.RBH-public-gateway.id
