@@ -17,6 +17,14 @@ import { useSession } from "next-auth/react";
 import { ChartComponent } from "@components/chart";
 import { z } from "zod";
 
+type EditPermissionState = {
+    [key in Permission]: boolean
+}
+const makeInitialEditPermissionState: () => EditPermissionState = () =>  Object.keys(Permission).reduce((acc, key) => {
+    acc[Permission[key as keyof typeof Permission]] = false;
+    return acc;
+  }, {} as EditPermissionState);
+
 const HomesPage: NextPage = () => {
     const { data: session } = useSession();
     const [modalError, setModalError] = useState<string | null>(null);
@@ -26,6 +34,7 @@ const HomesPage: NextPage = () => {
     const [isInviteModalOpen, setInviteModalOpen] = useState<boolean>(false);
     const [isRemovalModalOpen, setRemovalModalOpen] = useState<boolean>(false);
     const [isEditPermissionsModalOpen, setEditPermissionsModalOpen] = useState<boolean>(false);
+    const [editStatePermission, setEditState] = useState<EditPermissionState>(makeInitialEditPermissionState());
 
     const [selectedUser, setSelectedUser] = useState<string | null>(null);
     const homes = useHomeContext((s) => s.homes);
@@ -70,6 +79,14 @@ const HomesPage: NextPage = () => {
         getOccupants();
     }, [selectedHome, selectedUser, getSelectedUserPermissions, getCurrentUserPermissions, getOccupants]);
 
+    useEffect(() => {
+        const initialEditPermissionState = makeInitialEditPermissionState();
+        for(const key in Permission){
+            console.log("checking", Permission[key], "selected", selectedUserPermissions)
+            initialEditPermissionState[Permission[key]] = !!selectedUserPermissions?.find(perm => perm.name === Permission[key]) 
+        }
+        setEditState(initialEditPermissionState);
+    }, [selectedUserPermissions, setEditState])
 
     const handleToggleModal = (setterFunction: React.Dispatch<React.SetStateAction<boolean>>) => () => {
         setterFunction(state => !state);
@@ -136,10 +153,16 @@ const HomesPage: NextPage = () => {
         if(permissionCheck === "bad") {
             setModalError("You cannot change your own Permissions!");
         } else {
+            setSelectedUser(null);
             setEditPermissionsModalOpen(false);
         }
     }
-
+    const handleEditState = (permission: Permission) => () => {
+        setEditState(state => ({
+            ...state,
+            [permission]: !state[permission]
+        }));
+    }
     const handleInvite = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const form = (event.target as HTMLFormElement);
@@ -182,7 +205,12 @@ const HomesPage: NextPage = () => {
                             {isMenuOpen && <div className="absolute top-10 right-10 w-88 bg-slate-50">
                                 {hasPermission(Permission.Invite) && <div className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={handleToggleModal(setInviteModalOpen)}>Invite Roommate</div>}
                                 {hasPermission(Permission.Evict) && <div className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={handleToggleModal(setRemovalModalOpen)}>Remove Roommate </div>}
-                                {hasPermission(Permission.Owner) && <div className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={handleToggleModal(setEditPermissionsModalOpen)}>Edit Permissions</div>}
+                                {hasPermission(Permission.Owner) && <div className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={() => {
+                                    if(occupants && occupants.length > 0){
+                                        setSelectedUser(occupants[0]?.user.id || null);
+                                    }
+                                    handleToggleModal(setEditPermissionsModalOpen)();
+                                }}>Edit Permissions</div>}
                                 {hasPermission(Permission.Edit) && <div className="hover:bg-slate-200 border-b-2 border-black py-2"><Link href="/updatehome">Update Home</Link> </div>}
                                 <div className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={handleToggleModal(setLeaveModalOpen)}>Leave Home</div>
                                 {hasPermission(Permission.Delete) &&<div className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={handleToggleModal(setDeleteModalOpen)}>Delete Home</div>}
@@ -288,7 +316,7 @@ const HomesPage: NextPage = () => {
                 </Modal.Header>
                 <form onSubmit={handleUpdatePermission}>
                 <Modal.Body>
-                    <p>User: <select name="User"
+                    <span>User: <select name="User"
                         onChange={ (e) => {
                             setSelectedUser(e.target.value);
                         }}>
@@ -297,14 +325,15 @@ const HomesPage: NextPage = () => {
                             key={occupant.user.id} 
                             value={occupant.user.id}
                          >{occupant.user.name}</option>))}
-                    </select></div>
+                    </select></span>
                     {Object.values(Permission).map(permission => (
                         <div key={permission}>
                             <input
                                 name="Permissions"
                                 value={permission} 
                                 type="checkbox" 
-                                defaultChecked={ selectedUserPermissions?.find(selectedUserPermission => selectedUserPermission.name === permission) ? true : false }
+                                checked={editStatePermission[permission]}
+                                onChange={handleEditState(permission)}
                                 />
                             {permission}
                         </div>
