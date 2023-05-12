@@ -840,16 +840,20 @@ export const sendChargeTemplate = async () => {
     .catch(error => console.error(error));
 }
 
-export const sendEmail = async (receiverEmail: string, fields: {chargerUsername: string, homeName: string, amountOwed: string, dueDate: Date, comment: string}) => {
+export const sendEmail = async (receiverEmail: string, fields: {chargerUsername: string, homeName: string, amountOwed: string, dueDate: Date, address: string}) => {
     const params: SendTemplatedEmailRequest = {
         Source: "no-reply@roommatebudgethelper.tk",
         Destination: {
             ToAddresses: [receiverEmail]
         },
         Template: "ChargeTemplate",
-        TemplateData: `{ \"chargerUsername\":\"${fields.chargerUsername}\", \"homeName\":\"${fields.homeName}\", 
-        \"amountOwed\":\"${fields.amountOwed}\", \"dueDate\":\"${fields.dueDate.toDateString()}\, 
-        ${fields.dueDate.toTimeString()}\", \"comment\":\"${fields.comment}"}`
+        TemplateData: JSON.stringify({
+          user: fields.chargerUsername,
+          homename: fields.homeName,
+          address: fields.address,
+          amount: fields.amountOwed,
+          dueDate: fields.dueDate.toLocaleDateString('en-us', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+        })
     }
 
     const sent = await ses.sendTemplatedEmail(params).promise()
