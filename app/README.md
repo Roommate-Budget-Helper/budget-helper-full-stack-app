@@ -35,6 +35,8 @@ COGNITO_USER_POOL=<user-pool-id-here>
 # Google Credentials
 GOOGLE_CLIENT_ID=<google-client-id-here>
 GOOGLE_CLIENT_SECRET=<google-client-secret-here>
+
+S3_BUCKET_NAME=roommate-budget-helper
 ```
 
 10. While in the app folder run `npm i`

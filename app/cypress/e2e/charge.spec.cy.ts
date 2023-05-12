@@ -1,5 +1,4 @@
 import { generateUsername } from "unique-username-generator";
-import { registerUser } from "./login-registration.spec.cy";
 
 const successUsername = generateUsername();
 const successUsername2 = generateUsername();
@@ -23,7 +22,7 @@ describe('Charge Test', () => {
 
     before(() => {
         cy.visit('http://localhost:3000/login');
-        registerUser(successUsername, successPassword);
+        cy.register(successUsername, successPassword);
         // Login second user and connect their email invite!!
         cy.visit('http://localhost:3000/login');
         cy.contains("Sign Up").click();

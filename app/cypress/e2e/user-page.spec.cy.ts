@@ -1,5 +1,4 @@
 import { generateUsername } from "unique-username-generator";
-import { registerUser } from "./login-registration.spec.cy";
 
 const successUsername = generateUsername();
 const successPassword = "Abc@12345";
@@ -7,7 +6,7 @@ const successPassword = "Abc@12345";
 describe("User Tests", () => {
     before(() => {
         cy.visit("http://localhost:3000/register");
-        registerUser(successUsername, successPassword);
+        cy.register(successUsername, successPassword);
     });
 
     beforeEach(() => {

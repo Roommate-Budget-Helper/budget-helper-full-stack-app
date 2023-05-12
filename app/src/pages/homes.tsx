@@ -203,17 +203,17 @@ const HomesPage: NextPage = () => {
                         onClick={handleToggleModal(setMenuOpen)}>
                             <Icon path={mdiDotsVertical} size={1} className="mx-auto"/>
                             {isMenuOpen && <div className="absolute top-10 right-10 w-88 bg-slate-50">
-                                {hasPermission(Permission.Invite) && <div className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={handleToggleModal(setInviteModalOpen)}>Invite Roommate</div>}
-                                {hasPermission(Permission.Evict) && <div className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={handleToggleModal(setRemovalModalOpen)}>Remove Roommate </div>}
-                                {hasPermission(Permission.Owner) && <div className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={() => {
+                                {hasPermission(Permission.Invite) && <div id="invite" className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={handleToggleModal(setInviteModalOpen)}>Invite Roommate</div>}
+                                {hasPermission(Permission.Evict) && <div id="evict" className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={handleToggleModal(setRemovalModalOpen)}>Remove Roommate </div>}
+                                {hasPermission(Permission.Owner) && <div id="owner" className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={() => {
                                     if(occupants && occupants.length > 0){
                                         setSelectedUser(occupants[0]?.user.id || null);
                                     }
                                     handleToggleModal(setEditPermissionsModalOpen)();
                                 }}>Edit Permissions</div>}
-                                {hasPermission(Permission.Edit) && <div className="hover:bg-slate-200 border-b-2 border-black py-2"><Link href="/updatehome">Update Home</Link> </div>}
-                                <div className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={handleToggleModal(setLeaveModalOpen)}>Leave Home</div>
-                                {hasPermission(Permission.Delete) &&<div className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={handleToggleModal(setDeleteModalOpen)}>Delete Home</div>}
+                                {hasPermission(Permission.Edit) && <div id="edit" className="hover:bg-slate-200 border-b-2 border-black py-2"><Link href="/updatehome">Update Home</Link> </div>}
+                                <div id="leave" className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={handleToggleModal(setLeaveModalOpen)}>Leave Home</div>
+                                {hasPermission(Permission.Delete) &&<div id="delete" className="hover:bg-slate-200 border-b-2 border-black py-2" onClick={handleToggleModal(setDeleteModalOpen)}>Delete Home</div>}
                             </div>}
                         </div>
                         <div className="text-xl p-5">

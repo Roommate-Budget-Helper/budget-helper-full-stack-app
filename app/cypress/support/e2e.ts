@@ -78,3 +78,32 @@ Cypress.Commands.add("signoutOfApplication", () => {
     cy.get("button[value='Sign Out']").click();
     cy.wait(500).location("pathname").should("eq", "/login");
 })
+
+Cypress.Commands.add("register", (username: string, password: string) => {
+    cy.visit('http://localhost:3000/login');
+    cy.contains("Sign Up").click();
+    let emailAddress: string;
+    // see commands.js custom commands
+    cy.createInbox().then(inbox => {
+      // verify a new inbox was created
+      assert.isDefined(inbox)
+  
+      // save the inboxId for later checking the emails
+      emailAddress = inbox.emailAddress;
+  
+      // sign up with inbox email address and the password
+      cy.get('input[name=email]').type(emailAddress);
+      cy.get('input[name=password]').type(password);
+      cy.get('input[name=confirmPassword]').type(password);
+      cy.get('input[name=username]').type(username);
+      cy.get('button[type=submit]').click();
+  
+      cy.waitForEmail(inbox.id).then(email => {
+        assert.isDefined(email);
+        assert.strictEqual(/Your (confirmation|verification) code is/.test(email.body), true);
+        const code = email.body.match(/\d+/)[0];
+        cy.get('input[name=verification-code]').type(`${code}{enter}`)
+        cy.wait(600);
+      })
+    });
+})
