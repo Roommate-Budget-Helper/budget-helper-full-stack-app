@@ -45,7 +45,7 @@ jobs:
       - name: Building Code
         run: npm run build
   cypress-run:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost
     defaults:
