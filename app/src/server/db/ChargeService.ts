@@ -67,7 +67,7 @@ export const handleSendChargeEmail = async (charge: Charge, db: PrismaClient) =>
 
   if(!receiver) return; // TODO: Throw some error here if the receiver is not found
 
-  return await sendEmail(receiver.email, {chargerUsername: charger.name, homeName: home.name, amountOwed: charge.amount, dueDate: charge.dueDate, comment: charge.comment})
+  return await sendEmail(receiver.email, {chargerUsername: charger.name, homeName: home.name, amountOwed: charge.amount, dueDate: charge.dueDate, address: home.address})
 }
 
 

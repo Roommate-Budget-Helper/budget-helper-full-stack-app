@@ -37,7 +37,7 @@ export const billingRouter = createProtectedRouter()
 
         // send the email only on success of the charge creation
         if(result){
-          // await handleSendChargeEmail(result, ctx.prisma);
+          await handleSendChargeEmail(result, ctx.prisma);
         }
         
         return result;
