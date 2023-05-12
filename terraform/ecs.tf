@@ -17,11 +17,7 @@ resource "aws_ecs_capacity_provider" "asg-provider" {
   name = "asg-provider"
 
   auto_scaling_group_provider {
-    auto_scaling_group_arn         = aws_autoscaling_group.EC2ServiceGroup.arn
-    managed_termination_protection = "ENABLED"
-    managed_scaling {
-      target_capacity = 1
-    }
+    auto_scaling_group_arn = aws_autoscaling_group.EC2ServiceGroup.arn
   }
 }
 
@@ -48,9 +44,10 @@ data "template_file" "task_definition" {
 
 resource "aws_ecs_task_definition" "task" {
   family                   = "RBH"
-  network_mode             = "awsvpc"
+  network_mode             = "bridge"
   execution_role_arn       = aws_iam_role.ecs.arn
   requires_compatibilities = ["EC2"]
+  memory                   = 819
   container_definitions = jsonencode(
     jsondecode(
       data.template_file.task_definition.rendered
