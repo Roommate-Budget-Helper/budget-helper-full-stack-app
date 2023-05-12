@@ -17,11 +17,11 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
     return (
         <SessionProvider session={session}>
-            <HomeProvider>
-                <RouteGuard>
+            <RouteGuard>
+                <HomeProvider>
                     <Component {...pageProps} />
-                </RouteGuard>
-            </HomeProvider>
+                </HomeProvider>
+            </RouteGuard>
         </SessionProvider>
     );
 };

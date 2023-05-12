@@ -7,15 +7,18 @@ import FieldInput, { ImageFileFieldInput } from "@components/fieldinput";
 import Image from "next/image";
 import { trpc } from "utils/trpc";
 import { useRef } from "react";
+import { useState } from "react";
+import LoadingSpinner from "@components/loadingspinner";
 
 
 const UserPage: NextPage = () => {
     const fileRef = useRef<HTMLInputElement>(null);
+    const [error, setError] = useState<string | null>(null);
     const getPresignedURL = trpc.useMutation(["upload.getPresignedURL"]);
     const setProfileImage = trpc.useMutation(["user.setProfileImage"]);
     const {data: profileImageURL, refetch: refetchProfileImage}= trpc.useQuery(["user.getProfileImage"]);
     const setPaymentMethods = trpc.useMutation(["user.setPaymentMethods"]);
-    const {data: paymentMethods, refetch: refetchPaymentMethods} = trpc.useQuery(["user.getPaymentMethods"]);
+    const {data: paymentMethods, refetch: refetchPaymentMethods, isLoading: paymentMethodsLoading} = trpc.useQuery(["user.getPaymentMethods"]);
     const logOut = () => {
         signOut();
     };
@@ -48,6 +51,10 @@ const UserPage: NextPage = () => {
             return;
         }
         const imageFile = fileList[0];
+        if(imageFile && imageFile.size > 1000000){
+            setError("The image file is too large, it must be less than 1MB.");
+            return;
+        }
         let key = null;
         if(imageFile){
             const { url, fields } = await getPresignedURL.mutateAsync(imageFile.name);
@@ -70,6 +77,7 @@ const UserPage: NextPage = () => {
         await setProfileImage.mutateAsync({
             image: key,
         });
+        setError(null);
         refetchProfileImage();
     };
     return (
@@ -112,7 +120,8 @@ const UserPage: NextPage = () => {
                             <h3 className="text-xl font-bold text-evergreen-100">
                                 Set Payment Methods
                             </h3>
-                            {paymentMethods &&
+                            {!paymentMethodsLoading &&
+                                paymentMethods &&
                                 [0, 1, 2].map((i) => {
                                     const paymentMethod =
                                         paymentMethods.paymentMethods[i];
@@ -134,6 +143,7 @@ const UserPage: NextPage = () => {
                                         />
                                     );
                                 })}
+                            {paymentMethodsLoading && <LoadingSpinner />}
                             <Button
                                 classNames="bg-evergreen-80 text-dorian"
                                 value="Update Payment"
@@ -182,6 +192,9 @@ const UserPage: NextPage = () => {
                         />
                     </div>
                 </div>
+                {error && (
+                    <p className="text-xl font-light text-red-600">{error}</p>
+                )}
             </div>
         </>
     );

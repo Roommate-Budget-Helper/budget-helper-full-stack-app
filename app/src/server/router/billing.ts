@@ -153,4 +153,73 @@ export const billingRouter = createProtectedRouter()
         }
         return charges;
     }
-})
+}).query("getChargesThisMonth", {
+    input: z.object({
+        homeId: z.string()
+    }),
+    async resolve({ ctx, input }){
+        return await ctx.prisma.charge.findMany({
+            where: {
+                chargerId: ctx.session.user.id,
+                homeId: input.homeId,
+                created: {
+                    gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+                    lte: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)
+                }
+            }
+        });
+
+    }
+}).query("getChargesHistory", {
+    async resolve({ ctx }){
+        const charges = await ctx.prisma.charge.findMany({
+            where: {
+                OR: [
+                    {
+                        chargerId: ctx.session.user.id,
+                    },
+                    {
+                        receiverId: ctx.session.user.id,
+                    },
+                ],
+            },
+            select: {
+                chargeId: true,
+                home: true,
+                amountBeforeSplit: true,
+                amount: true,
+                dueDate: true,
+                created: true,
+                category: true,
+                paid: true,
+                confirmed: true,
+                chargerId: true,
+                chargeUser: {
+                    // charger data
+                    select: {
+                        name: true,
+                        image: true,
+                    },
+                },
+                receiverId: true,
+                receiveUser: {
+                    // receiver data
+                    select: {
+                        name: true,
+                        image: true,
+                    },
+                },
+                paidDate: true,
+                comment: true,
+            },
+        });
+        for(const charge of charges){
+            if(charge.chargeUser.image){
+                charge.chargeUser.image = await getSignedImage(charge.chargeUser.image);
+            }
+            if(charge.receiveUser.image){
+                charge.receiveUser.image = await getSignedImage(charge.receiveUser.image);
+            }
+        }
+        return charges;
+    }})

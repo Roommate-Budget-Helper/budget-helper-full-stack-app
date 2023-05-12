@@ -11,26 +11,44 @@ export const homesRouter = createProtectedRouter()
             if(!ctx.session.user){
                 return;
             }
-            const homes = await ctx.prisma.occupies.findMany({
+            const homes = await ctx.prisma.home.findMany({
                 select: {
-                    home: {
-                        select: {
-                            id: true,
-                            name: true,
-                            image: true,
-                            address: true,
-                        }
-                    }
+                    id: true,
+                    name: true,
+                    image: true,
+                    address: true,
                 },
                 where: {
-                    userId: ctx.session.user.id,
+                    Occupies: {
+                       some: {
+                            userId: ctx.session.user.id,
+                       }
+                    }
                 },
             });
+            
+            const homePromises = [];
             for(const home of homes){
-                if(home.home.image)
-                    home.home.image = await getSignedImage(home.home.image);
+                if(!home.image) continue;
+                homePromises.push(new Promise<{
+                    id: string,
+                    image: string,
+                }>((resolve, reject) => {
+                   getSignedImage(home.image!).then(
+                    image => resolve({
+                        id: home.id,
+                        image,
+                    })
+                   ).catch(reject); 
+                }));
             }
-            return homes.map((home) => home.home);
+            const homeImages = await Promise.all(homePromises);
+            for(const homeImage of homeImages){
+                const home = homes.find(home => home.id === homeImage.id);
+                if(!home) continue;
+                home.image = homeImage.image;
+            }
+            return homes;
         },
     })
     .mutation("createHome", {
@@ -105,6 +123,11 @@ export const homesRouter = createProtectedRouter()
                     homeId: input.id,
                 }
             }); 
+            await ctx.prisma.permission.deleteMany({
+                where: {
+                    occupiesHomeId: input.id,
+                }
+            })
             return await ctx.prisma.home.delete({
                 where: {
                     id: input.id,

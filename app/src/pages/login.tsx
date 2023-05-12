@@ -4,10 +4,11 @@ import type { NextPage } from "next";
 import Link from "next/link";
 import Head from "next/head";
 import React, { useState } from "react";
-import { signIn, useSession, signOut } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
+import { useHomeContext } from "stores/HomeStore";
 
 const LoginPage: NextPage = () => {
-    const session = useSession();
+    const clearSelectedHome = useHomeContext((s) => s.clearSelectedHome);
     const [errorState, setError] = useState(false);
 
     const onLogin = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -20,6 +21,7 @@ const LoginPage: NextPage = () => {
         }).then(res => {
             setError(!res?.ok);
         })
+        clearSelectedHome();
     }
     return (<>
         <Head>
