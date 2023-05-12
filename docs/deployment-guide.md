@@ -105,6 +105,87 @@ Before continuing with Terraform, you must create google oauth credentials.
 4. Click view push commands
 5. Run each of the push commands
 
+### Extra steps
+
+1. Configure your domain to point to a nginx reverse proxy (host yourself)
+2. Setup SSL on Nginx reverse proxy
+3. Reverse proxy should redirect http, https of your domain to the elastic ip of your instance in AWS targetting port 3000
+
+Example nginx config
+
+```
+user nginx;
+worker_processes auto;
+error_log /var/log/nginx/error.log;
+pid /run/nginx.pid;
+
+# Load dynamic modules. See /usr/share/doc/nginx/README.dynamic.
+include /usr/share/nginx/modules/*.conf;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  /var/log/nginx/access.log  main;
+
+    sendfile            on;
+    tcp_nopush          on;
+    tcp_nodelay         on;
+    keepalive_timeout   65;
+    types_hash_max_size 4096;
+
+    include             /etc/nginx/mime.types;
+    default_type        application/octet-stream;
+
+    # Load modular configuration files from the /etc/nginx/conf.d directory.
+    # See http://nginx.org/en/docs/ngx_core_module.html#include
+    # for more information.
+    include /etc/nginx/conf.d/*.conf;
+
+server{
+    server_name roommatebudgethelper.tk;
+    location / {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    	proxy_buffering off;
+	proxy_buffer_size 16k;
+	proxy_busy_buffers_size 25k;
+	proxy_buffers 64 4k;
+	}
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/roommatebudgethelper.tk/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/roommatebudgethelper.tk/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+
+
+
+server{
+    if ($host = roommatebudgethelper.tk) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    listen 80;
+    server_name roommatebudgethelper.tk;
+    return 404; # managed by Certbot
+
+
+}}
+```
+
 ## Integrate with Github Actions
 
 1. Set the following secrets in Github Actions on the repository
@@ -117,7 +198,7 @@ COGNITO_USER_POOL = <from terraform output>
 CYPRESS_API_KEY = <from mailslurp - Read Dev Guide 'Setting up testing'>
 DATABASE_URL = <from terraform output>
 GOOGLE_CLIENT_ID = <from google setup>
-GOOGLE_CLIENT_SECRET = <from google setup>
+GOOGLE_CLIENT_SECRET = <from google setup>yum install certbot python3-certbot-nginx
 NEXTAUTH_SECRET = <from terraform output>
 NEXTAUTH_URL = <base url of domain e.x https://roommatebudgethelper.tk>
 S3_BUCKET_NAME = <from terraform output>
