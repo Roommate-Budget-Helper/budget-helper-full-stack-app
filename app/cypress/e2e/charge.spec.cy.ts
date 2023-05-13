@@ -23,7 +23,7 @@ describe('Charge Test', () => {
     const chargeCategory = generateUsername();
     const cost = "35";
     const date = new Date().toISOString().split("T")[0];
-    it("Charge tests", () => {
+    it("Create Users and Home", () => {
         cy.register(successUsername, successPassword);
         cy.visit("http://localhost:3000/login");
         cy.contains("Sign Up").click();
@@ -52,6 +52,8 @@ describe('Charge Test', () => {
         cy.signoutOfApplication();
         acceptsInviteIntoHome(successUsername2, successPassword, homeName);
         cy.signoutOfApplication();
+    });
+    it("Charges", () => {
         cy.login(successUsername, successPassword);
         cy.viewAHome(homeCheck, homeName, address);
         cy.visit("http://localhost:3000/billing");
@@ -59,42 +61,6 @@ describe('Charge Test', () => {
         cy.get("button[value='Send Charge']").click();
         cy.wait(300);
         cy.contains("Create Charge");
-
-        cy.get("input[name=amount]").type(cost);
-        cy.get("input[name=name]").type(chargeDescription);
-        cy.get("input[name=category]").type(chargeCategory);
-        cy.get("input[name=dueDate]").type(date);
-        cy.get("input[id=" + successUsername + "]").click();
-        cy.get("button[type=submit]").click();
-
-        cy.contains("Splitting $35");
-        cy.get("input[name=" + successUsername2 + "]").type("35");
-        cy.get("button[value='Send Charge']").click();
-        cy.wait(300);
-        cy.signoutOfApplication();
-        cy.login(successUsername2, successPassword);
-        cy.viewAHome(homeCheck, homeName, address);
-        cy.visit("http://localhost:3000/billing");
-        cy.wait(500).contains("Charger: ");
-        cy.contains("Amount Before Splitting: $");
-        cy.contains("Description: ");
-        cy.get("button[value='Send Payment']").click();
-        cy.wait(300);
-        cy.signoutOfApplication();
-        cy.login(successUsername, successPassword);
-        cy.viewAHome(homeCheck, homeName, address);
-        cy.visit("http://localhost:3000/billing");
-        cy.wait(500).contains("Date Paid:");
-        cy.contains("Amount Paid: $");
-        cy.get("button[value='Confirm Payment']").click();
-        cy.wait(500).contains("You have no charges pending approval.");
-        cy.viewAHome(homeCheck, homeName, address);
-        cy.visit("http://localhost:3000/history");
-        cy.wait(500).contains("Charge History");
-        cy.contains("you charged");
-        cy.contains("✅ Confirmed");
-        cy.contains("⭐ Total Amount: $");
-        cy.visit("http://localhost:3000/createcharge");
         cy.get("input[name=amount]").type(cost);
         cy.get("input[name=name]").type(chargeDescription);
         cy.get("input[name=category]").type(chargeCategory);
@@ -111,5 +77,44 @@ describe('Charge Test', () => {
         cy.get("input[name=category]").type(chargeCategory);
         cy.get("button[type=submit]").click();
         cy.contains("The bill amount must be greater than 0.01");
+        cy.reload();
+        cy.get("input[name=amount]").type(cost);
+        cy.get("input[name=name]").type(chargeDescription);
+        cy.get("input[name=category]").type(chargeCategory);
+        cy.get("input[name=dueDate]").type(date);
+        cy.get("input[id=" + successUsername + "]").click();
+        cy.get("button[type=submit]").click();
+
+        cy.contains("Splitting $35");
+        cy.get("input[name=" + successUsername2 + "]").type("35");
+        cy.get("button[value='Send Charge']").click();
+        cy.wait(300);
+        cy.signoutOfApplication();
+    });
+    it("Pay Charge", () => {
+        cy.login(successUsername2, successPassword);
+        cy.viewAHome(homeCheck, homeName, address);
+        cy.visit("http://localhost:3000/billing");
+        cy.wait(500).contains("Charger: ");
+        cy.contains("Amount Before Splitting: $");
+        cy.contains("Description: ");
+        cy.get("button[value='Send Payment']").click();
+        cy.wait(300);
+        cy.signoutOfApplication();
+    });
+    it("Verify Charge", () => {
+        cy.login(successUsername, successPassword);
+        cy.viewAHome(homeCheck, homeName, address);
+        cy.visit("http://localhost:3000/billing");
+        cy.wait(500).contains("Date Paid:");
+        cy.contains("Amount Paid: $");
+        cy.get("button[value='Confirm Payment']").click();
+        cy.wait(500).contains("You have no charges pending approval.");
+        cy.viewAHome(homeCheck, homeName, address);
+        cy.visit("http://localhost:3000/history");
+        cy.wait(500).contains("Charge History");
+        cy.contains("you charged");
+        cy.contains("✅ Confirmed");
+        cy.contains("⭐ Total Amount: $");
     })
 });
