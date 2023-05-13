@@ -21,9 +21,9 @@ const acceptsInviteIntoHome = (userName, password, homeName) => {
 describe('Charge Test', () => {
 
     before(() => {
-        cy.visit('http://localhost:3000/login');
         cy.register(successUsername, successPassword);
         // Login second user and connect their email invite!!
+        cy.signoutOfApplication();
         cy.visit('http://localhost:3000/login');
         cy.contains("Sign Up").click();
         let emailAddress: string;

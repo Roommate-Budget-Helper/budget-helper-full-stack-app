@@ -7,6 +7,7 @@ describe("User Tests", () => {
     before(() => {
         cy.visit("http://localhost:3000/register");
         cy.register(successUsername, successPassword);
+        cy.signoutOfApplication();
     });
 
     beforeEach(() => {
