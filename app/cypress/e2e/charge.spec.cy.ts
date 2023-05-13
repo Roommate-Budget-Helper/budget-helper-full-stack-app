@@ -57,6 +57,7 @@ describe('Charge Test', () => {
         cy.visit("http://localhost:3000/billing");
         cy.contains("Billing");
         cy.get("button[value='Send Charge']").click();
+        cy.wait(300);
         cy.contains("Create Charge");
 
         cy.get("input[name=amount]").type(cost);
