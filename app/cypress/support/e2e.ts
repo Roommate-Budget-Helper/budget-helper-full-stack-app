@@ -37,10 +37,6 @@ Cypress.Commands.add("deleteEmail", (emailId: string) => {
        return mailslurp.deleteEmail(emailId);
    });
 
-Cypress.on('uncaught:exception', (err, runnable) => {
-    return false
-})
-
 Cypress.Commands.add("login", (username: string, password: string) => {
     cy.visit('http://localhost:3000/login');
     cy.get('input[name=username]').type(username);
