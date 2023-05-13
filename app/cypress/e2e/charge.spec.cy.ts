@@ -43,7 +43,8 @@ describe('Charge Test', () => {
             assert.strictEqual(/Your (confirmation|verification) code is/.test(email.body), true);
             const code = email.body.match(/\d+/)[0];
             cy.get('input[name=verification-code]').type(`${code}{enter}`)
-            cy.wait(600);
+            cy.get('#createHome');
+            cy.signoutOfApplication();
             cy.login(successUsername, successPassword);
             cy.createAHome(image, homeName, address);
             cy.inviteARoommate(homeCheck, homeName, address, emailAddress);
@@ -59,7 +60,6 @@ describe('Charge Test', () => {
         cy.visit("http://localhost:3000/billing");
         cy.contains("Billing");
         cy.get("button[value='Send Charge']").click();
-        cy.wait(300);
         cy.contains("Create Charge");
         cy.get("input[name=amount]").type(cost);
         cy.get("input[name=name]").type(chargeDescription);

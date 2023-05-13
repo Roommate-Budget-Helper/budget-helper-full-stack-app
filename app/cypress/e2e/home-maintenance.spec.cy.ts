@@ -18,7 +18,7 @@ describe("Home Maintenance Test", () => {
     // Register once, Login each test
     it("Home Maintenance", () => {
         cy.register(usernameForTest, password);
-        cy.login(usernameForTest, password);
+        cy.get("#createHome")
         cy.createAHome(image, homeName, address);
         cy.viewAHome(homeCheck, homeName, address);
         cy.contains(homeName);
