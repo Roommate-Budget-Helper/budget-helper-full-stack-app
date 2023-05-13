@@ -50,28 +50,8 @@ describe('Charge Test', () => {
         cy.signoutOfApplication();
     });
 
-    afterEach(() => {
-        cy.signoutOfApplication();
-    })
-
     it("User accepts invite to home", () => {
         acceptsInviteIntoHome(successUsername2, successPassword, homeName);
-    })
-
-    it("User can see charges page", () => {
-        cy.login(successUsername, successPassword);
-        cy.viewAHome(homeCheck, homeName, address);
-        cy.visit("http://localhost:3000/billing");
-        cy.contains("Billing");
-    })
-
-    it("User selects create charge", () => {
-        cy.login(successUsername, successPassword);
-        cy.viewAHome(homeCheck, homeName, address);
-        cy.visit("http://localhost:3000/billing");
-        cy.get("button[value='Send Charge']").click();
-        cy.wait(300);
-        cy.contains("Create Charge");
     })
 
     const chargeDescription = generateUsername();
@@ -79,10 +59,14 @@ describe('Charge Test', () => {
     const cost = "35";
     const date = new Date().toISOString().split("T")[0];
 
-    it("User makes a charge to one person", () => {
+    it("User can see charges page", () => {
         cy.login(successUsername, successPassword);
         cy.viewAHome(homeCheck, homeName, address);
-        cy.visit("http://localhost:3000/createcharge");
+        cy.visit("http://localhost:3000/billing");
+        cy.contains("Billing");
+        cy.get("button[value='Send Charge']").click();
+        cy.contains("Create Charge");
+
         cy.get("input[name=amount]").type(cost);
         cy.get("input[name=name]").type(chargeDescription);
         cy.get("input[name=category]").type(chargeCategory);
@@ -90,9 +74,10 @@ describe('Charge Test', () => {
         cy.get("input[id=" + successUsername + "]").click();
         cy.get("button[type=submit]").click();
 
-        cy.wait(500).contains("Splitting $35");
+        cy.contains("Splitting $35");
         cy.get("input[name=" + successUsername2 + "]").type("35");
         cy.get("button[value='Send Charge']").click();
+        cy.wait(300);
         cy.signoutOfApplication();
         cy.login(successUsername2, successPassword);
         cy.viewAHome(homeCheck, homeName, address);
@@ -100,6 +85,7 @@ describe('Charge Test', () => {
         cy.wait(500).contains("Charger: ");
         cy.contains("Amount Before Splitting: $");
         cy.contains("Description: ");
+        cy.signoutOfApplication();
     })
 
     it("User can send a payment", () => {
@@ -114,15 +100,12 @@ describe('Charge Test', () => {
         cy.visit("http://localhost:3000/billing");
         cy.wait(500).contains("Date Paid:");
         cy.contains("Amount Paid: $");
-    })
-
-    it("User can confirm payment", () => {
-        cy.login(successUsername, successPassword);
         cy.viewAHome(homeCheck, homeName, address);
         cy.visit("http://localhost:3000/billing");
         cy.wait(500).contains("Date Paid:");
         cy.get("button[value='Confirm Payment']").click();
         cy.wait(500).contains("You have no charges pending approval.");
+        cy.signoutOfApplication();
     })
 
     it("User can see payment history", () => {
@@ -133,33 +116,18 @@ describe('Charge Test', () => {
         cy.contains("you charged");
         cy.contains("✅ Confirmed");
         cy.contains("⭐ Total Amount: $");
-    })
-
-    it("User cannot select no people to pay", () => {
-        cy.login(successUsername, successPassword);
-        cy.viewAHome(homeCheck, homeName, address);
         cy.visit("http://localhost:3000/createcharge");
         cy.get("input[name=amount]").type(cost);
         cy.get("input[name=name]").type(chargeDescription);
         cy.get("input[name=category]").type(chargeCategory);
         cy.get("button[type=submit]").click();
         cy.contains("You must have exactly one occupant as payer for a charge.");
-    })
-
-    it("User must put a charge description", () => {
-        cy.login(successUsername, successPassword);
-        cy.viewAHome(homeCheck, homeName, address);
-        cy.visit("http://localhost:3000/createcharge");
+        cy.reload()
         cy.get("input[name=amount]").type(cost);
         cy.get("input[name=category]").type(chargeCategory);
         cy.get("button[type=submit]").click();
         cy.contains("The charge must have a name, it cannot be empty.");
-    })
-
-    it("Bill cannot be less than 1 cent", () => {
-        cy.login(successUsername, successPassword);
-        cy.viewAHome(homeCheck, homeName, address);
-        cy.visit("http://localhost:3000/createcharge");
+        cy.reload();
         cy.get("input[name=amount]").type("0");
         cy.get("input[name=name]").type(chargeDescription);
         cy.get("input[name=category]").type(chargeCategory);
