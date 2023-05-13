@@ -23,7 +23,6 @@ describe('Charge Test', () => {
     before(() => {
         cy.register(successUsername, successPassword);
         // Login second user and connect their email invite!!
-        cy.signoutOfApplication();
         cy.visit('http://localhost:3000/login');
         cy.contains("Sign Up").click();
         let emailAddress: string;
@@ -71,6 +70,7 @@ describe('Charge Test', () => {
         cy.viewAHome(homeCheck, homeName, address);
         cy.visit("http://localhost:3000/billing");
         cy.get("button[value='Send Charge']").click();
+        cy.wait(300);
         cy.contains("Create Charge");
     })
 

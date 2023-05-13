@@ -6,15 +6,17 @@ describe("Home CRUD Test", () => {
 
     // Register once, Login each test
     before(() => {
-        cy.visit("http://localhost:3000/login");
         cy.register(usernameForTest, password);
     });
 
     beforeEach(() => {
-        cy.visit("http://localhost:3000/login");
         cy.login(usernameForTest, password);
         cy.visit("http://localhost:3000/homes");
     });
+
+    afterEach(() => {
+        cy.signoutOfApplication();
+    })
 
     // Test Home Page
 

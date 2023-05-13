@@ -11,14 +11,13 @@ describe("Home Maintenance Test", () => {
 
     // Register once, Login each test
     before(() => {
-        cy.visit("http://localhost:3000/login");
         cy.register(usernameForTest, password);
+        cy.login(usernameForTest, password);
         cy.createAHome(image, homeName, address);
         cy.signoutOfApplication();
     });
 
     beforeEach(() => {
-        cy.visit("http://localhost:3000/");
         cy.login(usernameForTest, password);
         cy.visit("http://localhost:3000/homes");
     });
@@ -75,6 +74,7 @@ describe("Home Maintenance Test", () => {
         cy.viewAHome(homeCheck, homeName, address);
         cy.get("div > #drop-down").click();
         cy.get("div > #edit").click();
+        cy.wait(300);
         cy.get("input[name=name]").clear();
         cy.get("input[name=address]").clear();
         cy.get("input[name=image]").attachFile(image);
