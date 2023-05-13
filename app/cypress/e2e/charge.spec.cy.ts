@@ -42,6 +42,7 @@ describe('Charge Test', () => {
             const code = email.body.match(/\d+/)[0];
             cy.get('input[name=verification-code]').type(`${code}{enter}`)
             cy.wait(600);
+            cy.signoutOfApplication();
             cy.login(successUsername, successPassword);
             cy.createAHome(image, homeName, address);
             cy.inviteARoommate(homeCheck, homeName, address, emailAddress);
