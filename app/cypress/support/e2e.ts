@@ -76,7 +76,12 @@ Cypress.Commands.add("inviteARoommate", (homeCheck: string, homeName: string, ad
 Cypress.Commands.add("signoutOfApplication", () => {
     cy.visit("http://localhost:3000/user");
     cy.get("button[value='Sign Out']").click();
-    cy.wait(500).location("pathname").should("eq", "/login");
+    cy.wait(500);
+    cy.visit("http://localhost:3000/login");
+    cy.wait(500);
+    cy.window().then(win => {
+        expect(win.location.pathname).to.equal("/login")
+    })
 })
 
 Cypress.Commands.add("register", (username: string, password: string) => {

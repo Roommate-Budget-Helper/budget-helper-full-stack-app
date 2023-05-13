@@ -16,6 +16,7 @@ const acceptsInviteIntoHome = (userName, password, homeName) => {
     cy.get("button[value=Accept]").click();
     cy.visit("http://localhost:3000/homes");
     cy.wait(500).contains(homeName);
+    cy.signoutOfApplication();
 };
 
 describe('Charge Test', () => {
@@ -67,7 +68,6 @@ describe('Charge Test', () => {
     })
 
     it("User selects create charge", () => {
-        cy.login(successUsername, successPassword);
         cy.viewAHome(homeCheck, homeName, address);
         cy.visit("http://localhost:3000/billing");
         cy.get("button[value='Send Charge']").click();
@@ -80,7 +80,6 @@ describe('Charge Test', () => {
     const date = new Date().toISOString().split("T")[0];
 
     it("User makes a charge to one person", () => {
-        cy.login(successUsername, successPassword);
         cy.viewAHome(homeCheck, homeName, address);
         cy.visit("http://localhost:3000/createcharge");
         cy.get("input[name=amount]").type(cost);
@@ -114,6 +113,7 @@ describe('Charge Test', () => {
         cy.visit("http://localhost:3000/billing");
         cy.wait(500).contains("Date Paid:");
         cy.contains("Amount Paid: $");
+        cy.signoutOfApplication();
     })
 
     it("User can confirm payment", () => {

@@ -13,15 +13,19 @@ describe("Home Maintenance Test", () => {
     before(() => {
         cy.visit("http://localhost:3000/login");
         cy.register(usernameForTest, password);
-        cy.visit("http://localhost:3000/login");
         cy.login(usernameForTest, password);
         cy.createAHome(image, homeName, address);
+        cy.signoutOfApplication();
     });
 
     beforeEach(() => {
-        cy.visit("http://localhost:3000/login");
+        cy.visit("http://localhost:3000/");
         cy.login(usernameForTest, password);
         cy.visit("http://localhost:3000/homes");
+    });
+
+    afterEach(() => {
+        cy.signoutOfApplication();
     });
 
     // Test Home Page
