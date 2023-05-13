@@ -10,9 +10,12 @@ describe("User Tests", () => {
     });
 
     beforeEach(() => {
-        cy.visit("http://localhost:3000/login");
         cy.login(successUsername, successPassword);
         cy.visit("http://localhost:3000/user");
+    });
+
+    afterEach(() => {
+        cy.signoutOfApplication();
     });
 
     it("Title exists", () => {
@@ -65,10 +68,5 @@ describe("User Tests", () => {
         );
         cy.get("button[value=Upload]").click();
         cy.contains("The image file is too large, it must be less than 1MB.");
-    });
-
-    it("Sign out", () => {
-        cy.signoutOfApplication();
-        // TODO: Verify that it redirects pages
     });
 });
