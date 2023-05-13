@@ -23,6 +23,10 @@ const CreationPage: NextPage = () => {
             setError(error.message);
         },
         onSuccess: async (home) => {
+            if(home === "bad") {
+                setError("You already have a home with these same specs!");
+                return;
+            }
             setSelectedHome(home.id);
             await refetchHomes();
             router.push("/homes");
@@ -41,6 +45,10 @@ const CreationPage: NextPage = () => {
         }
         if(addressVal.trim().length < 1) {
             setError("The home must have an address, it cannot be empty.");
+            return;
+        }
+        if(nameVal.trim().length > 32) {
+            setError("The home name must be short, it cannot be greater than 32 characters.");
             return;
         }
 
@@ -82,7 +90,6 @@ const CreationPage: NextPage = () => {
             name: nameVal,
             address: addressVal,
         });
-        setError(null);
     };
 
     return (

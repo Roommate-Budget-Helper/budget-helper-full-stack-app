@@ -17,6 +17,7 @@ const CreateChargePage: NextPage = () => {
     const [billName, setBillName] = useState<string>("");
     const [billAmount, setBillAmount] = useState<number>(0);
     const [billId, setBillId] = useState<string>("");
+    const [buyersName, setBuyersName] = useState<string>("");
     const [dueDate, setDueDate] = useState<string>("");
     const [category, setCategory] = useState<string>("");
 
@@ -71,10 +72,11 @@ const CreateChargePage: NextPage = () => {
         // check which home occupants to charge
         let checkedId = 0;
         occupants.data?.forEach((occupant) => {
-            if (form.elements[occupant.user.id]) {
+            if (form.elements[occupant.user.name]) {
                 const isOccupantSelected = form.elements[occupant.user.id].checked;
                 if (isOccupantSelected && checkedId === 0) {
                     setBillId(occupant.user.id);
+                    setBuyersName(occupant.user.name);
                     checkedId++;
                 }else if(isOccupantSelected){
                   setError("You can only select one occupant to have paid the bill");
@@ -99,8 +101,8 @@ const CreateChargePage: NextPage = () => {
         // check that the sum of the split amounts is equal to the total amount
         let sum = 0;
         occupants.data?.forEach((occupant) => {
-            if (form.elements[occupant.user.id]) {
-               sum += Number(form.elements[occupant.user.id].value);
+            if (form.elements[occupant.user.name]) {
+               sum += Number(form.elements[occupant.user.name].value);
             }
         });
 
@@ -111,12 +113,12 @@ const CreateChargePage: NextPage = () => {
 
         const formattedDueDate = new Date(dueDate);
         occupants.data?.forEach((occupant) => {
-            if (form.elements[occupant.user.id]) {
-                const amountDue = form.elements[occupant.user.id].value;
+            if (form.elements[occupant.user.name]) {
+                const amountDue = form.elements[occupant.user.name].value;
                 // Don't send a charge to the person who paid the bill
                 if(selectedHome){
                   // TODO: If this fails on one of them, then it shouldn't send any of them most likely
-                  if(occupant.user.id !== billId){
+                  if(occupant.user.name !== buyersName){
                     sendCharge.mutateAsync({
                       amountBeforeSplit: String(billAmount),
                       chargerId: billId,
@@ -213,7 +215,7 @@ const CreateChargePage: NextPage = () => {
                                                   {occupant.user.name}
                                               </div>
                                               <MoneyFieldInput
-                                                  name={occupant.user.id}
+                                                  name={occupant.user.name}
                                                   placeholder="0.00"
                                                   max={String(billAmount)}
                                               />
@@ -287,6 +289,7 @@ const CreateChargePage: NextPage = () => {
                                         className="bg-slate-600 w-88 my-10 p-3 rounded-xl text-dorian text-base"
                                     >
                                         <input
+                                            id={occupant.user.name}
                                             type="checkbox"
                                             name={occupant.user.id}
                                             className="mr-4"

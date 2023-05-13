@@ -1,6 +1,6 @@
 import { createProtectedRouter } from "./context";
 import { z } from "zod";
-import { canUserViewHome } from "../db/HomeService";
+import { canUserViewHome, homeAlreadyExists } from "../db/HomeService";
 import { getSignedImage } from "./image-upload";
 import { hasPermission } from "../db/UserService";
 import { Permission } from "../../types/permissions";
@@ -60,6 +60,9 @@ export const homesRouter = createProtectedRouter()
         async resolve({ ctx, input }) {
 
             //Creates image key here so the image can bey placed in the S3 Bucket and referenced in the Prisma Database
+            if(await homeAlreadyExists(input.name, input.address, ctx.prisma)) {
+                return "bad";
+            }
 
             //Puts home info in prisma database
             const home =  await ctx.prisma.home.create({
@@ -98,6 +101,9 @@ export const homesRouter = createProtectedRouter()
             if(!(await hasPermission(ctx.session.user.id, input.id, Permission.Edit, ctx.prisma)) ||
                !(await canUserViewHome(ctx.session.user.id,input.id, ctx.prisma)))
                 return;
+            if(await homeAlreadyExists(input.name, input.address, ctx.prisma)) {
+                return "bad";
+            }
             return await ctx.prisma.home.update({
                 where: {
                     id: input.id,

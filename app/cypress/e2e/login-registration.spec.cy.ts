@@ -6,14 +6,6 @@ let successInboxId: string;
 let successVerificationCode: string;
 let successEmailId: string;
 
-export const loginUser = (username, password) => {
-  cy.visit('http://localhost:3000/login');
-  cy.get('input[name=username]').type(username);
-  cy.get('input[name=password]').type(password);
-  cy.get('button[type=submit]').click();
-  cy.url().should('contain', '/homes');
-};
-
 export const registerUser = (username, password) => {
   cy.visit('http://localhost:3000/login');
   cy.contains("Sign Up").click();
@@ -125,7 +117,7 @@ describe('Login Test', () => {
 
   // Success flow for login
   it('Can log in with registered user', () => {
-    loginUser(successUsername, successPassword)
+    cy.login(successUsername, successPassword);
   });
 
   it('Can throw error on not existing username', () => {
@@ -175,7 +167,7 @@ describe('Forgot Password test', () => {
   });
 
   it('Can login with new password', () => {
-    loginUser(successUsername, newPassword);
+    cy.login(successUsername, newPassword);
   });
   
 

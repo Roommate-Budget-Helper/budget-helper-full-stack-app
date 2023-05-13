@@ -38,3 +38,14 @@ export const moreThanOneOwner = async (userId:string, homeId: string, db: Prisma
     if(homeOwners[0]?.occupiesUserId !== userId) return true;
     return false;
 }
+
+export const homeAlreadyExists = async (homeName:string, homeAddress:string, db: PrismaClient) => {
+    const home = await db.home.findFirst({
+        where: {
+            name: homeName,
+            address: homeAddress
+        }
+    })
+    if(home) return true;
+    return false;
+}

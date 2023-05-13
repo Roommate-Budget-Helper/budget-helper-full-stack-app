@@ -23,5 +23,5 @@
         }
     },
     "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.cjs", "**/*.mjs", "cypress/support/e2e.ts"],
-    "exclude": ["node_modules"]
+    "exclude": ["node_modules", "cypress"]
 }
