@@ -48,6 +48,7 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost
+      NEXTAUTH_URL: http://localhost:3000
     defaults:
       run:
         working-directory: ./app
