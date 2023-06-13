@@ -13,8 +13,8 @@
     },
     "dependencies": {
         "@ant-design/icons": "^5.0.0",
-        "@aws-sdk/client-s3": "^3.266.1",
-        "@aws-sdk/s3-presigned-post": "^3.266.1",
+        "@aws-sdk/client-s3": "^3.350.0",
+        "@aws-sdk/s3-presigned-post": "^3.350.0",
         "@mdi/js": "^7.1.96",
         "@mdi/react": "^1.6.1",
         "@next-auth/prisma-adapter": "^1.0.4",
